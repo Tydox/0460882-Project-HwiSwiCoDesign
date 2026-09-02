@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+
+
+echo "================================================="
+echo "Configuring kernel permissions for clean profiling..."
+echo "================================================="
+sudo sysctl -w kernel.kptr_restrict=0
+sudo sysctl -w kernel.perf_event_paranoid=-1
+echo "Kernel configuration successful!"
+echo ""
+
+
 if [[ $# -lt 2 || $# -gt 3 ]]; then
   printf 'Usage: %s <benchmark> <original|optimized> [quick|full]\n' "$0" >&2
   exit 2
@@ -90,6 +101,8 @@ printf 'Timing %s (%s, %s mode)...\n' "$BENCHMARK" "$IMPLEMENTATION" "$MODE"
 printf 'Profiling %s (%s) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION"
 perf record \
   -F 999 \
+  -e cpu-clock \
+  -g \
   --call-graph dwarf \
   --output "$PERF_DATA" \
   -- \
