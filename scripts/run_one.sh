@@ -98,8 +98,14 @@ fi
 printf 'Timing %s (%s, %s mode)...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
 "$PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}" --output "$TIMING_JSON"
 
+
+echo "================================================="
+echo ""
+echo "================================================="
+
 printf 'Profiling one representative %s value (%s) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION"
-perf record -F 999 -e cpu-clock -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" --debug-single-value
+#perf record -F 999 -e cpu-clock -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" --debug-single-value
+perf record -e cycles:u -c 2400000 -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" --debug-single-value
 
 printf 'Creating perf report...\n'
 perf report --stdio --input "$PERF_DATA" > "$PERF_REPORT"
