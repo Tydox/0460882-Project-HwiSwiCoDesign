@@ -1,0 +1,10 @@
+benchmark=raytrace
+implementation=optimized
+completed_at=2026-09-03T14:40:25+00:00
+source_sha256=88ef4d9060d8e8f6ce40f376477aaf89cc808fa44813225a3071a05a1467f017
+git_commit=ef492d403d1443b993b70e4977bcf3832010d6c2
+git_worktree=dirty
+run_mode=fast
+raytrace_image=raytrace.ppm
+raytrace_width=200
+raytrace_height=200
