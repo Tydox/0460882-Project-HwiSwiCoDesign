@@ -104,7 +104,7 @@ echo ""
 echo "================================================="
 
 printf 'Profiling one representative %s value (%s) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION"
-perf record -F 999 -e cpu-clock -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" --debug-single-value
+perf record -F 999 -e cpu-clock -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" #--debug-single-value
 #perf record -e cycles:u -c 2400000 -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" --debug-single-value
 
 
