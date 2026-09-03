@@ -8,30 +8,30 @@ sudo sysctl -w kernel.kptr_restrict=0
 sudo sysctl -w kernel.perf_event_paranoid=-1
 echo "Kernel configuration successful!"
 echo ""
-
-
-
-
 if [[ $# -lt 2 || $# -gt 3 ]]; then
-  printf 'Usage: %s <benchmark> <original|optimized> [quick|full]\n' "$0" >&2
+  printf 'Usage: %s <benchmark> <original|optimized> [--fast]\n' "$0" >&2
   exit 2
 fi
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BENCHMARK="$1"
 IMPLEMENTATION="$2"
-MODE="${3:-quick}"
+RUN_MODE="standard"
+RUN_OPTIONS=()
 
 case "$IMPLEMENTATION" in
   original|optimized) ;;
   *) printf 'Implementation must be original or optimized.\n' >&2; exit 2 ;;
 esac
 
-case "$MODE" in
-  quick) TIMING_MODE=(--fast) ;;
-  full) TIMING_MODE=(--rigorous) ;;
-  *) printf 'Mode must be quick or full.\n' >&2; exit 2 ;;
-esac
+if [[ $# -eq 3 ]]; then
+  if [[ "$3" != "--fast" ]]; then
+    printf 'Optional third argument must be --fast.\n' >&2
+    exit 2
+  fi
+  RUN_MODE="fast"
+  RUN_OPTIONS=(--fast)
+fi
 
 MANIFEST="$PROJECT_DIR/suites/$IMPLEMENTATION/MANIFEST"
 SOURCE="$PROJECT_DIR/suites/$IMPLEMENTATION/bm_$BENCHMARK/run_benchmark.py"
@@ -88,49 +88,30 @@ else
   GIT_WORKTREE_STATE="not-a-git-repository"
 fi
 
-rm -f "$TIMING_JSON" "$PERF_DATA" "$PERF_REPORT" \
-  "$PERF_SCRIPT" "$FOLDED" "$FLAMEGRAPH" "$RUN_METADATA"
+rm -f "$TIMING_JSON" "$PERF_DATA" "$PERF_REPORT" "$PERF_SCRIPT" "$FOLDED" "$FLAMEGRAPH" "$RUN_METADATA"
 
 if [[ "$BENCHMARK" == "raytrace" ]]; then
   RAYTRACE_IMAGE="$RESULT_DIR/raytrace.ppm"
   rm -f "$RAYTRACE_IMAGE"
 fi
 
-printf 'Timing %s (%s, %s mode)...\n' "$BENCHMARK" "$IMPLEMENTATION" "$MODE"
-"$PYTHON" -m pyperformance run \
-  --manifest "$MANIFEST" \
-  --benchmarks "$BENCHMARK" \
-  "${TIMING_MODE[@]}" \
-  --output "$TIMING_JSON"
+printf 'Timing %s (%s, %s mode)...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
+"$PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}" --output "$TIMING_JSON"
 
 printf 'Profiling %s (%s) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION"
-perf record \
-  -F 999 \
-  -e cpu-clock \
-  -g \
-  --call-graph dwarf \
-  --output "$PERF_DATA" \
-  -- \
-  "$DEBUG_PYTHON" -m pyperformance run \
-    --manifest "$MANIFEST" \
-    --benchmarks "$BENCHMARK" \
-    --fast
+perf record -F 999 -e cpu-clock -g --call-graph dwarf --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}"
 
 perf report --stdio --input "$PERF_DATA" > "$PERF_REPORT"
 perf script --input "$PERF_DATA" > "$PERF_SCRIPT"
 "$FLAMEGRAPH_DIR/stackcollapse-perf.pl" "$PERF_SCRIPT" > "$FOLDED"
-"$FLAMEGRAPH_DIR/flamegraph.pl" \
-  --title "$BENCHMARK - $IMPLEMENTATION" \
-  "$FOLDED" > "$FLAMEGRAPH"
+"$FLAMEGRAPH_DIR/flamegraph.pl" --title "$BENCHMARK - $IMPLEMENTATION" "$FOLDED" > "$FLAMEGRAPH"
 
 # Raytrace already supports --filename. Render one representative image in a
 # separate invocation so file output is not included in the measured timing or
 # in the perf profile.
 if [[ "$BENCHMARK" == "raytrace" ]]; then
   printf 'Saving Raytrace image: %s\n' "$RAYTRACE_IMAGE"
-  "$PYTHON" "$SOURCE" \
-    --debug-single-value \
-    --filename "$RAYTRACE_IMAGE"
+  "$PYTHON" "$SOURCE" --debug-single-value --filename "$RAYTRACE_IMAGE"
 fi
 
 {
