@@ -98,12 +98,20 @@ fi
 printf 'Timing %s (%s, %s mode)...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
 "$PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}" --output "$TIMING_JSON"
 
-printf 'Profiling %s (%s) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION"
-perf record -F 999 -e cpu-clock -g --call-graph dwarf --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}"
+printf 'Profiling one representative %s value (%s) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION"
+perf record -F 999 -e cpu-clock -g --call-graph dwarf --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" --debug-single-value
 
 perf report --stdio --input "$PERF_DATA" > "$PERF_REPORT"
+if ! grep -q '%' "$PERF_REPORT"; then
+  printf 'perf report did not produce any sample rows: %s\n' "$PERF_REPORT" >&2
+  exit 1
+fi
 perf script --input "$PERF_DATA" > "$PERF_SCRIPT"
 "$FLAMEGRAPH_DIR/stackcollapse-perf.pl" "$PERF_SCRIPT" > "$FOLDED"
+if [[ ! -s "$FOLDED" ]]; then
+  printf 'No stack samples were produced: %s\n' "$FOLDED" >&2
+  exit 1
+fi
 "$FLAMEGRAPH_DIR/flamegraph.pl" --title "$BENCHMARK - $IMPLEMENTATION" "$FOLDED" > "$FLAMEGRAPH"
 
 # Raytrace already supports --filename. Render one representative image in a
