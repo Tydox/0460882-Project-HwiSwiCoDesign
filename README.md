@@ -62,8 +62,8 @@ names:
 ## 3. Confirm the untouched pipeline quickly
 
 ```bash
-./scripts/run_one.sh raytrace original quick
-./scripts/run_one.sh raytrace optimized quick
+./scripts/run_one.sh raytrace original --fast
+./scripts/run_one.sh raytrace optimized --fast
 ./scripts/compare.sh raytrace
 ```
 
@@ -98,16 +98,16 @@ Run the baseline before changing the optimized source, then run the optimized
 version:
 
 ```bash
-./scripts/run_one.sh raytrace original full
-./scripts/run_one.sh raytrace optimized full
+./scripts/run_one.sh raytrace original
+./scripts/run_one.sh raytrace optimized
 ./scripts/compare.sh raytrace
 ```
 
 Repeat the same three commands for the second benchmark.
 
-`quick` uses a short timing run and a short profiling run for pipeline testing.
-`full` uses rigorous timing. Profiling intentionally remains shorter because a
-flame graph needs representative samples, not a second statistical timing run.
+Passing `--fast` uses pyperformance's short run mode for pipeline testing.
+Omitting it uses pyperformance's standard run mode. The selected mode applies
+to both the timing and profiling invocations.
 
 ## Outputs
 
