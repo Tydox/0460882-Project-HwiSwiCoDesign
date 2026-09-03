@@ -105,9 +105,33 @@ version:
 
 Repeat the same three commands for the second benchmark.
 
-Passing `--fast` uses pyperformance's short run mode for pipeline testing.
-Omitting it uses pyperformance's standard run mode. The selected mode applies
-to both the timing and profiling invocations.
+Choose the execution mode on each invocation:
+
+```bash
+# Regular (default)
+./scripts/run_one.sh raytrace optimized
+
+# Fast
+./scripts/run_one.sh raytrace optimized --fast
+
+# One diagnostic value
+./scripts/run_one.sh raytrace optimized --debug-single-value
+```
+
+`--fast` uses pyperformance's short timing mode for pipeline testing.
+`--debug-single-value` computes one value for the shortest diagnostic run. The
+selected mode applies to timing and profiling; do not pass both mode flags.
+
+Raytrace defaults to a 100x100 workload and image. Override either dimension
+without editing the benchmark source:
+
+```bash
+./scripts/run_one.sh raytrace optimized --fast --width 200 --height 150
+```
+
+`--width` and `--height` accept positive integers only and are rejected for
+benchmarks other than raytrace. Use the same dimensions for original and
+optimized runs so their timing results remain comparable.
 
 ## Outputs
 
