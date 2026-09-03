@@ -1,38 +1,60 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "================================================="
-echo "Configuring kernel permissions for clean profiling..."
-echo "================================================="
-sudo sysctl -w kernel.kptr_restrict=0
-sudo sysctl -w kernel.perf_event_paranoid=-1
-echo "Kernel configuration successful!"
-echo ""
-if [[ $# -lt 2 || $# -gt 3 ]]; then
-  printf 'Usage: %s <benchmark> <original|optimized> [--fast]\n' "$0" >&2
+if [[ $# -lt 2 ]]; then
+  printf 'Usage: %s <benchmark> <original|optimized> [--fast|--debug-single-value] [--width PIXELS] [--height PIXELS]\n' "$0" >&2
   exit 2
 fi
 
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BENCHMARK="$1"
 IMPLEMENTATION="$2"
-RUN_MODE="standard"
+shift 2
+RUN_MODE="regular"
 RUN_OPTIONS=()
+BENCHMARK_OPTIONS=()
+RAYTRACE_WIDTH=100
+RAYTRACE_HEIGHT=100
 
 case "$IMPLEMENTATION" in
   original|optimized) ;;
   *) printf 'Implementation must be original or optimized.\n' >&2; exit 2 ;;
 esac
 
-if [[ $# -eq 3 ]]; then
-  if [[ "$3" != "--fast" ]]; then
-    printf 'Optional third argument must be --fast.\n' >&2
-    exit 2
-  fi
-  RUN_MODE="fast"
-  RUN_OPTIONS=(--fast)
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --fast|--debug-single-value)
+      if [[ ${#RUN_OPTIONS[@]} -ne 0 ]]; then
+        printf 'Choose only one mode: --fast or --debug-single-value.\n' >&2
+        exit 2
+      fi
+      RUN_OPTIONS=("$1")
+      if [[ "$1" == "--fast" ]]; then RUN_MODE="fast"; else RUN_MODE="debug-single-value"; fi
+      shift
+      ;;
+    --width|--height)
+      if [[ "$BENCHMARK" != "raytrace" ]]; then
+        printf '%s is supported only for the raytrace benchmark.\n' "$1" >&2
+        exit 2
+      fi
+      if [[ $# -lt 2 || ! "$2" =~ ^[1-9][0-9]*$ ]]; then
+        printf '%s requires a positive integer.\n' "$1" >&2
+        exit 2
+      fi
+      if [[ "$1" == "--width" ]]; then RAYTRACE_WIDTH="$2"; else RAYTRACE_HEIGHT="$2"; fi
+      shift 2
+      ;;
+    *)
+      printf 'Unknown option: %s\n' "$1" >&2
+      exit 2
+      ;;
+  esac
+done
+
+if [[ "$BENCHMARK" == "raytrace" ]]; then
+  BENCHMARK_OPTIONS=(--width "$RAYTRACE_WIDTH" --height "$RAYTRACE_HEIGHT")
 fi
 
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MANIFEST="$PROJECT_DIR/suites/$IMPLEMENTATION/MANIFEST"
 SOURCE="$PROJECT_DIR/suites/$IMPLEMENTATION/bm_$BENCHMARK/run_benchmark.py"
 RESULT_PARENT="$PROJECT_DIR/results/$BENCHMARK/$IMPLEMENTATION"
@@ -52,6 +74,14 @@ for required in "$MANIFEST" "$SOURCE" "$PYTHON" "$DEBUG_PYTHON" \
     exit 1
   fi
 done
+
+echo "================================================="
+echo "Configuring kernel permissions for clean profiling..."
+echo "================================================="
+sudo sysctl -w kernel.kptr_restrict=0
+sudo sysctl -w kernel.perf_event_paranoid=-1
+echo "Kernel configuration successful!"
+echo ""
 
 if [[ "$IMPLEMENTATION" == "optimized" ]]; then
   RUN_TIMESTAMP="$(date '+%Y-%m-%d-%H-%M')"
@@ -96,15 +126,23 @@ if [[ "$BENCHMARK" == "raytrace" ]]; then
 fi
 
 printf 'Timing %s (%s, %s mode)...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
-"$PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}" --output "$TIMING_JSON"
+if [[ "$BENCHMARK" == "raytrace" ]]; then
+  "$PYTHON" "$SOURCE" "${RUN_OPTIONS[@]}" "${BENCHMARK_OPTIONS[@]}" --output "$TIMING_JSON"
+else
+  "$PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}" --output "$TIMING_JSON"
+fi
 
 
 echo "================================================="
 echo ""
 echo "================================================="
 
-printf 'Profiling one representative %s value (%s) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION"
-perf record -F 999 -e cpu-clock -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" #--debug-single-value
+printf 'Profiling %s (%s, %s mode) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
+if [[ "$BENCHMARK" == "raytrace" ]]; then
+  perf record -F 999 -e cpu-clock -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" "$SOURCE" "${RUN_OPTIONS[@]}" "${BENCHMARK_OPTIONS[@]}"
+else
+  perf record -F 999 -e cpu-clock -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}"
+fi
 #perf record -e cycles:u -c 2400000 -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" --debug-single-value
 
 
@@ -129,7 +167,7 @@ printf 'Creating flame graph...\n'
 # in the perf profile.
 if [[ "$BENCHMARK" == "raytrace" ]]; then
   printf 'Saving Raytrace image: %s\n' "$RAYTRACE_IMAGE"
-  "$PYTHON" "$SOURCE" --debug-single-value --filename "$RAYTRACE_IMAGE"
+  "$PYTHON" "$SOURCE" --debug-single-value "${BENCHMARK_OPTIONS[@]}" --filename "$RAYTRACE_IMAGE"
 fi
 
 {
@@ -139,8 +177,11 @@ fi
   printf 'source_sha256=%s\n' "$(sha256sum "$SOURCE" | cut -d ' ' -f 1)"
   printf 'git_commit=%s\n' "$GIT_COMMIT"
   printf 'git_worktree=%s\n' "$GIT_WORKTREE_STATE"
+  printf 'run_mode=%s\n' "$RUN_MODE"
   if [[ "$BENCHMARK" == "raytrace" ]]; then
     printf '%s\n' 'raytrace_image=raytrace.ppm'
+    printf 'raytrace_width=%s\n' "$RAYTRACE_WIDTH"
+    printf 'raytrace_height=%s\n' "$RAYTRACE_HEIGHT"
   fi
 } > "$RUN_METADATA"
 
