@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-
-
 echo "================================================="
 echo "Configuring kernel permissions for clean profiling..."
 echo "================================================="
@@ -10,6 +8,8 @@ sudo sysctl -w kernel.kptr_restrict=0
 sudo sysctl -w kernel.perf_event_paranoid=-1
 echo "Kernel configuration successful!"
 echo ""
+
+
 
 
 if [[ $# -lt 2 || $# -gt 3 ]]; then
@@ -91,6 +91,11 @@ fi
 rm -f "$TIMING_JSON" "$PERF_DATA" "$PERF_REPORT" \
   "$PERF_SCRIPT" "$FOLDED" "$FLAMEGRAPH" "$RUN_METADATA"
 
+if [[ "$BENCHMARK" == "raytrace" ]]; then
+  RAYTRACE_IMAGE="$RESULT_DIR/raytrace.ppm"
+  rm -f "$RAYTRACE_IMAGE"
+fi
+
 printf 'Timing %s (%s, %s mode)...\n' "$BENCHMARK" "$IMPLEMENTATION" "$MODE"
 "$PYTHON" -m pyperformance run \
   --manifest "$MANIFEST" \
@@ -118,6 +123,16 @@ perf script --input "$PERF_DATA" > "$PERF_SCRIPT"
   --title "$BENCHMARK - $IMPLEMENTATION" \
   "$FOLDED" > "$FLAMEGRAPH"
 
+# Raytrace already supports --filename. Render one representative image in a
+# separate invocation so file output is not included in the measured timing or
+# in the perf profile.
+if [[ "$BENCHMARK" == "raytrace" ]]; then
+  printf 'Saving Raytrace image: %s\n' "$RAYTRACE_IMAGE"
+  "$PYTHON" "$SOURCE" \
+    --debug-single-value \
+    --filename "$RAYTRACE_IMAGE"
+fi
+
 {
   printf 'benchmark=%s\n' "$BENCHMARK"
   printf 'implementation=%s\n' "$IMPLEMENTATION"
@@ -125,6 +140,9 @@ perf script --input "$PERF_DATA" > "$PERF_SCRIPT"
   printf 'source_sha256=%s\n' "$(sha256sum "$SOURCE" | cut -d ' ' -f 1)"
   printf 'git_commit=%s\n' "$GIT_COMMIT"
   printf 'git_worktree=%s\n' "$GIT_WORKTREE_STATE"
+  if [[ "$BENCHMARK" == "raytrace" ]]; then
+    printf '%s\n' 'raytrace_image=raytrace.ppm'
+  fi
 } > "$RUN_METADATA"
 
 if [[ "$IMPLEMENTATION" == "optimized" ]]; then
