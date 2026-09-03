@@ -7,3 +7,4 @@ results/**/perf_script.txt
 results/**/stacks.folded
 __pycache__/
 *.pyc
+log.txt
