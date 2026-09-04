@@ -1,0 +1,2762 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="1200" height="2134" onload="init(evt)" viewBox="0 0 1200 2134" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples. -->
+<!-- NOTES:  -->
+<defs>
+	<linearGradient id="background" y1="0" y2="1" x1="0" x2="0" >
+		<stop stop-color="#eeeeee" offset="5%" />
+		<stop stop-color="#eeeeb0" offset="95%" />
+	</linearGradient>
+</defs>
+<style type="text/css">
+	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }
+	#search, #ignorecase { opacity:0.1; cursor:pointer; }
+	#search:hover, #search.show, #ignorecase:hover, #ignorecase.show { opacity:1; }
+	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+	#title { text-anchor:middle; font-size:17px}
+	#unzoom { cursor:pointer; }
+	#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+	.hide { display:none; }
+	.parent { opacity:0.5; }
+</style>
+<script type="text/ecmascript">
+<![CDATA[
+	"use strict";
+	var details, searchbtn, unzoombtn, matchedtxt, svg, searching, currentSearchTerm, ignorecase, ignorecaseBtn;
+	function init(evt) {
+		details = document.getElementById("details").firstChild;
+		searchbtn = document.getElementById("search");
+		ignorecaseBtn = document.getElementById("ignorecase");
+		unzoombtn = document.getElementById("unzoom");
+		matchedtxt = document.getElementById("matched");
+		svg = document.getElementsByTagName("svg")[0];
+		searching = 0;
+		currentSearchTerm = null;
+
+		// use GET parameters to restore a flamegraphs state.
+		var params = get_params();
+		if (params.x && params.y)
+			zoom(find_group(document.querySelector('[x="' + params.x + '"][y="' + params.y + '"]')));
+                if (params.s) search(params.s);
+	}
+
+	// event listeners
+	window.addEventListener("click", function(e) {
+		var target = find_group(e.target);
+		if (target) {
+			if (target.nodeName == "a") {
+				if (e.ctrlKey === false) return;
+				e.preventDefault();
+			}
+			if (target.classList.contains("parent")) unzoom(true);
+			zoom(target);
+			if (!document.querySelector('.parent')) {
+				// we have basically done a clearzoom so clear the url
+				var params = get_params();
+				if (params.x) delete params.x;
+				if (params.y) delete params.y;
+				history.replaceState(null, null, parse_params(params));
+				unzoombtn.classList.add("hide");
+				return;
+			}
+
+			// set parameters for zoom state
+			var el = target.querySelector("rect");
+			if (el && el.attributes && el.attributes.y && el.attributes._orig_x) {
+				var params = get_params()
+				params.x = el.attributes._orig_x.value;
+				params.y = el.attributes.y.value;
+				history.replaceState(null, null, parse_params(params));
+			}
+		}
+		else if (e.target.id == "unzoom") clearzoom();
+		else if (e.target.id == "search") search_prompt();
+		else if (e.target.id == "ignorecase") toggle_ignorecase();
+	}, false)
+
+	// mouse-over for info
+	// show
+	window.addEventListener("mouseover", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = "Function: " + g_to_text(target);
+	}, false)
+
+	// clear
+	window.addEventListener("mouseout", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = ' ';
+	}, false)
+
+	// ctrl-F for search
+	// ctrl-I to toggle case-sensitive search
+	window.addEventListener("keydown",function (e) {
+		if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+			e.preventDefault();
+			search_prompt();
+		}
+		else if (e.ctrlKey && e.keyCode === 73) {
+			e.preventDefault();
+			toggle_ignorecase();
+		}
+	}, false)
+
+	// functions
+	function get_params() {
+		var params = {};
+		var paramsarr = window.location.search.substr(1).split('&');
+		for (var i = 0; i < paramsarr.length; ++i) {
+			var tmp = paramsarr[i].split("=");
+			if (!tmp[0] || !tmp[1]) continue;
+			params[tmp[0]]  = decodeURIComponent(tmp[1]);
+		}
+		return params;
+	}
+	function parse_params(params) {
+		var uri = "?";
+		for (var key in params) {
+			uri += key + '=' + encodeURIComponent(params[key]) + '&';
+		}
+		if (uri.slice(-1) == "&")
+			uri = uri.substring(0, uri.length - 1);
+		if (uri == '?')
+			uri = window.location.href.split('?')[0];
+		return uri;
+	}
+	function find_child(node, selector) {
+		var children = node.querySelectorAll(selector);
+		if (children.length) return children[0];
+	}
+	function find_group(node) {
+		var parent = node.parentElement;
+		if (!parent) return;
+		if (parent.id == "frames") return node;
+		return find_group(parent);
+	}
+	function orig_save(e, attr, val) {
+		if (e.attributes["_orig_" + attr] != undefined) return;
+		if (e.attributes[attr] == undefined) return;
+		if (val == undefined) val = e.attributes[attr].value;
+		e.setAttribute("_orig_" + attr, val);
+	}
+	function orig_load(e, attr) {
+		if (e.attributes["_orig_"+attr] == undefined) return;
+		e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+		e.removeAttribute("_orig_"+attr);
+	}
+	function g_to_text(e) {
+		var text = find_child(e, "title").firstChild.nodeValue;
+		return (text)
+	}
+	function g_to_func(e) {
+		var func = g_to_text(e);
+		// if there's any manipulation we want to do to the function
+		// name before it's searched, do it here before returning.
+		return (func);
+	}
+	function update_text(e) {
+		var r = find_child(e, "rect");
+		var t = find_child(e, "text");
+		var w = parseFloat(r.attributes.width.value) -3;
+		var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+		t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+
+		// Smaller than this size won't fit anything
+		if (w < 2 * 12 * 0.59) {
+			t.textContent = "";
+			return;
+		}
+
+		t.textContent = txt;
+		var sl = t.getSubStringLength(0, txt.length);
+		// check if only whitespace or if we can fit the entire string into width w
+		if (/^ *$/.test(txt) || sl < w)
+			return;
+
+		// this isn't perfect, but gives a good starting point
+		// and avoids calling getSubStringLength too often
+		var start = Math.floor((w/sl) * txt.length);
+		for (var x = start; x > 0; x = x-2) {
+			if (t.getSubStringLength(0, x + 2) <= w) {
+				t.textContent = txt.substring(0, x) + "..";
+				return;
+			}
+		}
+		t.textContent = "";
+	}
+
+	// zoom
+	function zoom_reset(e) {
+		if (e.attributes != undefined) {
+			orig_load(e, "x");
+			orig_load(e, "width");
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_reset(c[i]);
+		}
+	}
+	function zoom_child(e, x, ratio) {
+		if (e.attributes != undefined) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - 10) * ratio + 10;
+				if (e.tagName == "text")
+					e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+			}
+		}
+
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_child(c[i], x - 10, ratio);
+		}
+	}
+	function zoom_parent(e) {
+		if (e.attributes) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = 10;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseInt(svg.width.baseVal.value) - (10 * 2);
+			}
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_parent(c[i]);
+		}
+	}
+	function zoom(node) {
+		var attr = find_child(node, "rect").attributes;
+		var width = parseFloat(attr.width.value);
+		var xmin = parseFloat(attr.x.value);
+		var xmax = parseFloat(xmin + width);
+		var ymin = parseFloat(attr.y.value);
+		var ratio = (svg.width.baseVal.value - 2 * 10) / width;
+
+		// XXX: Workaround for JavaScript float issues (fix me)
+		var fudge = 0.0001;
+
+		unzoombtn.classList.remove("hide");
+
+		var el = document.getElementById("frames").children;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var a = find_child(e, "rect").attributes;
+			var ex = parseFloat(a.x.value);
+			var ew = parseFloat(a.width.value);
+			var upstack;
+			// Is it an ancestor
+			if (0 == 0) {
+				upstack = parseFloat(a.y.value) > ymin;
+			} else {
+				upstack = parseFloat(a.y.value) < ymin;
+			}
+			if (upstack) {
+				// Direct ancestor
+				if (ex <= xmin && (ex+ew+fudge) >= xmax) {
+					e.classList.add("parent");
+					zoom_parent(e);
+					update_text(e);
+				}
+				// not in current path
+				else
+					e.classList.add("hide");
+			}
+			// Children maybe
+			else {
+				// no common path
+				if (ex < xmin || ex + fudge >= xmax) {
+					e.classList.add("hide");
+				}
+				else {
+					zoom_child(e, xmin, ratio);
+					update_text(e);
+				}
+			}
+		}
+		search();
+	}
+	function unzoom(dont_update_text) {
+		unzoombtn.classList.add("hide");
+		var el = document.getElementById("frames").children;
+		for(var i = 0; i < el.length; i++) {
+			el[i].classList.remove("parent");
+			el[i].classList.remove("hide");
+			zoom_reset(el[i]);
+			if(!dont_update_text) update_text(el[i]);
+		}
+		search();
+	}
+	function clearzoom() {
+		unzoom();
+
+		// remove zoom state
+		var params = get_params();
+		if (params.x) delete params.x;
+		if (params.y) delete params.y;
+		history.replaceState(null, null, parse_params(params));
+	}
+
+	// search
+	function toggle_ignorecase() {
+		ignorecase = !ignorecase;
+		if (ignorecase) {
+			ignorecaseBtn.classList.add("show");
+		} else {
+			ignorecaseBtn.classList.remove("show");
+		}
+		reset_search();
+		search();
+	}
+	function reset_search() {
+		var el = document.querySelectorAll("#frames rect");
+		for (var i = 0; i < el.length; i++) {
+			orig_load(el[i], "fill")
+		}
+		var params = get_params();
+		delete params.s;
+		history.replaceState(null, null, parse_params(params));
+	}
+	function search_prompt() {
+		if (!searching) {
+			var term = prompt("Enter a search term (regexp " +
+			    "allowed, eg: ^ext4_)"
+			    + (ignorecase ? ", ignoring case" : "")
+			    + "\nPress Ctrl-i to toggle case sensitivity", "");
+			if (term != null) search(term);
+		} else {
+			reset_search();
+			searching = 0;
+			currentSearchTerm = null;
+			searchbtn.classList.remove("show");
+			searchbtn.firstChild.nodeValue = "Search"
+			matchedtxt.classList.add("hide");
+			matchedtxt.firstChild.nodeValue = ""
+		}
+	}
+	function search(term) {
+		if (term) currentSearchTerm = term;
+		if (currentSearchTerm === null) return;
+
+		var re = new RegExp(currentSearchTerm, ignorecase ? 'i' : '');
+		var el = document.getElementById("frames").children;
+		var matches = new Object();
+		var maxwidth = 0;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var func = g_to_func(e);
+			var rect = find_child(e, "rect");
+			if (func == null || rect == null)
+				continue;
+
+			// Save max width. Only works as we have a root frame
+			var w = parseFloat(rect.attributes.width.value);
+			if (w > maxwidth)
+				maxwidth = w;
+
+			if (func.match(re)) {
+				// highlight
+				var x = parseFloat(rect.attributes.x.value);
+				orig_save(rect, "fill");
+				rect.attributes.fill.value = "rgb(230,0,230)";
+
+				// remember matches
+				if (matches[x] == undefined) {
+					matches[x] = w;
+				} else {
+					if (w > matches[x]) {
+						// overwrite with parent
+						matches[x] = w;
+					}
+				}
+				searching = 1;
+			}
+		}
+		if (!searching)
+			return;
+		var params = get_params();
+		params.s = currentSearchTerm;
+		history.replaceState(null, null, parse_params(params));
+
+		searchbtn.classList.add("show");
+		searchbtn.firstChild.nodeValue = "Reset Search";
+
+		// calculate percent matched, excluding vertical overlap
+		var count = 0;
+		var lastx = -1;
+		var lastw = 0;
+		var keys = Array();
+		for (k in matches) {
+			if (matches.hasOwnProperty(k))
+				keys.push(k);
+		}
+		// sort the matched frames by their x location
+		// ascending, then width descending
+		keys.sort(function(a, b){
+			return a - b;
+		});
+		// Step through frames saving only the biggest bottom-up frames
+		// thanks to the sort order. This relies on the tree property
+		// where children are always smaller than their parents.
+		var fudge = 0.0001;	// JavaScript floating point
+		for (var k in keys) {
+			var x = parseFloat(keys[k]);
+			var w = matches[keys[k]];
+			if (x >= lastx + lastw - fudge) {
+				count += w;
+				lastx = x;
+				lastw = w;
+			}
+		}
+		// display matched percent
+		matchedtxt.classList.remove("hide");
+		var pct = 100 * count / maxwidth;
+		if (pct != 100) pct = pct.toFixed(1)
+		matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+	}
+]]>
+</script>
+<rect x="0.0" y="0" width="1200.0" height="2134.0" fill="url(#background)"  />
+<text id="title" x="600.00" y="24" >raytrace - optimized</text>
+<text id="details" x="10.00" y="2117" > </text>
+<text id="unzoom" x="10.00" y="24" class="hide">Reset Zoom</text>
+<text id="search" x="1090.00" y="24" >Search</text>
+<text id="ignorecase" x="1174.00" y="24" >ic</text>
+<text id="matched" x="1090.00" y="2117" > </text>
+<g id="frames">
+<g >
+<title>pthread_getspecific@@GLIBC_2.34 (191,191,191 samples, 0.26%)</title><rect x="1034.9" y="2037" width="3.1" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="1037.93" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="1141" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1151.5" ></text>
+</g>
+<g >
+<title>_PyGILState_GetThisThreadState (57,057,057 samples, 0.08%)</title><rect x="596.7" y="2037" width="1.0" height="15.0" fill="rgb(216,53,12)" rx="2" ry="2" />
+<text  x="599.74" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_VectorcallTstate.lto_priv.10 (342,342,342 samples, 0.46%)</title><rect x="148.8" y="2021" width="5.4" height="15.0" fill="rgb(244,179,42)" rx="2" ry="2" />
+<text  x="151.76" y="2031.5" ></text>
+</g>
+<g >
+<title>cell_dealloc.lto_priv.0 (21,021,021 samples, 0.03%)</title><rect x="757.9" y="2037" width="0.4" height="15.0" fill="rgb(252,220,52)" rx="2" ry="2" />
+<text  x="760.94" y="2047.5" ></text>
+</g>
+<g >
+<title>builtin_max (8,008,008 samples, 0.01%)</title><rect x="753.1" y="2037" width="0.1" height="15.0" fill="rgb(240,165,39)" rx="2" ry="2" />
+<text  x="756.12" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1317" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1327.5" ></text>
+</g>
+<g >
+<title>PyTuple_Size (7,007,007 samples, 0.01%)</title><rect x="121.4" y="2037" width="0.1" height="15.0" fill="rgb(224,88,21)" rx="2" ry="2" />
+<text  x="124.39" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (73,073,073 samples, 0.10%)</title><rect x="139.9" y="1621" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1631.5" ></text>
+</g>
+<g >
+<title>PyDict_Contains (385,385,385 samples, 0.52%)</title><rect x="37.9" y="2037" width="6.1" height="15.0" fill="rgb(226,100,23)" rx="2" ry="2" />
+<text  x="40.88" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (16,016,016 samples, 0.02%)</title><rect x="1178.5" y="2037" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.49" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyTrash_cond (11,011,011 samples, 0.01%)</title><rect x="154.7" y="2021" width="0.2" height="15.0" fill="rgb(254,226,54)" rx="2" ry="2" />
+<text  x="157.74" y="2031.5" ></text>
+</g>
+<g >
+<title>PyCell_New (8,008,008 samples, 0.01%)</title><rect x="13.9" y="2053" width="0.1" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="16.85" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyObject_GenericSetAttrWithDict (277,277,277 samples, 0.37%)</title><rect x="1061.7" y="2053" width="4.4" height="15.0" fill="rgb(228,110,26)" rx="2" ry="2" />
+<text  x="1064.65" y="2063.5" ></text>
+</g>
+<g >
+<title>module_getattro.lto_priv.0 (12,012,012 samples, 0.02%)</title><rect x="904.5" y="2037" width="0.2" height="15.0" fill="rgb(248,198,47)" rx="2" ry="2" />
+<text  x="907.49" y="2047.5" ></text>
+</g>
+<g >
+<title>listiter_dealloc.lto_priv.0 (8,008,008 samples, 0.01%)</title><rect x="201.3" y="2021" width="0.1" height="15.0" fill="rgb(205,2,0)" rx="2" ry="2" />
+<text  x="204.30" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (74,074,074 samples, 0.10%)</title><rect x="139.9" y="1685" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1695.5" ></text>
+</g>
+<g >
+<title>r_long (12,012,012 samples, 0.02%)</title><rect x="1177.8" y="2053" width="0.2" height="15.0" fill="rgb(222,81,19)" rx="2" ry="2" />
+<text  x="1180.80" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyObject_FastCallDictTstate (37,037,037 samples, 0.05%)</title><rect x="147.9" y="2021" width="0.6" height="15.0" fill="rgb(222,81,19)" rx="2" ry="2" />
+<text  x="150.94" y="2031.5" ></text>
+</g>
+<g >
+<title>PyObject_ClearWeakRefs (130,130,130 samples, 0.18%)</title><rect x="69.2" y="2037" width="2.0" height="15.0" fill="rgb(219,67,16)" rx="2" ry="2" />
+<text  x="72.17" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1333" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1343.5" ></text>
+</g>
+<g >
+<title>visit_decref (31,031,031 samples, 0.04%)</title><rect x="964.8" y="2037" width="0.5" height="15.0" fill="rgb(253,220,52)" rx="2" ry="2" />
+<text  x="967.85" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1269" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1279.5" ></text>
+</g>
+<g >
+<title>PyGILState_Check (160,160,160 samples, 0.22%)</title><rect x="24.6" y="2053" width="2.5" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="27.55" y="2063.5" ></text>
+</g>
+<g >
+<title>__errno_location (14,014,014 samples, 0.02%)</title><rect x="1123.4" y="2053" width="0.2" height="15.0" fill="rgb(233,130,31)" rx="2" ry="2" />
+<text  x="1126.40" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1381" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1391.5" ></text>
+</g>
+<g >
+<title>_PyObject_VectorcallTstate.lto_priv.6 (25,025,025 samples, 0.03%)</title><rect x="154.2" y="2021" width="0.4" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="157.21" y="2031.5" ></text>
+</g>
+<g >
+<title>_PyObject_GetDictPtr (47,047,047 samples, 0.06%)</title><rect x="1066.1" y="2053" width="0.7" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="1069.06" y="2063.5" ></text>
+</g>
+<g >
+<title>PyIter_Next (18,018,018 samples, 0.02%)</title><rect x="57.0" y="2037" width="0.3" height="15.0" fill="rgb(210,26,6)" rx="2" ry="2" />
+<text  x="60.04" y="2047.5" ></text>
+</g>
+<g >
+<title>PyObject_GC_UnTrack (218,218,218 samples, 0.29%)</title><rect x="72.0" y="2037" width="3.4" height="15.0" fill="rgb(230,118,28)" rx="2" ry="2" />
+<text  x="74.98" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyTuple_FromArray (271,271,271 samples, 0.37%)</title><rect x="154.9" y="2021" width="4.3" height="15.0" fill="rgb(254,229,54)" rx="2" ry="2" />
+<text  x="157.91" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (12,012,012 samples, 0.02%)</title><rect x="719.8" y="2021" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="722.82" y="2031.5" ></text>
+</g>
+<g >
+<title>PyObject_GC_UnTrack (31,031,031 samples, 0.04%)</title><rect x="135.6" y="2021" width="0.5" height="15.0" fill="rgb(230,118,28)" rx="2" ry="2" />
+<text  x="138.59" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (12,012,012 samples, 0.02%)</title><rect x="1123.2" y="1909" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1126.18" y="1919.5" ></text>
+</g>
+<g >
+<title>listiter_next.lto_priv.0 (200,200,200 samples, 0.27%)</title><rect x="877.1" y="2037" width="3.1" height="15.0" fill="rgb(244,183,43)" rx="2" ry="2" />
+<text  x="880.06" y="2047.5" ></text>
+</g>
+<g >
+<title>unicode_dealloc.lto_priv.0 (7,007,007 samples, 0.01%)</title><rect x="962.3" y="2037" width="0.1" height="15.0" fill="rgb(240,163,39)" rx="2" ry="2" />
+<text  x="965.28" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (73,073,073 samples, 0.10%)</title><rect x="139.9" y="1541" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1551.5" ></text>
+</g>
+<g >
+<title>_PyUnicode_CheckConsistency (49,049,049 samples, 0.07%)</title><rect x="679.5" y="2037" width="0.7" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="682.45" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1605" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1615.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1925" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1935.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1845" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1855.5" ></text>
+</g>
+<g >
+<title>_Py_CheckFunctionResult (517,517,517 samples, 0.70%)</title><rect x="1109.3" y="2053" width="8.2" height="15.0" fill="rgb(208,16,4)" rx="2" ry="2" />
+<text  x="1112.26" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1573" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1583.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1893" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1903.5" ></text>
+</g>
+<g >
+<title>PyList_New (10,010,010 samples, 0.01%)</title><rect x="27.2" y="2053" width="0.2" height="15.0" fill="rgb(214,45,10)" rx="2" ry="2" />
+<text  x="30.25" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyNumber_Index (22,022,022 samples, 0.03%)</title><rect x="623.2" y="2037" width="0.4" height="15.0" fill="rgb(246,189,45)" rx="2" ry="2" />
+<text  x="626.23" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="1125.7" y="2005" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1128.65" y="2015.5" ></text>
+</g>
+<g >
+<title>unicode_fill_invalid.lto_priv.0 (9,009,009 samples, 0.01%)</title><rect x="1185.4" y="2053" width="0.2" height="15.0" fill="rgb(221,76,18)" rx="2" ry="2" />
+<text  x="1188.41" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="213" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown] (334,334,334 samples, 0.45%)</title><rect x="139.9" y="2021" width="5.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.86" y="2031.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (16,016,016 samples, 0.02%)</title><rect x="648.8" y="2037" width="0.2" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="651.77" y="2047.5" ></text>
+</g>
+<g >
+<title>do_call_core.lto_priv.0 (8,008,008 samples, 0.01%)</title><rect x="767.7" y="2037" width="0.1" height="15.0" fill="rgb(233,131,31)" rx="2" ry="2" />
+<text  x="770.66" y="2047.5" ></text>
+</g>
+<g >
+<title>PyObject_RichCompare (58,058,058 samples, 0.08%)</title><rect x="29.5" y="2053" width="1.0" height="15.0" fill="rgb(219,67,16)" rx="2" ry="2" />
+<text  x="32.54" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyUnicode_FromId (292,292,292 samples, 0.39%)</title><rect x="680.4" y="2037" width="4.6" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="683.36" y="2047.5" ></text>
+</g>
+<g >
+<title>is_tstate_valid.lto_priv.0 (426,426,426 samples, 0.57%)</title><rect x="868.0" y="2037" width="6.8" height="15.0" fill="rgb(251,214,51)" rx="2" ry="2" />
+<text  x="871.04" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.0" y="1989" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.04" y="1999.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="245" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="255.5" ></text>
+</g>
+<g >
+<title>PyObject_GetItem (36,036,036 samples, 0.05%)</title><rect x="77.5" y="2037" width="0.5" height="15.0" fill="rgb(244,179,42)" rx="2" ry="2" />
+<text  x="80.45" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1877" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1887.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1125.0" y="1941" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1127.97" y="1951.5" ></text>
+</g>
+<g >
+<title>[unknown] (73,073,073 samples, 0.10%)</title><rect x="139.9" y="1669" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1679.5" ></text>
+</g>
+<g >
+<title>lookdict_split.lto_priv.0 (755,755,755 samples, 1.02%)</title><rect x="1144.8" y="2053" width="12.0" height="15.0" fill="rgb(239,158,37)" rx="2" ry="2" />
+<text  x="1147.78" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="1109" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1119.5" ></text>
+</g>
+<g >
+<title>_PyObject_VectorcallTstate.lto_priv.23 (11,011,011 samples, 0.01%)</title><rect x="1099.9" y="2053" width="0.2" height="15.0" fill="rgb(218,60,14)" rx="2" ry="2" />
+<text  x="1102.95" y="2063.5" ></text>
+</g>
+<g >
+<title>subtype_dealloc.lto_priv.0 (447,447,447 samples, 0.60%)</title><rect x="938.3" y="2037" width="7.2" height="15.0" fill="rgb(251,214,51)" rx="2" ry="2" />
+<text  x="941.33" y="2047.5" ></text>
+</g>
+<g >
+<title>write_size_t (7,007,007 samples, 0.01%)</title><rect x="143.2" y="1797" width="0.1" height="15.0" fill="rgb(239,160,38)" rx="2" ry="2" />
+<text  x="146.19" y="1807.5" ></text>
+</g>
+<g >
+<title>pymalloc_pool_extend (65,065,065 samples, 0.09%)</title><rect x="916.9" y="2037" width="1.1" height="15.0" fill="rgb(207,9,2)" rx="2" ry="2" />
+<text  x="919.92" y="2047.5" ></text>
+</g>
+<g >
+<title>all_name_chars (9,009,009 samples, 0.01%)</title><rect x="721.9" y="2037" width="0.2" height="15.0" fill="rgb(253,221,52)" rx="2" ry="2" />
+<text  x="724.91" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (22,022,022 samples, 0.03%)</title><rect x="1123.0" y="1973" width="0.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1126.02" y="1983.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRawAlloc (8,008,008 samples, 0.01%)</title><rect x="143.7" y="1845" width="0.1" height="15.0" fill="rgb(240,165,39)" rx="2" ry="2" />
+<text  x="146.68" y="1855.5" ></text>
+</g>
+<g >
+<title>vgetargs1_impl (15,015,015 samples, 0.02%)</title><rect x="964.6" y="2037" width="0.2" height="15.0" fill="rgb(229,110,26)" rx="2" ry="2" />
+<text  x="967.61" y="2047.5" ></text>
+</g>
+<g >
+<title>__GI___libc_write (10,010,010 samples, 0.01%)</title><rect x="710.2" y="2037" width="0.2" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="713.20" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="309" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="319.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="661" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="671.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="1013" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1023.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRawRealloc (7,007,007 samples, 0.01%)</title><rect x="146.3" y="2021" width="0.1" height="15.0" fill="rgb(252,216,51)" rx="2" ry="2" />
+<text  x="149.31" y="2031.5" ></text>
+</g>
+<g >
+<title>PyMethod_New (7,007,007 samples, 0.01%)</title><rect x="60.7" y="2037" width="0.1" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="63.73" y="2047.5" ></text>
+</g>
+<g >
+<title>write_size_t (225,225,225 samples, 0.30%)</title><rect x="965.4" y="2037" width="3.6" height="15.0" fill="rgb(239,160,38)" rx="2" ry="2" />
+<text  x="968.44" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="1061" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1071.5" ></text>
+</g>
+<g >
+<title>[unknown] (177,177,177 samples, 0.24%)</title><rect x="139.9" y="1781" width="2.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1791.5" ></text>
+</g>
+<g >
+<title>[unknown] (15,015,015 samples, 0.02%)</title><rect x="1178.5" y="1925" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.50" y="1935.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1845" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1855.5" ></text>
+</g>
+<g >
+<title>PyNumber_Long (9,009,009 samples, 0.01%)</title><rect x="62.6" y="2037" width="0.2" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="65.61" y="2047.5" ></text>
+</g>
+<g >
+<title>get_type_cache.lto_priv.0 (100,100,100 samples, 0.13%)</title><rect x="853.6" y="2037" width="1.6" height="15.0" fill="rgb(249,204,48)" rx="2" ry="2" />
+<text  x="856.63" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (15,015,015 samples, 0.02%)</title><rect x="1178.5" y="1893" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.50" y="1903.5" ></text>
+</g>
+<g >
+<title>float_dealloc.lto_priv.0 (622,622,622 samples, 0.84%)</title><rect x="775.0" y="2037" width="9.9" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="778.02" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (18,018,018 samples, 0.02%)</title><rect x="1123.1" y="1941" width="0.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1126.09" y="1951.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (445,445,445 samples, 0.60%)</title><rect x="1075.6" y="2053" width="7.1" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="1078.57" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="453" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="463.5" ></text>
+</g>
+<g >
+<title>tupleitem.lto_priv.0 (32,032,032 samples, 0.04%)</title><rect x="1183.1" y="2053" width="0.5" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="1186.10" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (15,015,015 samples, 0.02%)</title><rect x="143.8" y="1845" width="0.3" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="146.84" y="1855.5" ></text>
+</g>
+<g >
+<title>_copy_characters (9,009,009 samples, 0.01%)</title><rect x="1124.8" y="2053" width="0.1" height="15.0" fill="rgb(252,219,52)" rx="2" ry="2" />
+<text  x="1127.76" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (279,279,279 samples, 0.38%)</title><rect x="139.9" y="1893" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1903.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="997" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1007.5" ></text>
+</g>
+<g >
+<title>list_resize (34,034,034 samples, 0.05%)</title><rect x="876.3" y="2037" width="0.6" height="15.0" fill="rgb(231,119,28)" rx="2" ry="2" />
+<text  x="879.31" y="2047.5" ></text>
+</g>
+<g >
+<title>frame_alloc (411,411,411 samples, 0.55%)</title><rect x="803.7" y="2037" width="6.5" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="806.66" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="1125.7" y="2021" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1128.65" y="2031.5" ></text>
+</g>
+<g >
+<title>vectorcall_maybe.lto_priv.0 (81,081,081 samples, 0.11%)</title><rect x="207.5" y="2021" width="1.3" height="15.0" fill="rgb(250,210,50)" rx="2" ry="2" />
+<text  x="210.49" y="2031.5" ></text>
+</g>
+<g >
+<title>arena_map_is_used (216,216,216 samples, 0.29%)</title><rect x="723.8" y="2037" width="3.4" height="15.0" fill="rgb(247,194,46)" rx="2" ry="2" />
+<text  x="726.79" y="2047.5" ></text>
+</g>
+<g >
+<title>PyLong_AsDouble (41,041,041 samples, 0.06%)</title><rect x="134.8" y="2021" width="0.6" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="137.77" y="2031.5" ></text>
+</g>
+<g >
+<title>insertdict (775,775,775 samples, 1.05%)</title><rect x="855.6" y="2037" width="12.3" height="15.0" fill="rgb(230,116,27)" rx="2" ry="2" />
+<text  x="858.61" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1989" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1999.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1125.0" y="1973" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1127.97" y="1983.5" ></text>
+</g>
+<g >
+<title>[unknown] (14,014,014 samples, 0.02%)</title><rect x="1178.5" y="1877" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.52" y="1887.5" ></text>
+</g>
+<g >
+<title>PyFloat_FromDouble (647,647,647 samples, 0.87%)</title><rect x="14.3" y="2053" width="10.3" height="15.0" fill="rgb(253,222,53)" rx="2" ry="2" />
+<text  x="17.25" y="2063.5" ></text>
+</g>
+<g >
+<title>free_keys_object.lto_priv.0 (8,008,008 samples, 0.01%)</title><rect x="847.1" y="2037" width="0.2" height="15.0" fill="rgb(208,18,4)" rx="2" ry="2" />
+<text  x="850.14" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyTrash_begin (7,007,007 samples, 0.01%)</title><rect x="154.6" y="2021" width="0.1" height="15.0" fill="rgb(227,103,24)" rx="2" ry="2" />
+<text  x="157.62" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (73,073,073 samples, 0.10%)</title><rect x="139.9" y="1589" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1599.5" ></text>
+</g>
+<g >
+<title>PyLong_AsDouble (21,021,021 samples, 0.03%)</title><rect x="57.9" y="2037" width="0.4" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="60.93" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1429" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1439.5" ></text>
+</g>
+<g >
+<title>math_1_to_whatever (34,034,034 samples, 0.05%)</title><rect x="902.9" y="2037" width="0.5" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="905.90" y="2047.5" ></text>
+</g>
+<g >
+<title>type_call.lto_priv.0 (273,273,273 samples, 0.37%)</title><rect x="957.7" y="2037" width="4.4" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="960.71" y="2047.5" ></text>
+</g>
+<g >
+<title>_dl_map_object (20,020,020 samples, 0.03%)</title><rect x="1124.9" y="2053" width="0.3" height="15.0" fill="rgb(248,199,47)" rx="2" ry="2" />
+<text  x="1127.90" y="2063.5" ></text>
+</g>
+<g >
+<title>slot_tp_init (62,062,062 samples, 0.08%)</title><rect x="1179.1" y="2053" width="0.9" height="15.0" fill="rgb(239,160,38)" rx="2" ry="2" />
+<text  x="1182.06" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1173" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1183.5" ></text>
+</g>
+<g >
+<title>arena_map_get (83,083,083 samples, 0.11%)</title><rect x="722.5" y="2037" width="1.3" height="15.0" fill="rgb(212,32,7)" rx="2" ry="2" />
+<text  x="725.47" y="2047.5" ></text>
+</g>
+<g >
+<title>PyFloat_FromDouble (79,079,079 samples, 0.11%)</title><rect x="52.5" y="2037" width="1.3" height="15.0" fill="rgb(253,222,53)" rx="2" ry="2" />
+<text  x="55.55" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (304,304,304 samples, 0.41%)</title><rect x="139.9" y="1989" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1999.5" ></text>
+</g>
+<g >
+<title>[unknown] (12,012,012 samples, 0.02%)</title><rect x="719.8" y="2005" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="722.82" y="2015.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1221" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1231.5" ></text>
+</g>
+<g >
+<title>read (17,017,017 samples, 0.02%)</title><rect x="1178.5" y="2053" width="0.2" height="15.0" fill="rgb(252,216,51)" rx="2" ry="2" />
+<text  x="1181.47" y="2063.5" ></text>
+</g>
+<g >
+<title>PyLong_AsLongAndOverflow (8,008,008 samples, 0.01%)</title><rect x="58.4" y="2037" width="0.2" height="15.0" fill="rgb(240,163,38)" rx="2" ry="2" />
+<text  x="61.43" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1157" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1167.5" ></text>
+</g>
+<g >
+<title>func_dealloc.lto_priv.0 (8,008,008 samples, 0.01%)</title><rect x="200.4" y="2021" width="0.1" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="203.41" y="2031.5" ></text>
+</g>
+<g >
+<title>dict_dealloc.lto_priv.0 (389,389,389 samples, 0.52%)</title><rect x="761.4" y="2037" width="6.1" height="15.0" fill="rgb(227,101,24)" rx="2" ry="2" />
+<text  x="764.35" y="2047.5" ></text>
+</g>
+<g >
+<title>malloc (8,008,008 samples, 0.01%)</title><rect x="1169.4" y="2053" width="0.2" height="15.0" fill="rgb(230,119,28)" rx="2" ry="2" />
+<text  x="1172.44" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (14,014,014 samples, 0.02%)</title><rect x="141.3" y="1701" width="0.2" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="144.31" y="1711.5" ></text>
+</g>
+<g >
+<title>tuple_get_empty (11,011,011 samples, 0.01%)</title><rect x="1181.2" y="2053" width="0.2" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="1184.23" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRawRealloc (8,008,008 samples, 0.01%)</title><rect x="622.9" y="2037" width="0.1" height="15.0" fill="rgb(252,216,51)" rx="2" ry="2" />
+<text  x="625.89" y="2047.5" ></text>
+</g>
+<g >
+<title>frame_dealloc.lto_priv.0 (2,321,321,319 samples, 3.13%)</title><rect x="810.2" y="2037" width="36.9" height="15.0" fill="rgb(211,31,7)" rx="2" ry="2" />
+<text  x="813.21" y="2047.5" >fra..</text>
+</g>
+<g >
+<title>PyThread_tss_get (27,027,027 samples, 0.04%)</title><rect x="137.4" y="2021" width="0.4" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="140.36" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="709" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="719.5" ></text>
+</g>
+<g >
+<title>PyObject_GenericSetAttr (83,083,083 samples, 0.11%)</title><rect x="75.6" y="2037" width="1.3" height="15.0" fill="rgb(210,25,6)" rx="2" ry="2" />
+<text  x="78.58" y="2047.5" ></text>
+</g>
+<g >
+<title>PyMem_Free (23,023,023 samples, 0.03%)</title><rect x="59.7" y="2037" width="0.4" height="15.0" fill="rgb(253,225,53)" rx="2" ry="2" />
+<text  x="62.75" y="2047.5" ></text>
+</g>
+<g >
+<title>validate_list (167,167,167 samples, 0.23%)</title><rect x="1185.7" y="2053" width="2.7" height="15.0" fill="rgb(242,172,41)" rx="2" ry="2" />
+<text  x="1188.73" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="197" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="207.5" ></text>
+</g>
+<g >
+<title>_PyTrash_end (129,129,129 samples, 0.17%)</title><rect x="655.9" y="2037" width="2.1" height="15.0" fill="rgb(208,15,3)" rx="2" ry="2" />
+<text  x="658.92" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyFunction_Vectorcall (700,700,700 samples, 0.94%)</title><rect x="1038.0" y="2053" width="11.1" height="15.0" fill="rgb(212,34,8)" rx="2" ry="2" />
+<text  x="1040.97" y="2063.5" ></text>
+</g>
+<g >
+<title>_int_malloc (15,015,015 samples, 0.02%)</title><rect x="1125.2" y="2053" width="0.3" height="15.0" fill="rgb(215,47,11)" rx="2" ry="2" />
+<text  x="1128.22" y="2063.5" ></text>
+</g>
+<g >
+<title>lookup_maybe_method.lto_priv.0 (42,042,042 samples, 0.06%)</title><rect x="201.4" y="2021" width="0.7" height="15.0" fill="rgb(212,34,8)" rx="2" ry="2" />
+<text  x="204.42" y="2031.5" ></text>
+</g>
+<g >
+<title>[python3.10d] (38,038,038 samples, 0.05%)</title><rect x="36.7" y="2053" width="0.6" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="39.74" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (69,069,069 samples, 0.09%)</title><rect x="140.0" y="85" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="95.5" ></text>
+</g>
+<g >
+<title>PyGILState_Check (124,124,124 samples, 0.17%)</title><rect x="1016.3" y="2037" width="2.0" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="1019.28" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1477" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1487.5" ></text>
+</g>
+<g >
+<title>excess_args (26,026,026 samples, 0.04%)</title><rect x="768.2" y="2037" width="0.4" height="15.0" fill="rgb(223,83,19)" rx="2" ry="2" />
+<text  x="771.17" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (277,277,277 samples, 0.37%)</title><rect x="139.9" y="1877" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1887.5" ></text>
+</g>
+<g >
+<title>call_function.lto_priv.0 (22,022,022 samples, 0.03%)</title><rect x="1135.8" y="2053" width="0.3" height="15.0" fill="rgb(235,141,33)" rx="2" ry="2" />
+<text  x="1138.79" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyType_Lookup (79,079,079 samples, 0.11%)</title><rect x="1033.7" y="2037" width="1.2" height="15.0" fill="rgb(241,169,40)" rx="2" ry="2" />
+<text  x="1036.67" y="2047.5" ></text>
+</g>
+<g >
+<title>PyLong_FromLong (27,027,027 samples, 0.04%)</title><rect x="58.9" y="2037" width="0.4" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="61.86" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyDict_GetItemIdWithError (8,008,008 samples, 0.01%)</title><rect x="242.9" y="2037" width="0.1" height="15.0" fill="rgb(242,171,40)" rx="2" ry="2" />
+<text  x="245.91" y="2047.5" ></text>
+</g>
+<g >
+<title>slot_tp_init (168,168,168 samples, 0.23%)</title><rect x="935.6" y="2037" width="2.6" height="15.0" fill="rgb(239,160,38)" rx="2" ry="2" />
+<text  x="938.56" y="2047.5" ></text>
+</g>
+<g >
+<title>PyThreadState_Get (73,073,073 samples, 0.10%)</title><rect x="90.7" y="2037" width="1.2" height="15.0" fill="rgb(251,212,50)" rx="2" ry="2" />
+<text  x="93.70" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="389" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="399.5" ></text>
+</g>
+<g >
+<title>vectorcall_maybe.lto_priv.0 (120,120,120 samples, 0.16%)</title><rect x="962.6" y="2037" width="1.9" height="15.0" fill="rgb(250,210,50)" rx="2" ry="2" />
+<text  x="965.60" y="2047.5" ></text>
+</g>
+<g >
+<title>PyNumber_Negative (10,010,010 samples, 0.01%)</title><rect x="66.3" y="2037" width="0.2" height="15.0" fill="rgb(225,92,22)" rx="2" ry="2" />
+<text  x="69.32" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (16,016,016 samples, 0.02%)</title><rect x="1178.5" y="2021" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.49" y="2031.5" ></text>
+</g>
+<g >
+<title>get_float_state (167,167,167 samples, 0.23%)</title><rect x="848.2" y="2037" width="2.7" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="851.22" y="2047.5" ></text>
+</g>
+<g >
+<title>listiter_dealloc.lto_priv.0 (8,008,008 samples, 0.01%)</title><rect x="876.9" y="2037" width="0.2" height="15.0" fill="rgb(205,2,0)" rx="2" ry="2" />
+<text  x="879.93" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="485" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (69,069,069 samples, 0.09%)</title><rect x="140.0" y="53" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="63.5" ></text>
+</g>
+<g >
+<title>PyNumber_Add (94,094,094 samples, 0.13%)</title><rect x="60.9" y="2037" width="1.5" height="15.0" fill="rgb(253,224,53)" rx="2" ry="2" />
+<text  x="63.88" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (9,009,009 samples, 0.01%)</title><rect x="572.6" y="2005" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="575.55" y="2015.5" ></text>
+</g>
+<g >
+<title>_PyTrash_end (13,013,013 samples, 0.02%)</title><rect x="1103.2" y="2053" width="0.2" height="15.0" fill="rgb(208,15,3)" rx="2" ry="2" />
+<text  x="1106.21" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1829" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1839.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1493" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1503.5" ></text>
+</g>
+<g >
+<title>_PyFrame_New_NoTrack (32,032,032 samples, 0.04%)</title><rect x="596.2" y="2037" width="0.5" height="15.0" fill="rgb(219,68,16)" rx="2" ry="2" />
+<text  x="599.22" y="2047.5" ></text>
+</g>
+<g >
+<title>frame_alloc (154,154,154 samples, 0.21%)</title><rect x="1140.0" y="2053" width="2.4" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="1142.97" y="2063.5" ></text>
+</g>
+<g >
+<title>lookup_maybe_method.lto_priv.0 (196,196,196 samples, 0.26%)</title><rect x="899.8" y="2037" width="3.1" height="15.0" fill="rgb(212,34,8)" rx="2" ry="2" />
+<text  x="902.78" y="2047.5" ></text>
+</g>
+<g >
+<title>_Py_CheckFunctionResult (322,322,322 samples, 0.43%)</title><rect x="685.2" y="2037" width="5.1" height="15.0" fill="rgb(208,16,4)" rx="2" ry="2" />
+<text  x="688.22" y="2047.5" ></text>
+</g>
+<g >
+<title>allocate_from_new_pool (10,010,010 samples, 0.01%)</title><rect x="1125.7" y="2053" width="0.1" height="15.0" fill="rgb(212,32,7)" rx="2" ry="2" />
+<text  x="1128.65" y="2063.5" ></text>
+</g>
+<g >
+<title>object_dealloc.lto_priv.0 (14,014,014 samples, 0.02%)</title><rect x="1171.5" y="2053" width="0.2" height="15.0" fill="rgb(214,41,9)" rx="2" ry="2" />
+<text  x="1174.48" y="2063.5" ></text>
+</g>
+<g >
+<title>read_size_t (786,786,786 samples, 1.06%)</title><rect x="918.3" y="2037" width="12.5" height="15.0" fill="rgb(213,39,9)" rx="2" ry="2" />
+<text  x="921.29" y="2047.5" ></text>
+</g>
+<g >
+<title>_Py_NewReference (414,414,414 samples, 0.56%)</title><rect x="703.4" y="2037" width="6.6" height="15.0" fill="rgb(227,104,24)" rx="2" ry="2" />
+<text  x="706.37" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="533" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="543.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugFree (92,092,092 samples, 0.12%)</title><rect x="615.4" y="2037" width="1.5" height="15.0" fill="rgb(244,180,43)" rx="2" ry="2" />
+<text  x="618.39" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="725" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="735.5" ></text>
+</g>
+<g >
+<title>write_size_t (7,007,007 samples, 0.01%)</title><rect x="144.1" y="1845" width="0.1" height="15.0" fill="rgb(239,160,38)" rx="2" ry="2" />
+<text  x="147.08" y="1855.5" ></text>
+</g>
+<g >
+<title>PyMem_Malloc (29,029,029 samples, 0.04%)</title><rect x="60.1" y="2037" width="0.5" height="15.0" fill="rgb(221,75,18)" rx="2" ry="2" />
+<text  x="63.11" y="2047.5" ></text>
+</g>
+<g >
+<title>address_in_range (69,069,069 samples, 0.09%)</title><rect x="720.8" y="2037" width="1.1" height="15.0" fill="rgb(212,35,8)" rx="2" ry="2" />
+<text  x="723.81" y="2047.5" ></text>
+</g>
+<g >
+<title>PyThread_tss_get (87,087,087 samples, 0.12%)</title><rect x="30.7" y="2053" width="1.3" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="33.65" y="2063.5" ></text>
+</g>
+<g >
+<title>call_function.lto_priv.0 (287,287,287 samples, 0.39%)</title><rect x="753.4" y="2037" width="4.5" height="15.0" fill="rgb(235,141,33)" rx="2" ry="2" />
+<text  x="756.37" y="2047.5" ></text>
+</g>
+<g >
+<title>PyObject_GetAttr (35,035,035 samples, 0.05%)</title><rect x="76.9" y="2037" width="0.6" height="15.0" fill="rgb(216,52,12)" rx="2" ry="2" />
+<text  x="79.90" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1637" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1647.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="581" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="591.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRawMalloc (49,049,049 samples, 0.07%)</title><rect x="1055.8" y="2053" width="0.8" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="1058.81" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRealloc (9,009,009 samples, 0.01%)</title><rect x="623.0" y="2037" width="0.2" height="15.0" fill="rgb(227,101,24)" rx="2" ry="2" />
+<text  x="626.02" y="2047.5" ></text>
+</g>
+<g >
+<title>slot_nb_subtract (263,263,263 samples, 0.35%)</title><rect x="931.4" y="2037" width="4.2" height="15.0" fill="rgb(252,218,52)" rx="2" ry="2" />
+<text  x="934.37" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRawAlloc (158,158,158 samples, 0.21%)</title><rect x="618.1" y="2037" width="2.5" height="15.0" fill="rgb(240,165,39)" rx="2" ry="2" />
+<text  x="621.08" y="2047.5" ></text>
+</g>
+<g >
+<title>binary_op1 (1,385,385,384 samples, 1.87%)</title><rect x="731.0" y="2037" width="22.1" height="15.0" fill="rgb(226,97,23)" rx="2" ry="2" />
+<text  x="734.02" y="2047.5" >b..</text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="517" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="527.5" ></text>
+</g>
+<g >
+<title>_PyGILState_GetThisThreadState (46,046,046 samples, 0.06%)</title><rect x="1020.1" y="2037" width="0.8" height="15.0" fill="rgb(216,53,12)" rx="2" ry="2" />
+<text  x="1023.14" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (9,009,009 samples, 0.01%)</title><rect x="144.8" y="1989" width="0.2" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="147.83" y="1999.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1653" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1663.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="437" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="447.5" ></text>
+</g>
+<g >
+<title>PyFunction_NewWithQualName (21,021,021 samples, 0.03%)</title><rect x="53.9" y="2037" width="0.3" height="15.0" fill="rgb(211,28,6)" rx="2" ry="2" />
+<text  x="56.87" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_GC_Malloc (10,010,010 samples, 0.01%)</title><rect x="633.9" y="2037" width="0.1" height="15.0" fill="rgb(237,147,35)" rx="2" ry="2" />
+<text  x="636.88" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (43,043,043 samples, 0.06%)</title><rect x="917.3" y="2005" width="0.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.27" y="2015.5" ></text>
+</g>
+<g >
+<title>_PyObjectDict_SetItem (278,278,278 samples, 0.38%)</title><rect x="623.6" y="2037" width="4.4" height="15.0" fill="rgb(246,190,45)" rx="2" ry="2" />
+<text  x="626.58" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (23,023,023 samples, 0.03%)</title><rect x="1123.0" y="1989" width="0.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1126.01" y="1999.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1941" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1951.5" ></text>
+</g>
+<g >
+<title>build_indices (7,007,007 samples, 0.01%)</title><rect x="1135.6" y="2053" width="0.1" height="15.0" fill="rgb(241,165,39)" rx="2" ry="2" />
+<text  x="1138.63" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.0" y="1973" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.04" y="1983.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1701" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1711.5" ></text>
+</g>
+<g >
+<title>[unknown] (16,016,016 samples, 0.02%)</title><rect x="1178.5" y="1957" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.49" y="1967.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="949" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="959.5" ></text>
+</g>
+<g >
+<title>PyDict_SetDefault (8,008,008 samples, 0.01%)</title><rect x="133.7" y="2021" width="0.1" height="15.0" fill="rgb(226,101,24)" rx="2" ry="2" />
+<text  x="136.72" y="2031.5" ></text>
+</g>
+<g >
+<title>PyList_Append (31,031,031 samples, 0.04%)</title><rect x="57.3" y="2037" width="0.5" height="15.0" fill="rgb(214,41,9)" rx="2" ry="2" />
+<text  x="60.33" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1781" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1791.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="901" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="911.5" ></text>
+</g>
+<g >
+<title>move_unreachable (11,011,011 samples, 0.01%)</title><rect x="140.1" y="37" width="0.1" height="15.0" fill="rgb(210,27,6)" rx="2" ry="2" />
+<text  x="143.05" y="47.5" ></text>
+</g>
+<g >
+<title>[python3.10d] (88,088,088 samples, 0.12%)</title><rect x="132.2" y="2037" width="1.4" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="135.23" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (43,043,043 samples, 0.06%)</title><rect x="917.3" y="2021" width="0.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.27" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1749" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1759.5" ></text>
+</g>
+<g >
+<title>_PyGILState_GetThisThreadState (72,072,072 samples, 0.10%)</title><rect x="1049.1" y="2053" width="1.2" height="15.0" fill="rgb(216,53,12)" rx="2" ry="2" />
+<text  x="1052.12" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyType_LookupId (43,043,043 samples, 0.06%)</title><rect x="678.7" y="2037" width="0.7" height="15.0" fill="rgb(224,89,21)" rx="2" ry="2" />
+<text  x="681.67" y="2047.5" ></text>
+</g>
+<g >
+<title>python (74,143,143,069 samples, 99.96%)</title><rect x="10.4" y="2069" width="1179.5" height="15.0" fill="rgb(209,21,5)" rx="2" ry="2" />
+<text  x="13.37" y="2079.5" >python</text>
+</g>
+<g >
+<title>PyBool_FromLong (36,036,036 samples, 0.05%)</title><rect x="10.7" y="2053" width="0.6" height="15.0" fill="rgb(249,204,49)" rx="2" ry="2" />
+<text  x="13.70" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="421" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="431.5" ></text>
+</g>
+<g >
+<title>get_latin1_char.lto_priv.0 (7,007,007 samples, 0.01%)</title><rect x="1144.2" y="2053" width="0.1" height="15.0" fill="rgb(232,128,30)" rx="2" ry="2" />
+<text  x="1147.15" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (28,028,028 samples, 0.04%)</title><rect x="917.5" y="1925" width="0.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.50" y="1935.5" ></text>
+</g>
+<g >
+<title>tupleiter_next.lto_priv.0 (26,026,026 samples, 0.04%)</title><rect x="956.7" y="2037" width="0.4" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="959.71" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="805" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="815.5" ></text>
+</g>
+<g >
+<title>tuple_iter.lto_priv.0 (30,030,030 samples, 0.04%)</title><rect x="1181.4" y="2053" width="0.5" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="1184.40" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (159,159,159 samples, 0.21%)</title><rect x="139.9" y="1765" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1775.5" ></text>
+</g>
+<g >
+<title>PyObject_Malloc (34,034,034 samples, 0.05%)</title><rect x="80.9" y="2037" width="0.5" height="15.0" fill="rgb(206,4,1)" rx="2" ry="2" />
+<text  x="83.88" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="773" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="783.5" ></text>
+</g>
+<g >
+<title>__GI___libc_open (11,011,011 samples, 0.01%)</title><rect x="710.0" y="2037" width="0.2" height="15.0" fill="rgb(249,202,48)" rx="2" ry="2" />
+<text  x="713.03" y="2047.5" ></text>
+</g>
+<g >
+<title>PyTuple_GetItem (1,678,678,677 samples, 2.26%)</title><rect x="93.7" y="2037" width="26.7" height="15.0" fill="rgb(241,167,40)" rx="2" ry="2" />
+<text  x="96.73" y="2047.5" >P..</text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="853" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="863.5" ></text>
+</g>
+<g >
+<title>[unknown] (24,024,024 samples, 0.03%)</title><rect x="917.6" y="1893" width="0.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.57" y="1903.5" ></text>
+</g>
+<g >
+<title>PyLong_AsLong (10,010,010 samples, 0.01%)</title><rect x="58.3" y="2037" width="0.1" height="15.0" fill="rgb(220,72,17)" rx="2" ry="2" />
+<text  x="61.27" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_FastCallDictTstate (92,092,092 samples, 0.12%)</title><rect x="1059.5" y="2053" width="1.5" height="15.0" fill="rgb(222,81,19)" rx="2" ry="2" />
+<text  x="1062.55" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="629" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="639.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="1125.7" y="2037" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1128.65" y="2047.5" ></text>
+</g>
+<g >
+<title>uname (9,009,009 samples, 0.01%)</title><rect x="1189.9" y="2069" width="0.1" height="15.0" fill="rgb(213,41,9)" rx="2" ry="2" />
+<text  x="1192.86" y="2079.5" ></text>
+</g>
+<g >
+<title>[unknown] (9,009,009 samples, 0.01%)</title><rect x="710.1" y="1941" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.06" y="1951.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1973" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1983.5" ></text>
+</g>
+<g >
+<title>PyObject_GetAttr (39,039,039 samples, 0.05%)</title><rect x="1018.3" y="2037" width="0.6" height="15.0" fill="rgb(216,52,12)" rx="2" ry="2" />
+<text  x="1021.26" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (297,297,297 samples, 0.40%)</title><rect x="139.9" y="1957" width="4.8" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1967.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1125.0" y="1989" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1127.97" y="1999.5" ></text>
+</g>
+<g >
+<title>rangeiter_next.lto_priv.0 (10,010,010 samples, 0.01%)</title><rect x="918.1" y="2037" width="0.2" height="15.0" fill="rgb(221,76,18)" rx="2" ry="2" />
+<text  x="921.13" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_FastCallDictTstate (22,022,022 samples, 0.03%)</title><rect x="628.3" y="2037" width="0.3" height="15.0" fill="rgb(222,81,19)" rx="2" ry="2" />
+<text  x="631.27" y="2047.5" ></text>
+</g>
+<g >
+<title>__memmove_avx_unaligned_erms (7,007,007 samples, 0.01%)</title><rect x="1123.7" y="2053" width="0.1" height="15.0" fill="rgb(205,0,0)" rx="2" ry="2" />
+<text  x="1126.72" y="2063.5" ></text>
+</g>
+<g >
+<title>float_mul.lto_priv.0 (650,650,650 samples, 0.88%)</title><rect x="786.1" y="2037" width="10.4" height="15.0" fill="rgb(210,23,5)" rx="2" ry="2" />
+<text  x="789.11" y="2047.5" ></text>
+</g>
+<g >
+<title>cfunction_call.lto_priv.0 (8,008,008 samples, 0.01%)</title><rect x="1136.2" y="2053" width="0.1" height="15.0" fill="rgb(246,189,45)" rx="2" ry="2" />
+<text  x="1139.16" y="2063.5" ></text>
+</g>
+<g >
+<title>PyType_GenericAlloc (216,216,216 samples, 0.29%)</title><rect x="32.9" y="2053" width="3.5" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="35.95" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="837" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="847.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="757" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="767.5" ></text>
+</g>
+<g >
+<title>[unknown] (15,015,015 samples, 0.02%)</title><rect x="917.7" y="1877" width="0.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.71" y="1887.5" ></text>
+</g>
+<g >
+<title>PyNumber_Subtract (150,150,150 samples, 0.20%)</title><rect x="66.5" y="2037" width="2.4" height="15.0" fill="rgb(239,158,37)" rx="2" ry="2" />
+<text  x="69.48" y="2047.5" ></text>
+</g>
+<g >
+<title>PyLong_FromLongLong (26,026,026 samples, 0.04%)</title><rect x="59.3" y="2037" width="0.4" height="15.0" fill="rgb(239,159,38)" rx="2" ry="2" />
+<text  x="62.29" y="2047.5" ></text>
+</g>
+<g >
+<title>do_richcompare (21,021,021 samples, 0.03%)</title><rect x="767.8" y="2037" width="0.3" height="15.0" fill="rgb(211,27,6)" rx="2" ry="2" />
+<text  x="770.80" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (291,291,291 samples, 0.39%)</title><rect x="139.9" y="1941" width="4.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1951.5" ></text>
+</g>
+<g >
+<title>_PyObject_GenericGetAttrWithDict (123,123,123 samples, 0.17%)</title><rect x="634.5" y="2037" width="2.0" height="15.0" fill="rgb(206,6,1)" rx="2" ry="2" />
+<text  x="637.55" y="2047.5" ></text>
+</g>
+<g >
+<title>binary_op (157,157,157 samples, 0.21%)</title><rect x="1130.8" y="2053" width="2.5" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="1133.76" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (9,009,009 samples, 0.01%)</title><rect x="572.6" y="2021" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="575.55" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (8,008,008 samples, 0.01%)</title><rect x="710.1" y="1909" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.08" y="1919.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRawAlloc (8,008,008 samples, 0.01%)</title><rect x="142.1" y="1749" width="0.1" height="15.0" fill="rgb(240,165,39)" rx="2" ry="2" />
+<text  x="145.08" y="1759.5" ></text>
+</g>
+<g >
+<title>tuplesubscript.lto_priv.0 (27,027,027 samples, 0.04%)</title><rect x="957.1" y="2037" width="0.5" height="15.0" fill="rgb(250,208,49)" rx="2" ry="2" />
+<text  x="960.14" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_GC_New (31,031,031 samples, 0.04%)</title><rect x="634.0" y="2037" width="0.5" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="637.04" y="2047.5" ></text>
+</g>
+<g >
+<title>long_richcompare.lto_priv.0 (33,033,033 samples, 0.04%)</title><rect x="882.2" y="2037" width="0.5" height="15.0" fill="rgb(250,210,50)" rx="2" ry="2" />
+<text  x="885.22" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_GC_Malloc (16,016,016 samples, 0.02%)</title><rect x="1061.4" y="2053" width="0.2" height="15.0" fill="rgb(237,147,35)" rx="2" ry="2" />
+<text  x="1064.36" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugMalloc (77,077,077 samples, 0.10%)</title><rect x="616.9" y="2037" width="1.2" height="15.0" fill="rgb(211,31,7)" rx="2" ry="2" />
+<text  x="619.86" y="2047.5" ></text>
+</g>
+<g >
+<title>math_1 (8,008,008 samples, 0.01%)</title><rect x="1169.6" y="2053" width="0.1" height="15.0" fill="rgb(231,121,29)" rx="2" ry="2" />
+<text  x="1172.60" y="2063.5" ></text>
+</g>
+<g >
+<title>vgetargskeywords (59,059,059 samples, 0.08%)</title><rect x="1188.9" y="2053" width="0.9" height="15.0" fill="rgb(226,98,23)" rx="2" ry="2" />
+<text  x="1191.85" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyObject_VectorcallTstate.lto_priv.10 (1,081,081,080 samples, 1.46%)</title><rect x="1082.8" y="2053" width="17.1" height="15.0" fill="rgb(244,179,42)" rx="2" ry="2" />
+<text  x="1085.75" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (69,069,069 samples, 0.09%)</title><rect x="140.0" y="149" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="159.5" ></text>
+</g>
+<g >
+<title>vgetargs1_impl (29,029,029 samples, 0.04%)</title><rect x="1188.4" y="2053" width="0.5" height="15.0" fill="rgb(229,110,26)" rx="2" ry="2" />
+<text  x="1191.39" y="2063.5" ></text>
+</g>
+<g >
+<title>subtype_dealloc.lto_priv.0 (59,059,059 samples, 0.08%)</title><rect x="1180.1" y="2053" width="1.0" height="15.0" fill="rgb(251,214,51)" rx="2" ry="2" />
+<text  x="1183.11" y="2063.5" ></text>
+</g>
+<g >
+<title>long_add.lto_priv.0 (23,023,023 samples, 0.03%)</title><rect x="880.3" y="2037" width="0.3" height="15.0" fill="rgb(207,13,3)" rx="2" ry="2" />
+<text  x="883.27" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyTrash_cond (249,249,249 samples, 0.34%)</title><rect x="652.0" y="2037" width="3.9" height="15.0" fill="rgb(254,226,54)" rx="2" ry="2" />
+<text  x="654.95" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (30,030,030 samples, 0.04%)</title><rect x="917.5" y="1957" width="0.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.47" y="1967.5" ></text>
+</g>
+<g >
+<title>min_max (20,020,020 samples, 0.03%)</title><rect x="1171.1" y="2053" width="0.3" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="1174.11" y="2063.5" ></text>
+</g>
+<g >
+<title>PyTuple_New (58,058,058 samples, 0.08%)</title><rect x="120.4" y="2037" width="1.0" height="15.0" fill="rgb(254,226,54)" rx="2" ry="2" />
+<text  x="123.43" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1829" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1839.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugFree (20,020,020 samples, 0.03%)</title><rect x="145.6" y="2021" width="0.3" height="15.0" fill="rgb(244,180,43)" rx="2" ry="2" />
+<text  x="148.56" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (16,016,016 samples, 0.02%)</title><rect x="1178.5" y="2005" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.49" y="2015.5" ></text>
+</g>
+<g >
+<title>_PyObject_Free (223,223,223 samples, 0.30%)</title><rect x="628.6" y="2037" width="3.6" height="15.0" fill="rgb(224,90,21)" rx="2" ry="2" />
+<text  x="631.62" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyTuple_FromArray (40,040,040 samples, 0.05%)</title><rect x="1103.4" y="2053" width="0.7" height="15.0" fill="rgb(254,229,54)" rx="2" ry="2" />
+<text  x="1106.44" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="821" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="831.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="405" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="415.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1861" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1871.5" ></text>
+</g>
+<g >
+<title>PyThread_tss_is_created (15,015,015 samples, 0.02%)</title><rect x="137.8" y="2021" width="0.2" height="15.0" fill="rgb(239,156,37)" rx="2" ry="2" />
+<text  x="140.79" y="2031.5" ></text>
+</g>
+<g >
+<title>_PyDict_CheckConsistency (214,214,214 samples, 0.29%)</title><rect x="969.1" y="2053" width="3.5" height="15.0" fill="rgb(235,139,33)" rx="2" ry="2" />
+<text  x="972.15" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="1093" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1103.5" ></text>
+</g>
+<g >
+<title>inherit_slots (8,008,008 samples, 0.01%)</title><rect x="855.3" y="2037" width="0.1" height="15.0" fill="rgb(222,81,19)" rx="2" ry="2" />
+<text  x="858.30" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="1125" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1135.5" ></text>
+</g>
+<g >
+<title>_PyObject_MakeTpCall (550,550,550 samples, 0.74%)</title><rect x="1066.8" y="2053" width="8.8" height="15.0" fill="rgb(229,113,27)" rx="2" ry="2" />
+<text  x="1069.81" y="2063.5" ></text>
+</g>
+<g >
+<title>PyThread_tss_is_created (16,016,016 samples, 0.02%)</title><rect x="1019.8" y="2037" width="0.2" height="15.0" fill="rgb(239,156,37)" rx="2" ry="2" />
+<text  x="1022.75" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_Calloc (8,008,008 samples, 0.01%)</title><rect x="1059.4" y="2053" width="0.1" height="15.0" fill="rgb(206,8,2)" rx="2" ry="2" />
+<text  x="1062.42" y="2063.5" ></text>
+</g>
+<g >
+<title>func_clear.lto_priv.0 (11,011,011 samples, 0.01%)</title><rect x="200.2" y="2021" width="0.2" height="15.0" fill="rgb(249,205,49)" rx="2" ry="2" />
+<text  x="203.23" y="2031.5" ></text>
+</g>
+<g >
+<title>PyErr_Occurred (23,023,023 samples, 0.03%)</title><rect x="52.2" y="2037" width="0.3" height="15.0" fill="rgb(216,52,12)" rx="2" ry="2" />
+<text  x="55.17" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (69,069,069 samples, 0.09%)</title><rect x="140.0" y="69" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="79.5" ></text>
+</g>
+<g >
+<title>PyNumber_Multiply (224,224,224 samples, 0.30%)</title><rect x="62.8" y="2037" width="3.5" height="15.0" fill="rgb(234,134,32)" rx="2" ry="2" />
+<text  x="65.76" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="1125.3" y="2037" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1128.30" y="2047.5" ></text>
+</g>
+<g >
+<title>float_add.lto_priv.0 (384,384,384 samples, 0.52%)</title><rect x="768.9" y="2037" width="6.1" height="15.0" fill="rgb(249,202,48)" rx="2" ry="2" />
+<text  x="771.87" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_GetDictPtr (35,035,035 samples, 0.05%)</title><rect x="640.8" y="2037" width="0.6" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="643.81" y="2047.5" ></text>
+</g>
+<g >
+<title>__GI___fstatat64 (29,029,029 samples, 0.04%)</title><rect x="1122.9" y="2053" width="0.5" height="15.0" fill="rgb(227,101,24)" rx="2" ry="2" />
+<text  x="1125.91" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRawFree (144,144,144 samples, 0.19%)</title><rect x="620.6" y="2037" width="2.3" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="623.60" y="2047.5" ></text>
+</g>
+<g >
+<title>float_dealloc.lto_priv.0 (37,037,037 samples, 0.05%)</title><rect x="199.6" y="2021" width="0.6" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="202.64" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1813" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1823.5" ></text>
+</g>
+<g >
+<title>__strchr_avx2 (14,014,014 samples, 0.02%)</title><rect x="1124.5" y="2053" width="0.2" height="15.0" fill="rgb(208,18,4)" rx="2" ry="2" />
+<text  x="1127.46" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (4,724,724,720 samples, 6.37%)</title><rect x="133.6" y="2037" width="75.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="136.64" y="2047.5" >[unknown]</text>
+</g>
+<g >
+<title>float_richcompare.lto_priv.0 (35,035,035 samples, 0.05%)</title><rect x="796.5" y="2037" width="0.5" height="15.0" fill="rgb(241,169,40)" rx="2" ry="2" />
+<text  x="799.48" y="2047.5" ></text>
+</g>
+<g >
+<title>PyNumber_AsSsize_t (12,012,012 samples, 0.02%)</title><rect x="27.7" y="2053" width="0.2" height="15.0" fill="rgb(241,169,40)" rx="2" ry="2" />
+<text  x="30.71" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyTrash_begin (177,177,177 samples, 0.24%)</title><rect x="649.1" y="2037" width="2.9" height="15.0" fill="rgb(227,103,24)" rx="2" ry="2" />
+<text  x="652.13" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (69,069,069 samples, 0.09%)</title><rect x="140.0" y="165" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1909" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1919.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1589" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1599.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="373" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="383.5" ></text>
+</g>
+<g >
+<title>__memset_avx2_unaligned_erms (572,572,572 samples, 0.77%)</title><rect x="710.9" y="2037" width="9.1" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="713.90" y="2047.5" ></text>
+</g>
+<g >
+<title>_Py_Dealloc (416,416,416 samples, 0.56%)</title><rect x="696.7" y="2037" width="6.7" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="699.75" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="1077" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1087.5" ></text>
+</g>
+<g >
+<title>PyThreadState_Get (79,079,079 samples, 0.11%)</title><rect x="136.1" y="2021" width="1.2" height="15.0" fill="rgb(251,212,50)" rx="2" ry="2" />
+<text  x="139.09" y="2031.5" ></text>
+</g>
+<g >
+<title>_PyEval_MakeFrameVector (1,491,491,490 samples, 2.01%)</title><rect x="972.8" y="2053" width="23.7" height="15.0" fill="rgb(215,48,11)" rx="2" ry="2" />
+<text  x="975.81" y="2063.5" >_..</text>
+</g>
+<g >
+<title>_PyObject_Malloc (9,009,009 samples, 0.01%)</title><rect x="143.0" y="1797" width="0.2" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="146.05" y="1807.5" ></text>
+</g>
+<g >
+<title>PyDict_SetItem (251,251,251 samples, 0.34%)</title><rect x="48.0" y="2037" width="4.0" height="15.0" fill="rgb(229,112,26)" rx="2" ry="2" />
+<text  x="51.04" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (9,009,009 samples, 0.01%)</title><rect x="142.3" y="1749" width="0.1" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="145.27" y="1759.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1125.0" y="1957" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1127.97" y="1967.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1797" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1807.5" ></text>
+</g>
+<g >
+<title>PyObject_SetItem (10,010,010 samples, 0.01%)</title><rect x="90.4" y="2037" width="0.1" height="15.0" fill="rgb(216,52,12)" rx="2" ry="2" />
+<text  x="93.35" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (9,009,009 samples, 0.01%)</title><rect x="572.6" y="1989" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="575.55" y="1999.5" ></text>
+</g>
+<g >
+<title>PyFloat_AsDouble (10,010,010 samples, 0.01%)</title><rect x="14.1" y="2053" width="0.2" height="15.0" fill="rgb(250,209,50)" rx="2" ry="2" />
+<text  x="17.09" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyEval_MakeFrameVector (652,652,652 samples, 0.88%)</title><rect x="572.7" y="2037" width="10.4" height="15.0" fill="rgb(215,48,11)" rx="2" ry="2" />
+<text  x="575.73" y="2047.5" ></text>
+</g>
+<g >
+<title>PyLong_FromLongLong (8,008,008 samples, 0.01%)</title><rect x="27.4" y="2053" width="0.2" height="15.0" fill="rgb(239,159,38)" rx="2" ry="2" />
+<text  x="30.44" y="2063.5" ></text>
+</g>
+<g >
+<title>PyObject_IS_GC (150,150,150 samples, 0.20%)</title><rect x="78.3" y="2037" width="2.4" height="15.0" fill="rgb(219,64,15)" rx="2" ry="2" />
+<text  x="81.30" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (58,565,565,507 samples, 78.96%)</title><rect x="37.3" y="2053" width="931.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="40.34" y="2063.5" >[unknown]</text>
+</g>
+<g >
+<title>method_vectorcall (9,009,009 samples, 0.01%)</title><rect x="903.6" y="2037" width="0.1" height="15.0" fill="rgb(240,163,39)" rx="2" ry="2" />
+<text  x="906.60" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1285" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1295.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1253" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1263.5" ></text>
+</g>
+<g >
+<title>[unknown] (16,016,016 samples, 0.02%)</title><rect x="1123.1" y="1925" width="0.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1126.12" y="1935.5" ></text>
+</g>
+<g >
+<title>PyObject_GC_Del (54,054,054 samples, 0.07%)</title><rect x="28.3" y="2053" width="0.9" height="15.0" fill="rgb(237,149,35)" rx="2" ry="2" />
+<text  x="31.33" y="2063.5" ></text>
+</g>
+<g >
+<title>get_dict_state (43,043,043 samples, 0.06%)</title><rect x="847.5" y="2037" width="0.7" height="15.0" fill="rgb(235,138,33)" rx="2" ry="2" />
+<text  x="850.53" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="1123.2" y="1893" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1126.21" y="1903.5" ></text>
+</g>
+<g >
+<title>_PyObject_GetDictPtr (46,046,046 samples, 0.06%)</title><rect x="1020.9" y="2037" width="0.7" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="1023.87" y="2047.5" ></text>
+</g>
+<g >
+<title>PyVectorcall_Call (12,012,012 samples, 0.02%)</title><rect x="132.0" y="2037" width="0.2" height="15.0" fill="rgb(234,137,32)" rx="2" ry="2" />
+<text  x="135.03" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyLong_Sign (23,023,023 samples, 0.03%)</title><rect x="1050.6" y="2053" width="0.3" height="15.0" fill="rgb(213,38,9)" rx="2" ry="2" />
+<text  x="1053.57" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (13,013,013 samples, 0.02%)</title><rect x="10.1" y="2053" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="13.06" y="2063.5" ></text>
+</g>
+<g >
+<title>__close (7,007,007 samples, 0.01%)</title><rect x="710.5" y="2037" width="0.1" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="713.51" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1125.0" y="2021" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1127.97" y="2031.5" ></text>
+</g>
+<g >
+<title>_PyObject_GetMethod (31,031,031 samples, 0.04%)</title><rect x="596.2" y="2021" width="0.5" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="599.23" y="2031.5" ></text>
+</g>
+<g >
+<title>file (23,023,023 samples, 0.03%)</title><rect x="10.0" y="2069" width="0.4" height="15.0" fill="rgb(226,97,23)" rx="2" ry="2" />
+<text  x="13.00" y="2079.5" ></text>
+</g>
+<g >
+<title>_PyPegen_expect_token (13,013,013 samples, 0.02%)</title><rect x="1102.9" y="2053" width="0.2" height="15.0" fill="rgb(213,38,9)" rx="2" ry="2" />
+<text  x="1105.93" y="2063.5" ></text>
+</g>
+<g >
+<title>float_richcompare.lto_priv.0 (96,096,096 samples, 0.13%)</title><rect x="1138.4" y="2053" width="1.6" height="15.0" fill="rgb(241,169,40)" rx="2" ry="2" />
+<text  x="1141.44" y="2063.5" ></text>
+</g>
+<g >
+<title>PyCallable_Check (162,162,162 samples, 0.22%)</title><rect x="11.3" y="2053" width="2.6" height="15.0" fill="rgb(249,202,48)" rx="2" ry="2" />
+<text  x="14.27" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugFree (24,024,024 samples, 0.03%)</title><rect x="1050.9" y="2053" width="0.4" height="15.0" fill="rgb(244,180,43)" rx="2" ry="2" />
+<text  x="1053.95" y="2063.5" ></text>
+</g>
+<g >
+<title>PyDict_GetItemWithError (191,191,191 samples, 0.26%)</title><rect x="1012.2" y="2037" width="3.1" height="15.0" fill="rgb(223,85,20)" rx="2" ry="2" />
+<text  x="1015.24" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (193,193,193 samples, 0.26%)</title><rect x="139.9" y="1797" width="3.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1807.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1237" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1247.5" ></text>
+</g>
+<g >
+<title>PyTuple_New (11,011,011 samples, 0.01%)</title><rect x="32.8" y="2053" width="0.1" height="15.0" fill="rgb(254,226,54)" rx="2" ry="2" />
+<text  x="35.77" y="2063.5" ></text>
+</g>
+<g >
+<title>PyObject_GenericGetAttr (8,008,008 samples, 0.01%)</title><rect x="75.4" y="2037" width="0.2" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="78.45" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (69,069,069 samples, 0.09%)</title><rect x="140.0" y="117" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="127.5" ></text>
+</g>
+<g >
+<title>r_object (25,025,025 samples, 0.03%)</title><rect x="1178.0" y="2053" width="0.4" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="1180.99" y="2063.5" ></text>
+</g>
+<g >
+<title>PyErr_Occurred (63,063,063 samples, 0.09%)</title><rect x="1015.3" y="2037" width="1.0" height="15.0" fill="rgb(216,52,12)" rx="2" ry="2" />
+<text  x="1018.28" y="2047.5" ></text>
+</g>
+<g >
+<title>PyDict_GetItemWithError (251,251,251 samples, 0.34%)</title><rect x="44.0" y="2037" width="4.0" height="15.0" fill="rgb(223,85,20)" rx="2" ry="2" />
+<text  x="47.01" y="2047.5" ></text>
+</g>
+<g >
+<title>do_richcompare (12,012,012 samples, 0.02%)</title><rect x="1137.7" y="2053" width="0.2" height="15.0" fill="rgb(211,27,6)" rx="2" ry="2" />
+<text  x="1140.70" y="2063.5" ></text>
+</g>
+<g >
+<title>pthread_getspecific@@GLIBC_2.34 (96,096,096 samples, 0.13%)</title><rect x="202.4" y="2021" width="1.5" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="205.40" y="2031.5" ></text>
+</g>
+<g >
+<title>pthread_getspecific@@GLIBC_2.34 (337,337,337 samples, 0.45%)</title><rect x="1172.4" y="2053" width="5.3" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="1175.37" y="2063.5" ></text>
+</g>
+<g >
+<title>lookdict_split.lto_priv.0 (523,523,523 samples, 0.71%)</title><rect x="884.2" y="2037" width="8.3" height="15.0" fill="rgb(239,158,37)" rx="2" ry="2" />
+<text  x="887.16" y="2047.5" ></text>
+</g>
+<g >
+<title>visit_reachable (33,033,033 samples, 0.04%)</title><rect x="140.5" y="37" width="0.6" height="15.0" fill="rgb(252,216,51)" rx="2" ry="2" />
+<text  x="143.53" y="47.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="869" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="879.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1365" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1375.5" ></text>
+</g>
+<g >
+<title>PyObject_Call (10,010,010 samples, 0.01%)</title><rect x="69.0" y="2037" width="0.2" height="15.0" fill="rgb(227,102,24)" rx="2" ry="2" />
+<text  x="72.02" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (23,023,023 samples, 0.03%)</title><rect x="1123.0" y="2005" width="0.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1126.01" y="2015.5" ></text>
+</g>
+<g >
+<title>[unknown] (43,043,043 samples, 0.06%)</title><rect x="917.3" y="1989" width="0.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.27" y="1999.5" ></text>
+</g>
+<g >
+<title>float_sub.lto_priv.0 (416,416,416 samples, 0.56%)</title><rect x="797.0" y="2037" width="6.7" height="15.0" fill="rgb(235,142,33)" rx="2" ry="2" />
+<text  x="800.04" y="2047.5" ></text>
+</g>
+<g >
+<title>__memmove_avx_unaligned_erms (12,012,012 samples, 0.02%)</title><rect x="710.7" y="2037" width="0.2" height="15.0" fill="rgb(205,0,0)" rx="2" ry="2" />
+<text  x="713.70" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRawAlloc (178,178,178 samples, 0.24%)</title><rect x="1052.9" y="2053" width="2.9" height="15.0" fill="rgb(240,165,39)" rx="2" ry="2" />
+<text  x="1055.92" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1125.0" y="1925" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1127.97" y="1935.5" ></text>
+</g>
+<g >
+<title>all (74,175,175,101 samples, 100%)</title><rect x="10.0" y="2085" width="1180.0" height="15.0" fill="rgb(213,39,9)" rx="2" ry="2" />
+<text  x="13.00" y="2095.5" ></text>
+</g>
+<g >
+<title>[unknown] (73,073,073 samples, 0.10%)</title><rect x="139.9" y="1557" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1567.5" ></text>
+</g>
+<g >
+<title>_PyObject_GetMethod (10,010,010 samples, 0.01%)</title><rect x="148.5" y="2021" width="0.2" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="151.52" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (235,235,235 samples, 0.32%)</title><rect x="139.9" y="1845" width="3.8" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1855.5" ></text>
+</g>
+<g >
+<title>_PyObject_VectorcallTstate.lto_priv.6 (176,176,176 samples, 0.24%)</title><rect x="1100.1" y="2053" width="2.8" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="1103.12" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1669" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1679.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1397" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1407.5" ></text>
+</g>
+<g >
+<title>long_mul.lto_priv.0 (82,082,082 samples, 0.11%)</title><rect x="880.8" y="2037" width="1.3" height="15.0" fill="rgb(218,64,15)" rx="2" ry="2" />
+<text  x="883.77" y="2047.5" ></text>
+</g>
+<g >
+<title>get_small_int.lto_priv.0 (122,122,122 samples, 0.16%)</title><rect x="851.0" y="2037" width="2.0" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="854.02" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1205" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1215.5" ></text>
+</g>
+<g >
+<title>[unknown] (69,069,069 samples, 0.09%)</title><rect x="140.0" y="101" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="111.5" ></text>
+</g>
+<g >
+<title>get_float_state (12,012,012 samples, 0.02%)</title><rect x="200.6" y="2021" width="0.2" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="203.57" y="2031.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (10,010,010 samples, 0.01%)</title><rect x="142.8" y="1781" width="0.2" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="145.84" y="1791.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="357" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (25,025,025 samples, 0.03%)</title><rect x="1123.0" y="2021" width="0.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1125.97" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (301,301,301 samples, 0.41%)</title><rect x="139.9" y="1973" width="4.8" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1983.5" ></text>
+</g>
+<g >
+<title>[unknown] (73,073,073 samples, 0.10%)</title><rect x="139.9" y="1605" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1615.5" ></text>
+</g>
+<g >
+<title>arena_map_get (298,298,298 samples, 0.40%)</title><rect x="1125.9" y="2053" width="4.7" height="15.0" fill="rgb(212,32,7)" rx="2" ry="2" />
+<text  x="1128.86" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (73,073,073 samples, 0.10%)</title><rect x="139.9" y="1573" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1583.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1413" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1423.5" ></text>
+</g>
+<g >
+<title>PyGILState_Check (52,052,052 samples, 0.07%)</title><rect x="133.9" y="2021" width="0.8" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="136.86" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="549" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="559.5" ></text>
+</g>
+<g >
+<title>PyObject_GC_Del (23,023,023 samples, 0.03%)</title><rect x="71.6" y="2037" width="0.3" height="15.0" fill="rgb(237,149,35)" rx="2" ry="2" />
+<text  x="74.58" y="2047.5" ></text>
+</g>
+<g >
+<title>PyType_IsSubtype (539,539,539 samples, 0.73%)</title><rect x="121.9" y="2037" width="8.6" height="15.0" fill="rgb(254,228,54)" rx="2" ry="2" />
+<text  x="124.95" y="2047.5" ></text>
+</g>
+<g >
+<title>object_new.lto_priv.0 (51,051,051 samples, 0.07%)</title><rect x="912.4" y="2037" width="0.9" height="15.0" fill="rgb(209,19,4)" rx="2" ry="2" />
+<text  x="915.44" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1445" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1455.5" ></text>
+</g>
+<g >
+<title>_Py_NewReference (276,276,276 samples, 0.37%)</title><rect x="1118.5" y="2053" width="4.4" height="15.0" fill="rgb(227,104,24)" rx="2" ry="2" />
+<text  x="1121.47" y="2063.5" ></text>
+</g>
+<g >
+<title>insert_to_usedpool (10,010,010 samples, 0.01%)</title><rect x="855.4" y="2037" width="0.2" height="15.0" fill="rgb(247,194,46)" rx="2" ry="2" />
+<text  x="858.45" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_GenericSetAttrWithDict (269,269,269 samples, 0.36%)</title><rect x="636.5" y="2037" width="4.3" height="15.0" fill="rgb(228,110,26)" rx="2" ry="2" />
+<text  x="639.51" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1461" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1471.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1125.0" y="2005" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1127.97" y="2015.5" ></text>
+</g>
+<g >
+<title>[unknown] (69,069,069 samples, 0.09%)</title><rect x="140.0" y="181" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown] (80,080,080 samples, 0.11%)</title><rect x="139.9" y="1701" width="1.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1711.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="293" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="303.5" ></text>
+</g>
+<g >
+<title>read_size_t (10,010,010 samples, 0.01%)</title><rect x="203.9" y="2021" width="0.2" height="15.0" fill="rgb(213,39,9)" rx="2" ry="2" />
+<text  x="206.93" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (72,072,072 samples, 0.10%)</title><rect x="139.9" y="1509" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1519.5" ></text>
+</g>
+<g >
+<title>[unknown] (267,267,267 samples, 0.36%)</title><rect x="139.9" y="1861" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1871.5" ></text>
+</g>
+<g >
+<title>[unknown] (223,223,223 samples, 0.30%)</title><rect x="139.9" y="1829" width="3.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1839.5" ></text>
+</g>
+<g >
+<title>tupledealloc.lto_priv.0 (492,492,492 samples, 0.66%)</title><rect x="948.7" y="2037" width="7.8" height="15.0" fill="rgb(225,92,22)" rx="2" ry="2" />
+<text  x="951.67" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyDict_ContainsId (134,134,134 samples, 0.18%)</title><rect x="214.8" y="2037" width="2.1" height="15.0" fill="rgb(245,186,44)" rx="2" ry="2" />
+<text  x="217.77" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugCheckAddress (1,099,099,098 samples, 1.48%)</title><rect x="597.9" y="2037" width="17.5" height="15.0" fill="rgb(213,38,9)" rx="2" ry="2" />
+<text  x="600.91" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="1045" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1055.5" ></text>
+</g>
+<g >
+<title>new_dict_with_shared_keys.lto_priv.0 (122,122,122 samples, 0.16%)</title><rect x="909.6" y="2037" width="2.0" height="15.0" fill="rgb(218,62,15)" rx="2" ry="2" />
+<text  x="912.64" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="501" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="511.5" ></text>
+</g>
+<g >
+<title>get_tuple_state (31,031,031 samples, 0.04%)</title><rect x="200.8" y="2021" width="0.5" height="15.0" fill="rgb(219,67,16)" rx="2" ry="2" />
+<text  x="203.80" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1861" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1871.5" ></text>
+</g>
+<g >
+<title>tupledealloc.lto_priv.0 (75,075,075 samples, 0.10%)</title><rect x="1181.9" y="2053" width="1.2" height="15.0" fill="rgb(225,92,22)" rx="2" ry="2" />
+<text  x="1184.88" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="469" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="479.5" ></text>
+</g>
+<g >
+<title>call_function.lto_priv.0 (2,262,262,260 samples, 3.05%)</title><rect x="163.4" y="2021" width="36.0" height="15.0" fill="rgb(235,141,33)" rx="2" ry="2" />
+<text  x="166.40" y="2031.5" >cal..</text>
+</g>
+<g >
+<title>PyThread_tss_get (86,086,086 samples, 0.12%)</title><rect x="91.9" y="2037" width="1.3" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="94.87" y="2047.5" ></text>
+</g>
+<g >
+<title>lookdict_unicode_nodummy (722,722,722 samples, 0.97%)</title><rect x="1157.7" y="2053" width="11.5" height="15.0" fill="rgb(231,119,28)" rx="2" ry="2" />
+<text  x="1160.66" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyObject_GC_Alloc (22,022,022 samples, 0.03%)</title><rect x="1061.0" y="2053" width="0.4" height="15.0" fill="rgb(241,166,39)" rx="2" ry="2" />
+<text  x="1064.01" y="2063.5" ></text>
+</g>
+<g >
+<title>find_name_in_mro.lto_priv.0 (24,024,024 samples, 0.03%)</title><rect x="1138.0" y="2053" width="0.4" height="15.0" fill="rgb(205,3,0)" rx="2" ry="2" />
+<text  x="1140.98" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyObject_Call_Prepend (85,085,085 samples, 0.11%)</title><rect x="146.5" y="2021" width="1.4" height="15.0" fill="rgb(211,30,7)" rx="2" ry="2" />
+<text  x="149.52" y="2031.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugMalloc (100,100,100 samples, 0.13%)</title><rect x="1051.3" y="2053" width="1.6" height="15.0" fill="rgb(211,31,7)" rx="2" ry="2" />
+<text  x="1054.33" y="2063.5" ></text>
+</g>
+<g >
+<title>pthread_getspecific@@GLIBC_2.34 (221,221,221 samples, 0.30%)</title><rect x="913.4" y="2037" width="3.5" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="916.38" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (16,016,016 samples, 0.02%)</title><rect x="1178.5" y="1989" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.49" y="1999.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1621" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1631.5" ></text>
+</g>
+<g >
+<title>[unknown] (18,018,018 samples, 0.02%)</title><rect x="1123.1" y="1957" width="0.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1126.09" y="1967.5" ></text>
+</g>
+<g >
+<title>float_div.lto_priv.0 (75,075,075 samples, 0.10%)</title><rect x="784.9" y="2037" width="1.2" height="15.0" fill="rgb(231,120,28)" rx="2" ry="2" />
+<text  x="787.92" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (118,118,118 samples, 0.16%)</title><rect x="139.9" y="1733" width="1.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1743.5" ></text>
+</g>
+<g >
+<title>_PyUnicode_FromId (309,309,309 samples, 0.42%)</title><rect x="1104.2" y="2053" width="5.0" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="1107.25" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyDict_CheckConsistency (365,365,365 samples, 0.49%)</title><rect x="209.0" y="2037" width="5.8" height="15.0" fill="rgb(235,139,33)" rx="2" ry="2" />
+<text  x="211.96" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (15,015,015 samples, 0.02%)</title><rect x="1178.5" y="1909" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.50" y="1919.5" ></text>
+</g>
+<g >
+<title>binary_op1 (140,140,140 samples, 0.19%)</title><rect x="1133.3" y="2053" width="2.2" height="15.0" fill="rgb(226,97,23)" rx="2" ry="2" />
+<text  x="1136.26" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyUnicode_CheckConsistency (152,152,152 samples, 0.21%)</title><rect x="159.2" y="2021" width="2.4" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="162.23" y="2031.5" ></text>
+</g>
+<g >
+<title>gc_list_size (14,014,014 samples, 0.02%)</title><rect x="1142.5" y="2053" width="0.2" height="15.0" fill="rgb(251,213,50)" rx="2" ry="2" />
+<text  x="1145.47" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="741" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="751.5" ></text>
+</g>
+<g >
+<title>[unknown] (134,134,134 samples, 0.18%)</title><rect x="139.9" y="1749" width="2.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1759.5" ></text>
+</g>
+<g >
+<title>_PyFrame_New_NoTrack (2,502,502,500 samples, 3.37%)</title><rect x="998.2" y="2053" width="39.8" height="15.0" fill="rgb(219,68,16)" rx="2" ry="2" />
+<text  x="1001.16" y="2063.5" >_Py..</text>
+</g>
+<g >
+<title>[unknown] (11,011,011 samples, 0.01%)</title><rect x="917.8" y="1861" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.78" y="1871.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="277" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="287.5" ></text>
+</g>
+<g >
+<title>long_sub.lto_priv.0 (82,082,082 samples, 0.11%)</title><rect x="882.7" y="2037" width="1.3" height="15.0" fill="rgb(244,183,43)" rx="2" ry="2" />
+<text  x="885.74" y="2047.5" ></text>
+</g>
+<g >
+<title>PyUnicode_InternInPlace (97,097,097 samples, 0.13%)</title><rect x="138.1" y="2021" width="1.5" height="15.0" fill="rgb(212,33,7)" rx="2" ry="2" />
+<text  x="141.06" y="2031.5" ></text>
+</g>
+<g >
+<title>PyArg_ParseTupleAndKeywords (16,016,016 samples, 0.02%)</title><rect x="10.4" y="2053" width="0.3" height="15.0" fill="rgb(226,98,23)" rx="2" ry="2" />
+<text  x="13.43" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="981" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="991.5" ></text>
+</g>
+<g >
+<title>[python3.10d] (8,008,008 samples, 0.01%)</title><rect x="1020.0" y="2037" width="0.1" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="1023.01" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="965" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="975.5" ></text>
+</g>
+<g >
+<title>math_sqrt (31,031,031 samples, 0.04%)</title><rect x="1170.2" y="2053" width="0.5" height="15.0" fill="rgb(239,157,37)" rx="2" ry="2" />
+<text  x="1173.24" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="1125.3" y="2021" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1128.30" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="693" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="703.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="565" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="575.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="933" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="943.5" ></text>
+</g>
+<g >
+<title>math_1_to_whatever (32,032,032 samples, 0.04%)</title><rect x="1169.7" y="2053" width="0.5" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="1172.73" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (15,015,015 samples, 0.02%)</title><rect x="1178.5" y="1941" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.50" y="1951.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1189" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1199.5" ></text>
+</g>
+<g >
+<title>PyType_GenericAlloc (25,025,025 samples, 0.03%)</title><rect x="121.5" y="2037" width="0.4" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="124.53" y="2047.5" ></text>
+</g>
+<g >
+<title>__memmove_avx_unaligned_erms (45,045,045 samples, 0.06%)</title><rect x="162.3" y="2021" width="0.7" height="15.0" fill="rgb(205,0,0)" rx="2" ry="2" />
+<text  x="165.27" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (9,009,009 samples, 0.01%)</title><rect x="572.6" y="1973" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="575.55" y="1983.5" ></text>
+</g>
+<g >
+<title>__GI___read_nocancel (7,007,007 samples, 0.01%)</title><rect x="1125.0" y="2037" width="0.1" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="1127.97" y="2047.5" ></text>
+</g>
+<g >
+<title>[libmagic.so.1.0.0] (8,008,008 samples, 0.01%)</title><rect x="10.1" y="2037" width="0.1" height="15.0" fill="rgb(216,54,12)" rx="2" ry="2" />
+<text  x="13.06" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="1957" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="1967.5" ></text>
+</g>
+<g >
+<title>PyObject_SetAttr (535,535,535 samples, 0.72%)</title><rect x="81.8" y="2037" width="8.6" height="15.0" fill="rgb(238,156,37)" rx="2" ry="2" />
+<text  x="84.83" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1685" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1695.5" ></text>
+</g>
+<g >
+<title>tuple_alloc (135,135,135 samples, 0.18%)</title><rect x="205.2" y="2021" width="2.1" height="15.0" fill="rgb(242,172,41)" rx="2" ry="2" />
+<text  x="208.15" y="2031.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (8,008,008 samples, 0.01%)</title><rect x="141.9" y="1733" width="0.1" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="144.92" y="1743.5" ></text>
+</g>
+<g >
+<title>_PyLong_New (16,016,016 samples, 0.02%)</title><rect x="1050.3" y="2053" width="0.2" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="1053.27" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="677" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="687.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="917" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="927.5" ></text>
+</g>
+<g >
+<title>PyUnicode_New (14,014,014 samples, 0.02%)</title><rect x="36.5" y="2053" width="0.2" height="15.0" fill="rgb(233,130,31)" rx="2" ry="2" />
+<text  x="39.48" y="2063.5" ></text>
+</g>
+<g >
+<title>lookdict_unicode (54,054,054 samples, 0.07%)</title><rect x="1156.8" y="2053" width="0.9" height="15.0" fill="rgb(214,41,9)" rx="2" ry="2" />
+<text  x="1159.80" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="325" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="335.5" ></text>
+</g>
+<g >
+<title>PyObject_GetIter (12,012,012 samples, 0.02%)</title><rect x="78.0" y="2037" width="0.2" height="15.0" fill="rgb(211,30,7)" rx="2" ry="2" />
+<text  x="81.03" y="2047.5" ></text>
+</g>
+<g >
+<title>PyObject_Free (27,027,027 samples, 0.04%)</title><rect x="27.9" y="2053" width="0.4" height="15.0" fill="rgb(238,153,36)" rx="2" ry="2" />
+<text  x="30.90" y="2063.5" ></text>
+</g>
+<g >
+<title>__strlen_avx2 (7,007,007 samples, 0.01%)</title><rect x="720.3" y="2037" width="0.1" height="15.0" fill="rgb(246,188,45)" rx="2" ry="2" />
+<text  x="723.27" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyGILState_GetThisThreadState (17,017,017 samples, 0.02%)</title><rect x="145.3" y="2021" width="0.2" height="15.0" fill="rgb(216,53,12)" rx="2" ry="2" />
+<text  x="148.26" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="2021" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="2031.5" ></text>
+</g>
+<g >
+<title>method_vectorcall (10,010,010 samples, 0.01%)</title><rect x="1170.7" y="2053" width="0.2" height="15.0" fill="rgb(240,163,39)" rx="2" ry="2" />
+<text  x="1173.73" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (8,008,008 samples, 0.01%)</title><rect x="143.3" y="1813" width="0.2" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="146.33" y="1823.5" ></text>
+</g>
+<g >
+<title>_PyType_GetModuleByDef (41,041,041 samples, 0.06%)</title><rect x="658.0" y="2037" width="0.7" height="15.0" fill="rgb(252,216,51)" rx="2" ry="2" />
+<text  x="661.04" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (287,287,287 samples, 0.39%)</title><rect x="139.9" y="1925" width="4.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1935.5" ></text>
+</g>
+<g >
+<title>_Py_CheckSlotResult (402,402,402 samples, 0.54%)</title><rect x="690.3" y="2037" width="6.4" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="693.35" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1125.7" y="1989" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1128.70" y="1999.5" ></text>
+</g>
+<g >
+<title>PyThread_tss_is_created (46,046,046 samples, 0.06%)</title><rect x="32.0" y="2053" width="0.8" height="15.0" fill="rgb(239,156,37)" rx="2" ry="2" />
+<text  x="35.04" y="2063.5" ></text>
+</g>
+<g >
+<title>PyObject_Malloc (16,016,016 samples, 0.02%)</title><rect x="29.3" y="2053" width="0.2" height="15.0" fill="rgb(206,4,1)" rx="2" ry="2" />
+<text  x="32.28" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyObject_GetMethod (404,404,404 samples, 0.55%)</title><rect x="641.4" y="2037" width="6.4" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="644.36" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyType_Lookup (1,256,256,255 samples, 1.69%)</title><rect x="658.7" y="2037" width="20.0" height="15.0" fill="rgb(241,169,40)" rx="2" ry="2" />
+<text  x="661.69" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyLong_New (13,013,013 samples, 0.02%)</title><rect x="597.7" y="2037" width="0.2" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="600.70" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="1029" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1039.5" ></text>
+</g>
+<g >
+<title>PyObject_Free (21,021,021 samples, 0.03%)</title><rect x="71.2" y="2037" width="0.4" height="15.0" fill="rgb(238,153,36)" rx="2" ry="2" />
+<text  x="74.24" y="2047.5" ></text>
+</g>
+<g >
+<title>PyThread_tss_get (55,055,055 samples, 0.07%)</title><rect x="1018.9" y="2037" width="0.9" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="1021.88" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (33,033,033 samples, 0.04%)</title><rect x="917.4" y="1973" width="0.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.43" y="1983.5" ></text>
+</g>
+<g >
+<title>object_dealloc.lto_priv.0 (47,047,047 samples, 0.06%)</title><rect x="911.6" y="2037" width="0.8" height="15.0" fill="rgb(214,41,9)" rx="2" ry="2" />
+<text  x="914.63" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (10,010,010 samples, 0.01%)</title><rect x="143.5" y="1829" width="0.2" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="146.51" y="1839.5" ></text>
+</g>
+<g >
+<title>_PyUnicode_FromUCS1.lto_priv.0 (11,011,011 samples, 0.01%)</title><rect x="685.0" y="2037" width="0.2" height="15.0" fill="rgb(217,58,13)" rx="2" ry="2" />
+<text  x="688.01" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (72,072,072 samples, 0.10%)</title><rect x="139.9" y="1525" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1535.5" ></text>
+</g>
+<g >
+<title>method_vectorcall_O (10,010,010 samples, 0.01%)</title><rect x="1170.9" y="2053" width="0.2" height="15.0" fill="rgb(216,52,12)" rx="2" ry="2" />
+<text  x="1173.94" y="2063.5" ></text>
+</g>
+<g >
+<title>convertsimple (26,026,026 samples, 0.04%)</title><rect x="760.9" y="2037" width="0.4" height="15.0" fill="rgb(246,193,46)" rx="2" ry="2" />
+<text  x="763.86" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (11,011,011 samples, 0.01%)</title><rect x="710.0" y="2005" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.03" y="2015.5" ></text>
+</g>
+<g >
+<title>_PyObjectDict_SetItem (120,120,120 samples, 0.16%)</title><rect x="1056.7" y="2053" width="1.9" height="15.0" fill="rgb(246,190,45)" rx="2" ry="2" />
+<text  x="1059.68" y="2063.5" ></text>
+</g>
+<g >
+<title>get_tuple_state (41,041,041 samples, 0.06%)</title><rect x="853.0" y="2037" width="0.6" height="15.0" fill="rgb(219,67,16)" rx="2" ry="2" />
+<text  x="855.96" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyEval_EvalFrameDefault (20,700,700,680 samples, 27.91%)</title><rect x="243.4" y="2037" width="329.3" height="15.0" fill="rgb(221,75,17)" rx="2" ry="2" />
+<text  x="246.42" y="2047.5" >_PyEval_EvalFrameDefault</text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="229" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="239.5" ></text>
+</g>
+<g >
+<title>__sqrt_finite@GLIBC_2.15 (10,010,010 samples, 0.01%)</title><rect x="720.1" y="2037" width="0.2" height="15.0" fill="rgb(249,204,48)" rx="2" ry="2" />
+<text  x="723.11" y="2047.5" ></text>
+</g>
+<g >
+<title>_Py_Dealloc (57,057,057 samples, 0.08%)</title><rect x="1117.5" y="2053" width="0.9" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="1120.53" y="2063.5" ></text>
+</g>
+<g >
+<title>subtype_dealloc.lto_priv.0 (55,055,055 samples, 0.07%)</title><rect x="204.2" y="2021" width="0.9" height="15.0" fill="rgb(251,214,51)" rx="2" ry="2" />
+<text  x="207.21" y="2031.5" ></text>
+</g>
+<g >
+<title>lookdict_unicode_nodummy (454,454,454 samples, 0.61%)</title><rect x="892.6" y="2037" width="7.2" height="15.0" fill="rgb(231,119,28)" rx="2" ry="2" />
+<text  x="895.55" y="2047.5" ></text>
+</g>
+<g >
+<title>PyLong_AsSsize_t (15,015,015 samples, 0.02%)</title><rect x="58.6" y="2037" width="0.2" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="61.55" y="2047.5" ></text>
+</g>
+<g >
+<title>tuple_alloc (192,192,192 samples, 0.26%)</title><rect x="945.6" y="2037" width="3.1" height="15.0" fill="rgb(242,172,41)" rx="2" ry="2" />
+<text  x="948.60" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyUnicode_CheckConsistency (9,009,009 samples, 0.01%)</title><rect x="1104.1" y="2053" width="0.1" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="1107.09" y="2063.5" ></text>
+</g>
+<g >
+<title>_PyMem_DebugRawFree (26,026,026 samples, 0.04%)</title><rect x="145.9" y="2021" width="0.4" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="148.90" y="2031.5" ></text>
+</g>
+<g >
+<title>[unknown] (73,073,073 samples, 0.10%)</title><rect x="139.9" y="1653" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1663.5" ></text>
+</g>
+<g >
+<title>convert_to_double (136,136,136 samples, 0.18%)</title><rect x="758.7" y="2037" width="2.2" height="15.0" fill="rgb(250,207,49)" rx="2" ry="2" />
+<text  x="761.69" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (11,011,011 samples, 0.01%)</title><rect x="710.0" y="2021" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.03" y="2031.5" ></text>
+</g>
+<g >
+<title>PyGILState_Check (173,173,173 samples, 0.23%)</title><rect x="54.2" y="2037" width="2.8" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="57.21" y="2047.5" ></text>
+</g>
+<g >
+<title>[python3.10d] (16,016,016 samples, 0.02%)</title><rect x="139.6" y="2021" width="0.3" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="142.61" y="2031.5" ></text>
+</g>
+<g >
+<title>_PyEval_Vector (102,102,102 samples, 0.14%)</title><rect x="996.5" y="2053" width="1.7" height="15.0" fill="rgb(205,0,0)" rx="2" ry="2" />
+<text  x="999.54" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (25,025,025 samples, 0.03%)</title><rect x="1123.0" y="2037" width="0.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1125.97" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_Call_Prepend (52,052,052 samples, 0.07%)</title><rect x="1058.6" y="2053" width="0.8" height="15.0" fill="rgb(211,30,7)" rx="2" ry="2" />
+<text  x="1061.59" y="2063.5" ></text>
+</g>
+<g >
+<title>binary_op (226,226,226 samples, 0.30%)</title><rect x="727.4" y="2037" width="3.6" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="730.42" y="2047.5" ></text>
+</g>
+<g >
+<title>lookup_method.lto_priv.0 (18,018,018 samples, 0.02%)</title><rect x="1169.2" y="2053" width="0.2" height="15.0" fill="rgb(224,88,21)" rx="2" ry="2" />
+<text  x="1172.16" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (69,069,069 samples, 0.09%)</title><rect x="140.0" y="133" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="143.5" ></text>
+</g>
+<g >
+<title>[unknown] (73,073,073 samples, 0.10%)</title><rect x="139.9" y="1637" width="1.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1647.5" ></text>
+</g>
+<g >
+<title>_PyObject_GC_Alloc (107,107,107 samples, 0.14%)</title><rect x="632.2" y="2037" width="1.7" height="15.0" fill="rgb(241,166,39)" rx="2" ry="2" />
+<text  x="635.17" y="2047.5" ></text>
+</g>
+<g >
+<title>PyNumber_AsSsize_t (15,015,015 samples, 0.02%)</title><rect x="62.4" y="2037" width="0.2" height="15.0" fill="rgb(241,169,40)" rx="2" ry="2" />
+<text  x="65.37" y="2047.5" ></text>
+</g>
+<g >
+<title>PyMem_Realloc (8,008,008 samples, 0.01%)</title><rect x="60.6" y="2037" width="0.1" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="63.58" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.2" y="2005" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.20" y="2015.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1301" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1311.5" ></text>
+</g>
+<g >
+<title>[unknown] (28,028,028 samples, 0.04%)</title><rect x="917.5" y="1941" width="0.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.50" y="1951.5" ></text>
+</g>
+<g >
+<title>resolve_slotdups (12,012,012 samples, 0.02%)</title><rect x="930.8" y="2037" width="0.2" height="15.0" fill="rgb(213,39,9)" rx="2" ry="2" />
+<text  x="933.80" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="710.1" y="1893" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.09" y="1903.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (13,013,013 samples, 0.02%)</title><rect x="142.5" y="1765" width="0.2" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="145.54" y="1775.5" ></text>
+</g>
+<g >
+<title>__memset_avx2_unaligned_erms (36,036,036 samples, 0.05%)</title><rect x="1123.8" y="2053" width="0.6" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1126.83" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (8,008,008 samples, 0.01%)</title><rect x="710.1" y="1925" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.08" y="1935.5" ></text>
+</g>
+<g >
+<title>cleanreturn (12,012,012 samples, 0.02%)</title><rect x="1137.1" y="2053" width="0.2" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="1140.13" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="885" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="895.5" ></text>
+</g>
+<g >
+<title>_PyObject_Malloc (9,009,009 samples, 0.01%)</title><rect x="141.7" y="1717" width="0.1" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="144.66" y="1727.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="613" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="623.5" ></text>
+</g>
+<g >
+<title>_Py_Dealloc (31,031,031 samples, 0.04%)</title><rect x="161.7" y="2021" width="0.5" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="164.74" y="2031.5" ></text>
+</g>
+<g >
+<title>list_iter.lto_priv.0 (21,021,021 samples, 0.03%)</title><rect x="876.0" y="2037" width="0.3" height="15.0" fill="rgb(232,126,30)" rx="2" ry="2" />
+<text  x="878.97" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (71,071,071 samples, 0.10%)</title><rect x="140.0" y="1349" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="1359.5" ></text>
+</g>
+<g >
+<title>[unknown] (12,012,012 samples, 0.02%)</title><rect x="719.8" y="1989" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="722.82" y="1999.5" ></text>
+</g>
+<g >
+<title>_PyDict_GetItemHint (1,634,634,633 samples, 2.20%)</title><rect x="216.9" y="2037" width="26.0" height="15.0" fill="rgb(240,161,38)" rx="2" ry="2" />
+<text  x="219.90" y="2047.5" >_..</text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="645" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="655.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1717" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1727.5" ></text>
+</g>
+<g >
+<title>_PyDict_LoadGlobal (15,015,015 samples, 0.02%)</title><rect x="243.1" y="2037" width="0.2" height="15.0" fill="rgb(219,68,16)" rx="2" ry="2" />
+<text  x="246.07" y="2047.5" ></text>
+</g>
+<g >
+<title>get_gc_state (16,016,016 samples, 0.02%)</title><rect x="1143.9" y="2053" width="0.3" height="15.0" fill="rgb(243,176,42)" rx="2" ry="2" />
+<text  x="1146.90" y="2063.5" ></text>
+</g>
+<g >
+<title>lookup_method.lto_priv.0 (13,013,013 samples, 0.02%)</title><rect x="202.1" y="2021" width="0.2" height="15.0" fill="rgb(224,88,21)" rx="2" ry="2" />
+<text  x="205.09" y="2031.5" ></text>
+</g>
+<g >
+<title>cfunction_call.lto_priv.0 (12,012,012 samples, 0.02%)</title><rect x="758.3" y="2037" width="0.2" height="15.0" fill="rgb(246,189,45)" rx="2" ry="2" />
+<text  x="761.28" y="2047.5" ></text>
+</g>
+<g >
+<title>siphash24 (15,015,015 samples, 0.02%)</title><rect x="1178.8" y="2053" width="0.3" height="15.0" fill="rgb(246,192,45)" rx="2" ry="2" />
+<text  x="1181.82" y="2063.5" ></text>
+</g>
+<g >
+<title>PyObject_IsTrue (12,012,012 samples, 0.02%)</title><rect x="80.7" y="2037" width="0.2" height="15.0" fill="rgb(230,115,27)" rx="2" ry="2" />
+<text  x="83.69" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyEval_Vector (823,823,823 samples, 1.11%)</title><rect x="583.1" y="2037" width="13.1" height="15.0" fill="rgb(205,0,0)" rx="2" ry="2" />
+<text  x="586.11" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (211,211,211 samples, 0.28%)</title><rect x="139.9" y="1813" width="3.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1823.5" ></text>
+</g>
+<g >
+<title>tupleiter_dealloc.lto_priv.0 (13,013,013 samples, 0.02%)</title><rect x="956.5" y="2037" width="0.2" height="15.0" fill="rgb(244,183,43)" rx="2" ry="2" />
+<text  x="959.50" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="341" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="351.5" ></text>
+</g>
+<g >
+<title>[unknown] (317,317,317 samples, 0.43%)</title><rect x="139.9" y="2005" width="5.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="2015.5" ></text>
+</g>
+<g >
+<title>PyUnicode_InternInPlace (73,073,073 samples, 0.10%)</title><rect x="130.7" y="2037" width="1.2" height="15.0" fill="rgb(212,33,7)" rx="2" ry="2" />
+<text  x="133.74" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (283,283,283 samples, 0.38%)</title><rect x="139.9" y="1909" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1919.5" ></text>
+</g>
+<g >
+<title>BB_setitem (9,009,009 samples, 0.01%)</title><rect x="37.3" y="2037" width="0.2" height="15.0" fill="rgb(218,60,14)" rx="2" ry="2" />
+<text  x="40.34" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="597" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="607.5" ></text>
+</g>
+<g >
+<title>PyThread_tss_is_created (31,031,031 samples, 0.04%)</title><rect x="93.2" y="2037" width="0.5" height="15.0" fill="rgb(239,156,37)" rx="2" ry="2" />
+<text  x="96.24" y="2047.5" ></text>
+</g>
+<g >
+<title>list_dealloc.lto_priv.0 (69,069,069 samples, 0.09%)</title><rect x="874.8" y="2037" width="1.1" height="15.0" fill="rgb(222,78,18)" rx="2" ry="2" />
+<text  x="877.84" y="2047.5" ></text>
+</g>
+<g >
+<title>slot_nb_add (16,016,016 samples, 0.02%)</title><rect x="931.1" y="2037" width="0.3" height="15.0" fill="rgb(216,55,13)" rx="2" ry="2" />
+<text  x="934.12" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1765" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1775.5" ></text>
+</g>
+<g >
+<title>new_dict (309,309,309 samples, 0.42%)</title><rect x="904.7" y="2037" width="4.9" height="15.0" fill="rgb(254,229,54)" rx="2" ry="2" />
+<text  x="907.72" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (7,007,007 samples, 0.01%)</title><rect x="1178.6" y="1733" width="0.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.63" y="1743.5" ></text>
+</g>
+<g >
+<title>_PyObject_IsFreed (57,057,057 samples, 0.08%)</title><rect x="647.8" y="2037" width="0.9" height="15.0" fill="rgb(214,42,10)" rx="2" ry="2" />
+<text  x="650.81" y="2047.5" ></text>
+</g>
+<g >
+<title>_PyObject_GetMethod (758,758,758 samples, 1.02%)</title><rect x="1021.6" y="2037" width="12.1" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="1024.60" y="2047.5" ></text>
+</g>
+<g >
+<title>type_call.lto_priv.0 (93,093,093 samples, 0.13%)</title><rect x="1183.8" y="2053" width="1.5" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="1186.79" y="2063.5" ></text>
+</g>
+<g >
+<title>PyObject_RichCompare (22,022,022 samples, 0.03%)</title><rect x="81.4" y="2037" width="0.4" height="15.0" fill="rgb(219,67,16)" rx="2" ry="2" />
+<text  x="84.42" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="261" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="271.5" ></text>
+</g>
+<g >
+<title>app1 (24,024,024 samples, 0.03%)</title><rect x="722.1" y="2037" width="0.4" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="725.08" y="2047.5" ></text>
+</g>
+<g >
+<title>get_float_state (75,075,075 samples, 0.10%)</title><rect x="1142.7" y="2053" width="1.2" height="15.0" fill="rgb(248,201,48)" rx="2" ry="2" />
+<text  x="1145.71" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="710.0" y="1957" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="713.04" y="1967.5" ></text>
+</g>
+<g >
+<title>_PyObject_Call (17,017,017 samples, 0.02%)</title><rect x="628.0" y="2037" width="0.3" height="15.0" fill="rgb(213,39,9)" rx="2" ry="2" />
+<text  x="631.00" y="2047.5" ></text>
+</g>
+<g >
+<title>cfunction_vectorcall_O.lto_priv.0 (45,045,045 samples, 0.06%)</title><rect x="1136.4" y="2053" width="0.7" height="15.0" fill="rgb(215,46,11)" rx="2" ry="2" />
+<text  x="1139.40" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (102,102,102 samples, 0.14%)</title><rect x="139.9" y="1717" width="1.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.94" y="1727.5" ></text>
+</g>
+<g >
+<title>[unknown] (10,010,010 samples, 0.01%)</title><rect x="1125.3" y="2005" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1128.30" y="2015.5" ></text>
+</g>
+<g >
+<title>min_max (47,047,047 samples, 0.06%)</title><rect x="903.7" y="2037" width="0.8" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="906.75" y="2047.5" ></text>
+</g>
+<g >
+<title>[unknown] (16,016,016 samples, 0.02%)</title><rect x="1178.5" y="1973" width="0.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1181.49" y="1983.5" ></text>
+</g>
+<g >
+<title>object_new.lto_priv.0 (38,038,038 samples, 0.05%)</title><rect x="1171.7" y="2053" width="0.6" height="15.0" fill="rgb(209,19,4)" rx="2" ry="2" />
+<text  x="1174.70" y="2063.5" ></text>
+</g>
+<g >
+<title>[unknown] (70,070,070 samples, 0.09%)</title><rect x="140.0" y="789" width="1.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="142.96" y="799.5" ></text>
+</g>
+<g >
+<title>[unknown] (27,027,027 samples, 0.04%)</title><rect x="917.5" y="1909" width="0.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="920.52" y="1919.5" ></text>
+</g>
+</g>
+</svg>
