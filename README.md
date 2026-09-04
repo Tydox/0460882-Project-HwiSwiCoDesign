@@ -1,6 +1,8 @@
 # 0460882-Project-HwiSwiCoDesign
 Submited Project Repo, including git history for bonus points
 
+![Alt](https://repobeats.axiom.co/api/embed/ad92f46e5b664778f6caa8c1b19150d3c0835058.svg "Repobeats analytics image")
+
 # pyperformance optimization project starter
 
 This starter keeps each benchmark in two independent suites:
