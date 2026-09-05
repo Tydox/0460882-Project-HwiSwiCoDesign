@@ -1,4 +1,5 @@
 [benchmarks]
 
 name	metafile
+pyflate	<local>
 raytrace	<local>
