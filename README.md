@@ -283,3 +283,38 @@ between images.
 - Keep `prompts.txt` updated because the assignment requires AI prompts.
 - Treat at least 7% as the project target, but also inspect whether the
   comparison reports statistical significance.
+
+
+
+## HERE
+
+```bash
+cd 0460882-Project-HwiSwiCoDesign
+
+gh auth login
+gh auth status
+
+#this is to avoid conflicts
+git status
+git pull --ff-only #-ffmeans “download the GitHub updates only if they can be applied cleanly.” It avoids Git unexpectedly creating a merge commit. 
+#download changes + integrate them ONLY if Git can do it without creating a merge or rebase
+#./scripts/run_one.sh raytrace original full #RUN THIS ONCE - FOR INITIAL RESULTS - DONT NEE TO RUN AGAIN
+./scripts/run_one.sh pyflate optimized #full
+./scripts/run_one.sh pyflate optimized --fast
+./scripts/compare.sh pyflate
+
+#git add results/pyflate/
+#or
+git add . #this adds all updated files
+
+git status #show you what has been changed
+git -c user.name="Yuval" -c user.email="74929281+yuval67@users.noreply.github.com" commit -m "CHANGE ME FOR WHAT UR COMMIT DOES"
+
+#git log -1 --format='%h | %an <%ae> | %s'
+git log -1 --format=fuller #Check the identity before pushing - Do this before every push. If the identity is wrong, do not push yet.
+git push
+
+#gh auth logout #This will logout of all github accounts on the server
+gh auth logout --hostname github.com --user Tydox
+gh auth status
+```
