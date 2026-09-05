@@ -300,9 +300,10 @@ git pull --ff-only #-ffmeans “download the GitHub updates only if they can be 
 #download changes + integrate them ONLY if Git can do it without creating a merge or rebase
 #./scripts/run_one.sh raytrace original full #RUN THIS ONCE - FOR INITIAL RESULTS - DONT NEE TO RUN AGAIN
 ./scripts/run_one.sh pyflate optimized #full
-./scripts/run_one.sh pyflate optimized --fast
+./scripts/run_one.sh pyflate optimized --fast #less iteration faster than the first #full
 ./scripts/compare.sh pyflate
 
+git status
 #git add results/pyflate/
 #or
 git add . #this adds all updated files
@@ -314,7 +315,6 @@ git -c user.name="Yuval" -c user.email="74929281+yuval67@users.noreply.github.co
 git log -1 --format=fuller #Check the identity before pushing - Do this before every push. If the identity is wrong, do not push yet.
 git push
 
-#gh auth logout #This will logout of all github accounts on the server
-gh auth logout --hostname github.com --user Tydox
+gh auth logout #This will logout of all github accounts on the server
 gh auth status
 ```
