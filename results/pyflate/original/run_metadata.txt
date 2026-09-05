@@ -1,0 +1,7 @@
+benchmark=pyflate
+implementation=original
+completed_at=2026-09-05T15:31:39+00:00
+source_sha256=ec5347c7045af86ba33e1b2c6f64bc4b506d0ade3b77391d7e41863fe25fb464
+git_commit=9a6ea309088aed9353118511fc8e20b58c5aa583
+git_worktree=clean
+run_mode=regular
