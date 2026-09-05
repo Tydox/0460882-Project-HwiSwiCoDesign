@@ -16,6 +16,7 @@ see 'bwt_reverse()'.  Correct output is produced in all test cases
 but ideally the problem would be found...
 """
 
+
 import hashlib
 import os
 import struct
