@@ -8,3 +8,5 @@ results/**/stacks.folded
 __pycache__/
 *.pyc
 log.txt
+suites/.DS_Store
+.DS_Store
