@@ -182,7 +182,7 @@ class Ray(object):
         return 'Ray(%s,%s)' % (repr(self.point), repr(self.vector))
 
     def pointAtTime(self, t):
-        return self.point + self.vector.scale(t)
+        return self.point + self.vector.scale(t) #Pnew=Pold+d*T #calc a point at time T along the ray d.
 
 
 Point.ZERO = Point(0, 0, 0)
