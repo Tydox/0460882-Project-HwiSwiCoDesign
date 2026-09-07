@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Keep perf diagnostics and counter formatting predictable across VM locales.
+export LC_ALL=C
+
 if [[ $# -lt 2 ]]; then
   printf 'Usage: %s <benchmark> <original|optimized> [--fast|--debug-single-value] [--width PIXELS] [--height PIXELS]\n' "$0" >&2
   exit 2
@@ -102,6 +105,10 @@ TIMING_JSON="$RESULT_DIR/timing.json"
 PERF_DATA="$RESULT_DIR/perf.data"
 PERF_REPORT="$RESULT_DIR/perf_report.txt"
 PERF_SCRIPT="$RESULT_DIR/perf_script.txt"
+PERF_STAT="$RESULT_DIR/perf_stat.txt"
+PERF_EVENTS="$RESULT_DIR/perf_events.txt"
+PERF_PROBE_LOG="$RESULT_DIR/perf_probe.log"
+PERF_RECORD_LOG="$RESULT_DIR/perf_record.log"
 FOLDED="$RESULT_DIR/stacks.folded"
 FLAMEGRAPH="$RESULT_DIR/flamegraph.svg"
 RUN_METADATA="$RESULT_DIR/run_metadata.txt"
@@ -118,33 +125,110 @@ else
   GIT_WORKTREE_STATE="not-a-git-repository"
 fi
 
-rm -f "$TIMING_JSON" "$PERF_DATA" "$PERF_REPORT" "$PERF_SCRIPT" "$FOLDED" "$FLAMEGRAPH" "$RUN_METADATA"
+rm -f "$TIMING_JSON" "$PERF_DATA" "$PERF_REPORT" "$PERF_SCRIPT" "$FOLDED" "$FLAMEGRAPH" "$RUN_METADATA" \
+  "$PERF_STAT" "$PERF_EVENTS" "$PERF_PROBE_LOG" "$PERF_RECORD_LOG"
 
 if [[ "$BENCHMARK" == "raytrace" ]]; then
   RAYTRACE_IMAGE="$RESULT_DIR/raytrace.ppm"
   rm -f "$RAYTRACE_IMAGE"
 fi
 
-printf 'Timing %s (%s, %s mode)...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
+# Use exactly the same benchmark arguments for all three measurement passes.
 if [[ "$BENCHMARK" == "raytrace" ]]; then
-  "$PYTHON" "$SOURCE" "${RUN_OPTIONS[@]}" "${BENCHMARK_OPTIONS[@]}" --output "$TIMING_JSON"
+  WORKLOAD=("$SOURCE" "${RUN_OPTIONS[@]}" "${BENCHMARK_OPTIONS[@]}")
 else
-  "$PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}" --output "$TIMING_JSON"
+  WORKLOAD=(-m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}")
 fi
 
+# Aliases (branches/branch-instructions, cycles/cpu-cycles, etc.) count the
+# same event, so request only one spelling. Extra generic events are probed
+# too: perf list alone does not guarantee the VM exposes the corresponding PMU.
+COUNTER_CANDIDATES=(
+  cpu-clock task-clock cycles instructions branch-instructions branch-misses
+  bus-cycles cache-references cache-misses ref-cycles
+  stalled-cycles-frontend stalled-cycles-backend
+  page-faults minor-faults major-faults context-switches cpu-migrations
+  alignment-faults emulation-faults cgroup-switches
+  L1-dcache-loads L1-dcache-load-misses L1-dcache-stores L1-dcache-store-misses
+  L1-dcache-prefetches L1-dcache-prefetch-misses
+  L1-icache-loads L1-icache-load-misses
+  LLC-loads LLC-load-misses LLC-stores LLC-store-misses LLC-prefetches LLC-prefetch-misses
+  dTLB-loads dTLB-load-misses dTLB-stores dTLB-store-misses
+  iTLB-loads iTLB-load-misses branch-loads branch-load-misses
+  node-loads node-load-misses node-stores node-store-misses
+  duration_time user_time system_time dummy bpf-output
+)
+STAT_EVENTS=()
+RECORD_EVENTS=()
+PROBE_DIR="$(mktemp -d "$RESULT_DIR/.perf-probe.XXXXXX")"
+trap 'rm -f "$PROBE_DIR/stat.txt" "$PROBE_DIR/record.data" "$PROBE_DIR/record.data.old"; rmdir "$PROBE_DIR"' EXIT
+printf 'event\tstat\trecord\n' > "$PERF_EVENTS"
+printf 'Probing perf events; diagnostics: %s\n' "$PERF_PROBE_LOG"
+for event in "${COUNTER_CANDIDATES[@]}"; do
+  printf '\n=== stat: %s ===\n' "$event" >> "$PERF_PROBE_LOG"
+  stat_status=unavailable
+  if perf stat --no-big-num -e "$event" --output "$PROBE_DIR/stat.txt" -- sleep 0.05 \
+      >> "$PERF_PROBE_LOG" 2>&1; then
+    # Some perf versions exit successfully even when a counter cannot run.
+    if [[ -s "$PROBE_DIR/stat.txt" ]] && ! grep -Eq '<not supported>|<not counted>' "$PROBE_DIR/stat.txt"; then
+      stat_status=enabled
+    fi
+  fi
+  if [[ -f "$PROBE_DIR/stat.txt" ]]; then
+    cat "$PROBE_DIR/stat.txt" >> "$PERF_PROBE_LOG"
+    rm -f "$PROBE_DIR/stat.txt"
+  fi
 
-echo "================================================="
-echo ""
-echo "================================================="
+  case "$event" in
+    duration_time|user_time|system_time)
+      record_status=stat-only
+      ;;
+    dummy|bpf-output)
+      # Probe counting support above, but neither is a benchmark counter:
+      # dummy never overflows; bpf-output needs an attached BPF producer.
+      stat_status="$stat_status (excluded: special-purpose event)"
+      record_status=excluded-special-purpose
+      ;;
+    *)
+      printf '\n=== record: %s ===\n' "$event" >> "$PERF_PROBE_LOG"
+      record_status=unavailable
+      if perf record -F 999 -e "$event" -g --output "$PROBE_DIR/record.data" -- sleep 0.05 \
+          >> "$PERF_PROBE_LOG" 2>&1; then
+        record_status=enabled
+        RECORD_EVENTS+=("$event")
+      fi
+      rm -f "$PROBE_DIR/record.data" "$PROBE_DIR/record.data.old"
+      ;;
+  esac
+  if [[ "$stat_status" == enabled ]]; then STAT_EVENTS+=("$event"); fi
+  printf '%s\t%s\t%s\n' "$event" "$stat_status" "$record_status" >> "$PERF_EVENTS"
+done
+if [[ ${#STAT_EVENTS[@]} -eq 0 || ! " ${RECORD_EVENTS[*]} " =~ " cpu-clock " ]]; then
+  printf 'No usable stat counters or cpu-clock sampling unavailable. See %s\n' "$PERF_PROBE_LOG" >&2
+  exit 1
+fi
+STAT_EVENT_LIST="$(IFS=,; printf '%s' "${STAT_EVENTS[*]}")"
+RECORD_EVENT_LIST="$(IFS=,; printf '%s' "${RECORD_EVENTS[*]}")"
+
+printf 'Timing %s (%s, %s mode)...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
+"$PYTHON" "${WORKLOAD[@]}" --output "$TIMING_JSON"
+
+# Count normal Python in its own pass, without perf record sampling overhead.
+# Keep events ungrouped so the kernel can multiplex limited hardware counters.
+printf 'Counting %s with perf stat (%s events)...\n' "$BENCHMARK" "${#STAT_EVENTS[@]}"
+perf stat --no-big-num -e "$STAT_EVENT_LIST" --output "$PERF_STAT" -- "$PYTHON" "${WORKLOAD[@]}"
+if grep -Eq '<not supported>|<not counted>' "$PERF_STAT"; then
+  printf 'Some counters could not run together. Check %s for unavailable counts.\n' "$PERF_STAT" >&2
+fi
 
 printf 'Profiling %s (%s, %s mode) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
-if [[ "$BENCHMARK" == "raytrace" ]]; then
-  perf record -F 999 -e cpu-clock -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" "$SOURCE" "${RUN_OPTIONS[@]}" "${BENCHMARK_OPTIONS[@]}"
-else
-  perf record -F 999 -e cpu-clock -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" "${RUN_OPTIONS[@]}"
+# perf.data and the text exports retain every selected sampling event.
+if ! perf record -F 999 -e "$RECORD_EVENT_LIST" -g --output "$PERF_DATA" -- \
+    "$DEBUG_PYTHON" "${WORKLOAD[@]}" 2> "$PERF_RECORD_LOG"; then
+  cat "$PERF_RECORD_LOG" >&2
+  exit 1
 fi
-#perf record -e cycles:u -c 2400000 -g --output "$PERF_DATA" -- "$DEBUG_PYTHON" -m pyperformance run --manifest "$MANIFEST" --benchmarks "$BENCHMARK" --debug-single-value
-
+cat "$PERF_RECORD_LOG" >&2
 
 printf 'Creating perf report...\n'
 perf report --stdio --input "$PERF_DATA" > "$PERF_REPORT"
@@ -154,7 +238,9 @@ if ! grep -q '%' "$PERF_REPORT"; then
 fi
 printf 'Exporting and collapsing perf stacks...\n'
 perf script --input "$PERF_DATA" > "$PERF_SCRIPT"
-"$FLAMEGRAPH_DIR/stackcollapse-perf.pl" "$PERF_SCRIPT" > "$FOLDED"
+# Mixing cycles, faults and clock samples would make flame-graph widths
+# meaningless. Preserve the existing CPU-time flame graph explicitly.
+"$FLAMEGRAPH_DIR/stackcollapse-perf.pl" --event-filter=cpu-clock "$PERF_SCRIPT" > "$FOLDED"
 if [[ ! -s "$FOLDED" ]]; then
   printf 'No stack samples were produced: %s\n' "$FOLDED" >&2
   exit 1
@@ -178,6 +264,13 @@ fi
   printf 'git_commit=%s\n' "$GIT_COMMIT"
   printf 'git_worktree=%s\n' "$GIT_WORKTREE_STATE"
   printf 'run_mode=%s\n' "$RUN_MODE"
+  printf 'perf_version=%s\n' "$(perf --version)"
+  printf 'kernel=%s\n' "$(uname -r)"
+  printf 'perf_stat_python=%s\n' "$PYTHON"
+  printf 'perf_record_python=%s\n' "$DEBUG_PYTHON"
+  printf 'perf_stat_events=%s\n' "$STAT_EVENT_LIST"
+  printf 'perf_record_events=%s\n' "$RECORD_EVENT_LIST"
+  printf '%s\n' 'perf_record_frequency=999' 'flamegraph_event=cpu-clock'
   if [[ "$BENCHMARK" == "raytrace" ]]; then
     printf '%s\n' 'raytrace_image=raytrace.ppm'
     printf 'raytrace_width=%s\n' "$RAYTRACE_WIDTH"
