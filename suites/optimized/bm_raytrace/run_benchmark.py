@@ -14,12 +14,14 @@ import math
 import pyperf
 
 
-DEFAULT_WIDTH = 100
-DEFAULT_HEIGHT = 100
+DEFAULT_WIDTH = 100 #100
+DEFAULT_HEIGHT = 100 #100
 EPSILON = 0.00001
 
 
 class Vector(object):
+
+    __slots__ = ('x', 'y', 'z')
 
     def __init__(self, initx, inity, initz):
         self.x = initx
@@ -95,6 +97,8 @@ assert Vector(-1, -1, 0).reflectThrough(Vector.UP) == Vector(-1, 1, 0)
 
 class Point(object):
 
+    __slots__ = ('x', 'y', 'z')
+
     def __init__(self, initx, inity, initz):
         self.x = initx
         self.y = inity
@@ -140,9 +144,16 @@ class Sphere(object):
         return 'Sphere(%s,%s)' % (repr(self.centre), self.radius)
 
     def intersectionTime(self, ray):
-        cp = self.centre - ray.point
-        v = cp.dot(ray.vector)
-        discriminant = (self.radius * self.radius) - (cp.dot(cp) - v * v)
+        centre = self.centre
+        point = ray.point
+        direction = ray.vector
+        cpx = centre.x - point.x
+        cpy = centre.y - point.y
+        cpz = centre.z - point.z
+        # Keep the dot products' original left-to-right arithmetic order.
+        v = (cpx * direction.x) + (cpy * direction.y) + (cpz * direction.z)
+        cpSquared = (cpx * cpx) + (cpy * cpy) + (cpz * cpz)
+        discriminant = (self.radius * self.radius) - (cpSquared - v * v)
         if discriminant < 0:
             return None
         else:
@@ -173,6 +184,8 @@ class Halfspace(object):
 
 
 class Ray(object):
+
+    __slots__ = ('point', 'vector')
 
     def __init__(self, point, vector):
         self.point = point
@@ -255,10 +268,11 @@ class Scene(object):
         vpRight = eye.vector.cross(Vector.UP).normalized()
         vpUp = vpRight.cross(eye.vector).normalized()
 
+        xcomponents = [vpRight.scale(x * pixelWidth - halfWidth)
+                       for x in range(canvas.width)]
         for y in range(canvas.height):
-            for x in range(canvas.width):
-                xcomp = vpRight.scale(x * pixelWidth - halfWidth)
-                ycomp = vpUp.scale(y * pixelHeight - halfHeight)
+            ycomp = vpUp.scale(y * pixelHeight - halfHeight)
+            for x, xcomp in enumerate(xcomponents):
                 ray = Ray(eye.point, eye.vector + xcomp + ycomp)
                 colour = self.rayColour(ray)
                 canvas.plot(x, y, *colour)
@@ -268,24 +282,41 @@ class Scene(object):
             return (0, 0, 0)
         try:
             self.recursionDepth = self.recursionDepth + 1
-            intersections = [(o, o.intersectionTime(ray), s)
-                             for (o, s) in self.objects]
-            i = firstIntersection(intersections)
-            if i is None:
+            closestTime = None
+            for o, s in self.objects:
+                t = o.intersectionTime(ray)
+                if t is not None and t > -EPSILON:
+                    # Strict comparison retains the first object on a tie.
+                    if closestTime is None or t < closestTime:
+                        closestObject = o
+                        closestTime = t
+                        closestSurface = s
+            if closestTime is None:
                 return (0, 0, 0)  # the background colour
             else:
-                (o, t, s) = i
-                p = ray.pointAtTime(t)
-                return s.colourAt(self, ray, p, o.normalAt(p))
+                p = ray.pointAtTime(closestTime)
+                return closestSurface.colourAt(
+                    self, ray, p, closestObject.normalAt(p))
         finally:
             self.recursionDepth = self.recursionDepth - 1
 
     def _lightIsVisible(self, l, p):
+        # Every object tests the same origin and normalized direction.
+        return self._lightRayIsVisible(Ray(p, l - p))
+
+    def _lightRayIsVisible(self, ray):
         for (o, s) in self.objects:
-            t = o.intersectionTime(Ray(p, l - p))
+            t = o.intersectionTime(ray)
             if t is not None and t > EPSILON:
                 return False
         return True
+
+    def _visibleLightDirections(self, p):
+        for light in self.lightPoints:
+            ray = Ray(p, light - p)
+            if self._lightRayIsVisible(ray):
+                # Shading uses the very same normalized shadow direction.
+                yield ray.vector
 
     def visibleLights(self, p):
         result = []
@@ -323,8 +354,8 @@ class SimpleSurface(object):
 
         if self.lambertCoefficient > 0:
             lambertAmount = 0
-            for lightPoint in scene.visibleLights(p):
-                contribution = (lightPoint - p).normalized().dot(normal)
+            for lightDirection in scene._visibleLightDirections(p):
+                contribution = lightDirection.dot(normal)
                 if contribution > 0:
                     lambertAmount = lambertAmount + contribution
             lambertAmount = min(1, lambertAmount)
@@ -345,7 +376,7 @@ class CheckerboardSurface(SimpleSurface):
 
     def baseColourAt(self, p):
         v = p - Point.ZERO
-        v.scale(1.0 / self.checkSize)
+        # Preserve the original unscaled checker pattern.
         if ((int(abs(v.x) + 0.5)
              + int(abs(v.y) + 0.5)
              + int(abs(v.z) + 0.5)) % 2):
