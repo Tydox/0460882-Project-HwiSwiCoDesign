@@ -1,0 +1,7 @@
+event	stat	record
+cpu-clock	enabled	enabled
+task-clock	enabled	enabled
+cycles	enabled	enabled
+instructions	enabled	enabled
+branch-instructions	enabled	enabled
+branch-misses	enabled	enabled

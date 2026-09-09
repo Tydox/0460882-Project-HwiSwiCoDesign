@@ -1,0 +1,161 @@
+
+=== stat: cpu-clock ===
+# started on Wed Sep  9 08:06:32 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              0.85 msec cpu-clock                 #    0.016 CPUs utilized          
+
+       0.053592022 seconds time elapsed
+
+       0.001535000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: cpu-clock ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-09-08-06/.perf-probe.L9RUAR/record.data ]
+
+=== stat: task-clock ===
+# started on Wed Sep  9 08:06:33 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              0.46 msec task-clock                #    0.009 CPUs utilized          
+
+       0.050962151 seconds time elapsed
+
+       0.000000000 seconds user
+       0.000914000 seconds sys
+
+
+
+=== record: task-clock ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-09-08-06/.perf-probe.L9RUAR/record.data ]
+
+=== stat: cycles ===
+# started on Wed Sep  9 08:06:34 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+           1006693      cycles                                                      
+
+       0.057168828 seconds time elapsed
+
+       0.000000000 seconds user
+       0.007096000 seconds sys
+
+
+
+=== record: cycles ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-09-08-06/.perf-probe.L9RUAR/record.data ]
+
+=== stat: instructions ===
+# started on Wed Sep  9 08:06:35 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+            554508      instructions                                                
+
+       0.063919415 seconds time elapsed
+
+       0.000000000 seconds user
+       0.013781000 seconds sys
+
+
+
+=== record: instructions ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-09-08-06/.perf-probe.L9RUAR/record.data (4 samples) ]
+
+=== stat: branch-instructions ===
+# started on Wed Sep  9 08:06:36 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+            119406      branch-instructions                                         
+
+       0.056571742 seconds time elapsed
+
+       0.000000000 seconds user
+       0.006508000 seconds sys
+
+
+
+=== record: branch-instructions ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-09-08-06/.perf-probe.L9RUAR/record.data ]
+
+=== stat: branch-misses ===
+# started on Wed Sep  9 08:06:38 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              5395      branch-misses                                               
+
+       0.056482058 seconds time elapsed
+
+       0.000000000 seconds user
+       0.006393000 seconds sys
+
+
+
+=== record: branch-misses ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-09-08-06/.perf-probe.L9RUAR/record.data ]
+
+=== stat: bus-cycles ===
+# started on Wed Sep  9 08:06:39 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+             43364      bus-cycles                                                  
+
+       0.056602990 seconds time elapsed
+
+       0.000000000 seconds user
+       0.006566000 seconds sys
+
+
+
+=== record: bus-cycles ===
