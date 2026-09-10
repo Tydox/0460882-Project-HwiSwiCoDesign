@@ -177,8 +177,8 @@ class Sphere(object):#this class represents a sphere in 3D space. It has a cente
         return (p - self.centre).normalized()
 
 
-class Halfspace(object):
-
+class Halfspace(object): #a half space is a region of space that is divided by a plane, visually it looks like a flat surface that extends infinitely in all directions. The half space is defined by a point on the plane and a normal vector that is perpendicular to the plane. The normal vector points towards the "inside" of the half space, indicating which side of the plane is considered to be part of the half space.
+#hyperplane vs halfspace is that a hyperplane is a flat, n-1 dimensional subspace that divides an n-dimensional space into two half spaces. A half space is one of the two regions created by a hyperplane. In 3D space, a hyperplane is a plane, and the two half spaces are the regions on either side of the plane. In 2D space, a hyperplane is a line, and the two half spaces are the regions on either side of the line.
     def __init__(self, point, normal):
         self.point = point
         self.normal = normal.normalized()
@@ -186,15 +186,15 @@ class Halfspace(object):
     def __repr__(self):
         return 'Halfspace(%s,%s)' % (repr(self.point), repr(self.normal))
 
-    def intersectionTime(self, ray):
+    def intersectionTime(self, ray):#equations is (p - p0) · n / (d · n) where p is the ray's origin, p0 is a point on the plane, d is the ray's direction, and n is the plane's normal vector. If d · n is zero, the ray is parallel to the plane and there is no intersection.
         v = ray.vector.dot(self.normal)
         if v:
             return 1 / -v
         else:
             return None
 
-    def normalAt(self, p):
-        return self.normal
+    def normalAt(self, p):#eq is n = (p - p0) / ||p - p0|| where p is the point on the surface, p0 is a point on the plane, and n is the normal vector. Since the normal vector is constant for a half space, we can simply return the normalized normal vector that was provided when the half space was created.
+        return self.normal #but we turn normal and not n = (p - p0) / ||p - p0|| because its not needed because the normal vector is constant for a half space, meaning it does not change based on the point p. The normal vector is defined by the orientation of the half space and remains the same regardless of where you are on the surface. Therefore, we can simply return the normalized normal vector that was provided when the half space was created, without needing to calculate it based on the point p.
 
 
 class Ray(object):
@@ -282,8 +282,7 @@ class Scene(object):
         vpRight = eye.vector.cross(Vector.UP).normalized()
         vpUp = vpRight.cross(eye.vector).normalized()
 
-        xcomponents = [vpRight.scale(x * pixelWidth - halfWidth)
-                       for x in range(canvas.width)]
+        xcomponents = [vpRight.scale(x * pixelWidth - halfWidth) for x in range(canvas.width)]
         for y in range(canvas.height):
             ycomp = vpUp.scale(y * pixelHeight - halfHeight)
             for x, xcomp in enumerate(xcomponents):
