@@ -21,100 +21,106 @@ EPSILON = 0.00001
 
 class Vector(object):
 
-    __slots__ = ('x', 'y', 'z')
+    __slots__ = ('x', 'y', 'z') #avoiding circular references and memory overhead of __dict__ and __weakref__ for each instance of the class. This is a memory optimization.
 
-    def __init__(self, initx, inity, initz):
+    def __init__(self, initx, inity, initz): 
         self.x = initx
         self.y = inity
         self.z = initz
 
-    def __str__(self):
-        return '(%s,%s,%s)' % (self.x, self.y, self.z)
+    def __str__(self): # this methis is used for printing the data of the class. its used when you call print() on an instance of the class. It returns a string representation of the object.
+        return '(%s,%s,%s)' % (self.x, self.y, self.z) #print example is (1,2,3) for Vector(1,2,3) we use % formatting to create the string representation of the vector's coordinates.
 
-    def __repr__(self):
-        return 'Vector(%s,%s,%s)' % (self.x, self.y, self.z)
+    def __repr__(self):# we use this for debugging and development purposes. It returns a string that, when evaluated, would recreate the object. In this case, it returns a string in the format 'Vector(x,y,z)' where x, y, and z are the coordinates of the vector.
+        return 'Vector(%s,%s,%s)' % (self.x, self.y, self.z) #example %s for string and replaced by value of self.x. the mod operator does the formatting. The % operator is used to format the string by replacing the placeholders with the actual values of the vector's coordinates.
 
     def magnitude(self):
-        return math.sqrt(self.dot(self))
+        return math.sqrt(self.dot(self))#math equation is: magnitude = sqrt(x^2 + y^2 + z^2) 
 
-    def __add__(self, other):
-        if other.isPoint():
+    def __add__(self, other):#overloading the + operator for vector addition.
+        if other.isPoint():# It takes another vector or point as an argument and returns a new vector or point that is the result of adding the two together.
             return Point(self.x + other.x, self.y + other.y, self.z + other.z)
         else:
             return Vector(self.x + other.x, self.y + other.y, self.z + other.z)
 
-    def __sub__(self, other):
-        other.mustBeVector()
-        return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
+    def __sub__(self, other):#overloading the - operator for vector subtraction. 
+        other.mustBeVector()#makes sure that the other object is a vector. If it is not, it raises an exception. This is important because you cannot subtract a point from a vector in this context.
+        return Vector(self.x - other.x, self.y - other.y, self.z - other.z)#It takes another vector as an argument and returns a new vector that is the result of subtracting the other vector from this one.
 
-    def scale(self, factor):
+    def scale(self, factor):#not using __rmul__ or __rmul__ because we want to be able to multiply a vector by a scalar (a single number). https://docs.python.org/3/reference/datamodel.html#object.__radd__
         return Vector(factor * self.x, factor * self.y, factor * self.z)
 
-    def dot(self, other):
-        other.mustBeVector()
+    def dot(self, other):#creating new operator for dot product of two vectors. SIMD instructions can be used to speed up the dot product calculation, which is a common operation in graphics and physics simulations. The dot product is used to calculate angles between vectors, projections, and lighting calculations in ray tracing.
+        other.mustBeVector() 
         return (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
 
-    def cross(self, other):
+    def cross(self, other):#create new operator for cross product of two vectors. The cross product is used to calculate normals to surfaces, which are important for lighting calculations in ray tracing.
         other.mustBeVector()
         return Vector(self.y * other.z - self.z * other.y,
                       self.z * other.x - self.x * other.z,
-                      self.x * other.y - self.y * other.x)
+                      self.x * other.y - self.y * other.x) #Check if we can use SIMD to speed up
 
-    def normalized(self):
+    def normalized(self): #this method returns a new vector that has the same direction as the original vector but with a magnitude of 1.
         return self.scale(1.0 / self.magnitude())
 
-    def negated(self):
+    def negated(self):#retruns same vector but with opposite direction. 
         return self.scale(-1)
 
-    def __eq__(self, other):
+    def __eq__(self, other):#overloading the == operator for vector equality. This method checks if two vectors are equal by comparing their x, y, and z coordinates. If all three coordinates are equal, the method returns True; otherwise, it returns False.
         return (self.x == other.x) and (self.y == other.y) and (self.z == other.z)
 
-    def isVector(self):
+    def isVector(self):#new method to check if the object is a vector. This is useful for type checking in other methods, ensuring that operations are performed on the correct types of objects.
         return True
 
-    def isPoint(self):
+    def isPoint(self):#method to check if the object is a point. This is useful for type checking in other methods, ensuring that operations are performed on the correct types of objects.
         return False
 
-    def mustBeVector(self):
+    def mustBeVector(self):#how it returns true or false? point and vector classes have oppisite return values for isVector and isPoint. If the object is a vector, mustBeVector returns self; if it is a point, it raises an exception. This is used to enforce type safety in operations that require a vector.
         return self
 
-    def mustBePoint(self):
+    def mustBePoint(self):#used with point objects to ensure that the object is indeed a point. If the object is a point, mustBePoint returns self; if it is a vector, it raises an exception. This is used to enforce type safety in operations that require a point.
         raise 'Vectors are not points!'
 
-    def reflectThrough(self, normal):
+    def reflectThrough(self, normal): #calculates the reflection of the vector through a given normal vector. first scales the normal vector by the dot product of the original vector and the normal, then subtracts twice this scaled normal from the original vector to get the reflected vector.
         d = normal.scale(self.dot(normal))
         return self - d.scale(2)
 
-
+#we do this to avoid creating new Vector objects for these common vectors, which can save memory and improve performance in a raytracer where these vectors are used frequently.
+#we make the following: zero vector, right vector, up vector, and out vector. These are commonly used in graphics programming for various calculations, such as defining directions and orientations in 3D space.
+#so to save memory and improve performance, we create these vectors once and reuse them throughout the program instead of creating new instances every time they are needed.
+#they are global constants that can be accessed anywhere in the code without needing to create new instances of the Vector class. This is especially useful in a raytracer, where performance and memory usage are critical.
+#they arent really constants because they can be modified, but by convention, they are treated as constants and should not be changed. This is a common practice in programming to indicate that certain values are intended to remain unchanged throughout the program.
 Vector.ZERO = Vector(0, 0, 0)
 Vector.RIGHT = Vector(1, 0, 0)
 Vector.UP = Vector(0, 1, 0)
 Vector.OUT = Vector(0, 0, 1)
-
+#this is a test to check if the reflectThrough method is working correctly. It reflects the RIGHT vector through the UP vector and checks if the result is still the RIGHT vector. This is a basic test to ensure that the reflection calculation is functioning as expected.
 assert Vector.RIGHT.reflectThrough(Vector.UP) == Vector.RIGHT
+#this is a test to check if the reflectThrough method is working correctly. It reflects the vector (-1, -1, 0) through the UP vector and checks if the result is (-1, 1, 0). This is a basic test to ensure that the reflection calculation is functioning as expected.
+#because it should move up to the positive y direction while keeping the x and z coordinates the same.
 assert Vector(-1, -1, 0).reflectThrough(Vector.UP) == Vector(-1, 1, 0)
 
 
 class Point(object):
 
-    __slots__ = ('x', 'y', 'z')
+    __slots__ = ('x', 'y', 'z')#slots gives us like c struct memory layout for the class. It avoids the overhead of a dictionary for each instance, which can save memory and improve performance, especially when creating many instances of the class.
 
     def __init__(self, initx, inity, initz):
         self.x = initx
         self.y = inity
         self.z = initz
 
-    def __str__(self):
+    def __str__(self): #overloading the str() function for Point objects. This method returns a string representation of the point in the format "(x,y,z)", where x, y, and z are the coordinates of the point. This is useful for printing and debugging purposes.
         return '(%s,%s,%s)' % (self.x, self.y, self.z)
 
-    def __repr__(self):
+    def __repr__(self):#overloading the repr() function for Point objects. This method returns a string representation of the point in the format "Point(x,y,z)", where x, y, and z are the coordinates of the point. This is useful for debugging and development purposes, as it provides a clear and unambiguous representation of the point object.
         return 'Point(%s,%s,%s)' % (self.x, self.y, self.z)
 
-    def __add__(self, other):
+    def __add__(self, other):#overloading the + operator for Point objects. This method allows you to add a vector to a point, resulting in a new point that is translated by the vector. It first checks if the other object is a vector using the mustBeVector() method, which raises an exception if it is not. If the other object is a vector, it returns a new Point object with coordinates that are the sum of the point's coordinates and the vector's coordinates.
         other.mustBeVector()
         return Point(self.x + other.x, self.y + other.y, self.z + other.z)
 
-    def __sub__(self, other):
+    def __sub__(self, other):#overloading the - operator for Point objects. This method allows you to subtract a point from another point, resulting in a vector that represents the direction and distance from the other point to this point. It first checks if the other object is a point using the isPoint() method. If it is, it returns a new Vector object with coordinates that are the difference between this point's coordinates and the other point's coordinates. If the other object is not a point (i.e., it is a vector), it returns a new Point object that is translated by the negative of the vector's coordinates.
         if other.isPoint():
             return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
         else:
@@ -132,8 +138,8 @@ class Point(object):
     def mustBePoint(self):
         return self
 
-
-class Sphere(object):
+#we use Shpere(object) and not Sphere() but its the same thing. The object is the base class for all classes in Python. by default, all classes inherit from object, so explicitly specifying it is not necessary. However, it can be done for clarity or to maintain compatibility with older versions of Python that do not support new-style classes.
+class Sphere(object):#this class represents a sphere in 3D space. It has a center point and a radius. The class provides methods to calculate the intersection of a ray with the sphere and to get the normal vector at a point on the sphere's surface.
 
     def __init__(self, centre, radius):
         centre.mustBePoint()
@@ -143,7 +149,15 @@ class Sphere(object):
     def __repr__(self):
         return 'Sphere(%s,%s)' % (repr(self.centre), self.radius)
 
-    def intersectionTime(self, ray):
+    def intersectionTime(self, ray): #the equation is (t - c) · d = r and the discriminant is r^2 - (c - p)^2 + ((c - p) · d)^2. If the discriminant is negative, there is no intersection. If it is zero or positive, the intersection time can be calculated as v - sqrt(discriminant), where v = (c - p) · d.
+
+        #the function calculates the following equations:
+        #  1. Vector from the ray's origin to the sphere's center: C - P 
+        # 2. Projection of this vector onto the ray's direction: v = (C - P) .dot(D) 
+        # 3. Squared distance from the sphere's center to the ray: cp = (C - P) .dot(C - P) 
+        # 4. Discriminant for intersection: discriminant = r^2 - (cp - v^2) If the discriminant is negative, there is no intersection. 
+        # If it is non-negative, the intersection time is given by: t = v - sqrt(discriminant)
+        
         centre = self.centre
         point = ray.point
         direction = ray.vector
