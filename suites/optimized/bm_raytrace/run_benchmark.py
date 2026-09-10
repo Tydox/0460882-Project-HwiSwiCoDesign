@@ -10,12 +10,19 @@ From http://www.lshift.net/blog/2008/10/29/toy-raytracer-in-python
 
 import array
 import math
+import os
 
+# Keep numeric libraries on one thread, including fresh pyperf worker imports.
+for _thread_setting in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS",
+                        "BLIS_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ[_thread_setting] = "1"
+import numpy as np
 import pyperf
 
 
 DEFAULT_WIDTH = 100 #100
 DEFAULT_HEIGHT = 100 #100
+DEFAULT_BATCH_SIZE = 1024
 EPSILON = 0.00001
 
 
@@ -289,28 +296,8 @@ class Scene(object):
     def addLight(self, p):
         self.lightPoints.append(p)
 
-    def render(self, canvas):
-        fovRadians = math.pi * (self.fieldOfView / 2.0) / 180.0
-        halfWidth = math.tan(fovRadians)
-        halfHeight = 0.75 * halfWidth
-        width = halfWidth * 2
-        height = halfHeight * 2
-        pixelWidth = width / (canvas.width - 1)
-        pixelHeight = height / (canvas.height - 1)
-
-        eye = Ray(self.position, self.lookingAt - self.position)
-        vpRight = eye.vector.cross(Vector.UP).normalized()
-        vpUp = vpRight.cross(eye.vector).normalized()
-
-        # Cache the original first addition, eye direction + horizontal offset.
-        columnDirections = [eye.vector + vpRight.scale(x * pixelWidth - halfWidth)
-                            for x in range(canvas.width)]
-        for y in range(canvas.height):
-            ycomp = vpUp.scale(y * pixelHeight - halfHeight)
-            for x, columnDirection in enumerate(columnDirections):
-                ray = Ray(eye.point, columnDirection + ycomp)
-                colour = self.rayColour(ray)
-                canvas.plot(x, y, *colour)
+    def render(self, canvas, batch_size=DEFAULT_BATCH_SIZE):
+        BatchedRenderer(self).render(canvas, batch_size)
 
     def rayColour(self, ray):
         if self.recursionDepth > 3:
@@ -420,7 +407,194 @@ class CheckerboardSurface(SimpleSurface):
             return self.baseColour
 
 
-def bench_raytrace(loops, width, height, filename):
+class BatchedRenderer:
+    """The existing sphere/halfspace renderer, with independent rays in columns.
+
+    Coordinate arrays have shape (3, ray_count), with rays in columns.
+    Every arithmetic operation is elementwise; no dot-product
+    reductions, reassociation, or approximate normalization are used.
+    """
+
+    def __init__(self, scene):
+        self.scene = scene
+        self.geometry = []
+        for obj, surface in scene.objects:
+            if isinstance(obj, Sphere):
+                self.geometry.append((self.coordinates(obj.centre),
+                                      obj.radiusSquared, None))
+            else:
+                self.geometry.append((None, None, self.coordinates(obj.normal)))
+        surfaces = [surface for obj, surface in scene.objects]
+        self.baseColours = np.array([s.baseColour for s in surfaces],
+                                    dtype=np.float64).reshape(-1, 3).T.copy()
+        self.otherColours = np.array([
+            s.otherColour if isinstance(s, CheckerboardSurface) else s.baseColour
+            for s in surfaces], dtype=np.float64).reshape(-1, 3).T.copy()
+        self.checker = np.array([isinstance(s, CheckerboardSurface)
+                                 for s in surfaces], dtype=bool)
+        self.specular = np.array([s.specularCoefficient for s in surfaces])
+        self.lambert = np.array([s.lambertCoefficient for s in surfaces])
+        self.ambient = np.array([s.ambientCoefficient for s in surfaces])
+        self.lights = [self.coordinates(light) for light in scene.lightPoints]
+
+    @staticmethod
+    def coordinates(value):
+        return np.array([[value.x], [value.y], [value.z]], dtype=np.float64)
+
+    @staticmethod
+    def dot(a, b):
+        return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2])
+
+    @classmethod
+    def normalized(cls, vectors):
+        factor = 1.0 / np.sqrt(cls.dot(vectors, vectors))
+        return factor * vectors
+
+    def intersectionTimes(self, object_index, origins, directions):
+        centre, radiusSquared, normal = self.geometry[object_index]
+        times = np.full(directions.shape[1], np.nan)
+        if centre is not None:
+            cp = centre - origins
+            v = self.dot(cp, directions)
+            discriminant = radiusSquared - (self.dot(cp, cp) - v * v)
+            hits = discriminant >= 0
+            # Like the scalar branch, only evaluate sqrt for intersecting rays.
+            times[hits] = v[hits] - np.sqrt(discriminant[hits])
+        else:
+            v = self.dot(directions, normal)
+            # Preserve the existing halfspace formula and parallel-ray branch.
+            np.divide(1, -v, out=times, where=v != 0)
+        return times
+
+    def closestHits(self, origins, directions):
+        closest = np.full(directions.shape[1], -1, dtype=np.intp)
+        times = np.zeros(directions.shape[1])
+        for index in range(len(self.geometry)):
+            candidate = self.intersectionTimes(index, origins, directions)
+            selected = ((candidate > -EPSILON)
+                        & ((closest < 0) | (candidate < times)))
+            # Object order and strict comparison retain the first hit on ties.
+            closest[selected] = index
+            times[selected] = candidate[selected]
+        return closest, times
+
+    def lightIsVisible(self, origins, directions):
+        visible = np.ones(directions.shape[1], dtype=bool)
+        remaining = np.arange(directions.shape[1])
+        for index in range(len(self.geometry)):
+            if remaining.size == 0:
+                break
+            times = self.intersectionTimes(index, origins[:, remaining],
+                                           directions[:, remaining])
+            blocked = times > EPSILON
+            visible[remaining[blocked]] = False
+            remaining = remaining[~blocked]
+        return visible
+
+    def normalsAt(self, points, objects):
+        normals = np.empty_like(points)
+        for index, (centre, radiusSquared, normal) in enumerate(self.geometry):
+            selected = objects == index
+            if centre is not None:
+                normals[:, selected] = self.normalized(points[:, selected] - centre)
+            else:
+                normals[:, selected] = normal
+        return normals
+
+    def baseColoursAt(self, points, objects):
+        colours = self.baseColours[:, objects].copy()
+        selected = self.checker[objects]
+        # int(abs(coordinate) + 0.5), not round-to-even. Take parity before
+        # summing so no fixed-width integer conversion limits the checker.
+        parity = np.remainder(np.floor(np.abs(points[:, selected]) + 0.5), 2)
+        odd = ((parity[0] + parity[1] + parity[2]) % 2) != 0
+        alternate = np.flatnonzero(selected)[odd]
+        colours[:, alternate] = self.otherColours[:, objects[alternate]]
+        return colours
+
+    def rayColours(self, origins, directions, depth=0):
+        colours = np.zeros_like(directions)
+        if depth > 3:
+            return colours
+        objects, times = self.closestHits(origins, directions)
+        hits = np.flatnonzero(objects >= 0)
+        if hits.size == 0:
+            return colours
+        objects = objects[hits]
+        directions = directions[:, hits]
+        points = origins[:, hits] + times[hits] * directions
+        normals = self.normalsAt(points, objects)
+        base = self.baseColoursAt(points, objects)
+        shaded = np.zeros_like(points)
+
+        specular = self.specular[objects]
+        selected = specular > 0
+        if np.any(selected):
+            d = directions[:, selected]
+            n = normals[:, selected]
+            projection = self.dot(d, n)
+            reflected = self.normalized(d - 2 * (projection * n))
+            reflectedColour = self.rayColours(points[:, selected], reflected, depth + 1)
+            shaded[:, selected] = (shaded[:, selected]
+                                   + specular[selected] * reflectedColour)
+
+        lambert = self.lambert[objects]
+        selected = lambert > 0
+        if np.any(selected):
+            p = points[:, selected]
+            n = normals[:, selected]
+            amount = np.zeros(p.shape[1])
+            for light in self.lights:
+                direction = self.normalized(light - p)
+                visible = self.lightIsVisible(p, direction)
+                contribution = self.dot(direction[:, visible], n[:, visible])
+                positive = contribution > 0
+                indices = np.flatnonzero(visible)[positive]
+                amount[indices] = amount[indices] + contribution[positive]
+            amount = np.minimum(1, amount)
+            shaded[:, selected] = (shaded[:, selected]
+                                   + (lambert[selected] * amount) * base[:, selected])
+
+        ambient = self.ambient[objects]
+        selected = ambient > 0
+        shaded[:, selected] = (shaded[:, selected]
+                               + ambient[selected] * base[:, selected])
+        colours[:, hits] = shaded
+        return colours
+
+    def primaryRayBatches(self, width, height, batch_size):
+        scene = self.scene
+        fovRadians = math.pi * (scene.fieldOfView / 2.0) / 180.0
+        halfWidth = math.tan(fovRadians)
+        halfHeight = 0.75 * halfWidth
+        pixelWidth = (halfWidth * 2) / (width - 1)
+        pixelHeight = (halfHeight * 2) / (height - 1)
+        eye = Ray(scene.position, scene.lookingAt - scene.position)
+        vpRight = eye.vector.cross(Vector.UP).normalized()
+        vpUp = vpRight.cross(eye.vector).normalized()
+        columns = (self.coordinates(eye.vector)
+                   + (np.arange(width) * pixelWidth - halfWidth)
+                   * self.coordinates(vpRight))
+        rows = ((np.arange(height) * pixelHeight - halfHeight)
+                * self.coordinates(vpUp))
+        origin = self.coordinates(eye.point)
+        for start in range(0, width * height, batch_size):
+            pixels = np.arange(start, min(start + batch_size, width * height))
+            x = pixels % width
+            y = pixels // width
+            directions = self.normalized(columns[:, x] + rows[:, y])
+            yield x, y, np.broadcast_to(origin, directions.shape), directions
+
+    def render(self, canvas, batch_size):
+        for x, y, origins, directions in self.primaryRayBatches(
+                canvas.width, canvas.height, batch_size):
+            colours = self.rayColours(origins, directions, self.scene.recursionDepth)
+            # Keep the existing Python RGB conversion and Canvas interface.
+            for px, py, (r, g, b) in zip(x.tolist(), y.tolist(), colours.T.tolist()):
+                canvas.plot(px, py, r, g, b)
+
+
+def bench_raytrace(loops, width, height, filename, batch_size=DEFAULT_BATCH_SIZE):
     range_it = range(loops)
     t0 = pyperf.perf_counter()
 
@@ -437,7 +611,7 @@ def bench_raytrace(loops, width, height, filename):
                         SimpleSurface(baseColour=(y / 6.0, 1 - y / 6.0, 0.5)))
         s.addObject(Halfspace(Point(0, 0, 0), Vector.UP),
                     CheckerboardSurface())
-        s.render(canvas)
+        s.render(canvas, batch_size)
 
     dt = pyperf.perf_counter() - t0
 
@@ -449,6 +623,7 @@ def bench_raytrace(loops, width, height, filename):
 def add_cmdline_args(cmd, args):
     cmd.append("--width=%s" % args.width)
     cmd.append("--height=%s" % args.height)
+    cmd.append("--batch-size=%s" % args.batch_size)
     if args.filename:
         cmd.extend(("--filename", args.filename))
 
@@ -464,12 +639,18 @@ if __name__ == "__main__":
                      help="Image height (default: %s)" % DEFAULT_HEIGHT)
     cmd.add_argument("--filename", metavar="FILENAME.PPM",
                      help="Output filename of the PPM picture")
+    cmd.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE,
+                     help="Rays per NumPy batch (default: %s)" % DEFAULT_BATCH_SIZE)
 
     args = runner.parse_args()
     runner.metadata['description'] = "Simple raytracer"
     runner.metadata['raytrace_width'] = args.width
     runner.metadata['raytrace_height'] = args.height
+    runner.metadata['raytrace_batch_size'] = args.batch_size
+    runner.metadata['raytrace_backend'] = 'numpy'
+    runner.metadata['numpy_version'] = np.__version__
+    runner.metadata['numpy_thread_limit'] = 1
 
     runner.bench_time_func('raytrace', bench_raytrace,
                            args.width, args.height,
-                           args.filename)
+                           args.filename, args.batch_size)
