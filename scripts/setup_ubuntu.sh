@@ -31,10 +31,12 @@ fi
 python3 -m venv "$PROJECT_DIR/.venv"
 "$PROJECT_DIR/.venv/bin/python" -m pip install --upgrade pip
 "$PROJECT_DIR/.venv/bin/python" -m pip install -e "$VENDOR_DIR/pyperformance"
+"$PROJECT_DIR/.venv/bin/python" -m pip install 'numpy>=1.24,<3'
 
 if python3-dbg -m venv "$PROJECT_DIR/.venv-dbg"; then
   "$PROJECT_DIR/.venv-dbg/bin/python" -m pip install --upgrade pip
   "$PROJECT_DIR/.venv-dbg/bin/python" -m pip install -e "$VENDOR_DIR/pyperformance"
+  "$PROJECT_DIR/.venv-dbg/bin/python" -m pip install 'numpy>=1.24,<3'
 else
   printf '%s\n' \
     'Could not create the debug-Python virtual environment.' \
