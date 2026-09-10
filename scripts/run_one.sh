@@ -5,7 +5,7 @@ set -euo pipefail
 export LC_ALL=C
 
 if [[ $# -lt 2 ]]; then
-  printf 'Usage: %s <benchmark> <original|optimized> [--fast|--debug-single-value] [--width PIXELS] [--height PIXELS]\n' "$0" >&2
+  printf 'Usage: %s <benchmark> <original|optimized> [--fast|--debug-single-value] [--width PIXELS] [--height PIXELS] [--batch-size RAYS]\n' "$0" >&2
   exit 2
 fi
 
@@ -17,6 +17,7 @@ RUN_OPTIONS=()
 BENCHMARK_OPTIONS=()
 RAYTRACE_WIDTH=100
 RAYTRACE_HEIGHT=100
+RAYTRACE_BATCH_SIZE=""
 
 case "$IMPLEMENTATION" in
   original|optimized) ;;
@@ -46,6 +47,14 @@ while [[ $# -gt 0 ]]; do
       if [[ "$1" == "--width" ]]; then RAYTRACE_WIDTH="$2"; else RAYTRACE_HEIGHT="$2"; fi
       shift 2
       ;;
+    --batch-size)
+      if [[ "$BENCHMARK" != "raytrace" || "$IMPLEMENTATION" != "optimized" ]]; then
+        printf '%s is supported only for optimized raytrace.\n' "$1" >&2
+        exit 2
+      fi
+      RAYTRACE_BATCH_SIZE="$2"
+      shift 2
+      ;;
     *)
       printf 'Unknown option: %s\n' "$1" >&2
       exit 2
@@ -55,6 +64,9 @@ done
 
 if [[ "$BENCHMARK" == "raytrace" ]]; then
   BENCHMARK_OPTIONS=(--width "$RAYTRACE_WIDTH" --height "$RAYTRACE_HEIGHT")
+  if [[ -n "$RAYTRACE_BATCH_SIZE" ]]; then
+    BENCHMARK_OPTIONS+=(--batch-size "$RAYTRACE_BATCH_SIZE")
+  fi
 fi
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -275,6 +287,9 @@ fi
     printf '%s\n' 'raytrace_image=raytrace.ppm'
     printf 'raytrace_width=%s\n' "$RAYTRACE_WIDTH"
     printf 'raytrace_height=%s\n' "$RAYTRACE_HEIGHT"
+    if [[ "$IMPLEMENTATION" == "optimized" ]]; then
+      "$PYTHON" -c 'import json, sys; m = json.load(open(sys.argv[1]))["metadata"]; print("raytrace_batch_size=" + str(m["raytrace_batch_size"])); print("numpy_version=" + m["numpy_version"])' "$TIMING_JSON"
+    fi
   fi
 } > "$RUN_METADATA"
 
