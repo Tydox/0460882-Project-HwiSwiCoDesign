@@ -172,6 +172,7 @@ COUNTER_CANDIDATES=(
 )
 STAT_EVENTS=()
 RECORD_EVENTS=()
+PROFILE_EVENT=cpu-clock
 PROBE_DIR="$(mktemp -d "$RESULT_DIR/.perf-probe.XXXXXX")"
 trap 'rm -f "$PROBE_DIR/stat.txt" "$PROBE_DIR/record.data" "$PROBE_DIR/record.data.old"; rmdir "$PROBE_DIR"' EXIT
 printf 'event\tstat\trecord\n' > "$PERF_EVENTS"
@@ -204,7 +205,8 @@ for event in "${COUNTER_CANDIDATES[@]}"; do
     *)
       printf '\n=== record: %s ===\n' "$event" >> "$PERF_PROBE_LOG"
       record_status=unavailable
-      if perf record -F 999 -e "$event" -g --output "$PROBE_DIR/record.data" -- sleep 0.05 \
+      if sudo perf record -F 999 --no-bpf-event -e "$event" --call-graph dwarf \
+          --output "$PROBE_DIR/record.data" -- sleep 0.05 \
           >> "$PERF_PROBE_LOG" 2>&1; then
         record_status=enabled
         RECORD_EVENTS+=("$event")
@@ -215,8 +217,9 @@ for event in "${COUNTER_CANDIDATES[@]}"; do
   if [[ "$stat_status" == enabled ]]; then STAT_EVENTS+=("$event"); fi
   printf '%s\t%s\t%s\n' "$event" "$stat_status" "$record_status" >> "$PERF_EVENTS"
 done
-if [[ ${#STAT_EVENTS[@]} -eq 0 || ! " ${RECORD_EVENTS[*]} " =~ " cpu-clock " ]]; then
-  printf 'No usable stat counters or cpu-clock sampling unavailable. See %s\n' "$PERF_PROBE_LOG" >&2
+if [[ ${#STAT_EVENTS[@]} -eq 0 || ! " ${RECORD_EVENTS[*]} " =~ " $PROFILE_EVENT " ]]; then
+  printf 'No usable stat counters or %s sampling unavailable. See %s\n' \
+    "$PROFILE_EVENT" "$PERF_PROBE_LOG" >&2
   exit 1
 fi
 STAT_EVENT_LIST="$(IFS=,; printf '%s' "${STAT_EVENTS[*]}")"
@@ -234,8 +237,12 @@ if grep -Eq '<not supported>|<not counted>' "$PERF_STAT"; then
 fi
 
 printf 'Profiling %s (%s, %s mode) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
-# perf.data and the text exports retain every selected sampling event.
-if ! perf record -F 999 -e "$RECORD_EVENT_LIST" -g --output "$PERF_DATA" -- \
+# Use one CPU-time sampling event so the report and flame graph have a clear,
+# consistent meaning. DWARF unwinding avoids bogus user-space call chains from
+# optimized native libraries that omit frame pointers. Run perf as root so
+# kernel mappings and symbols can be collected too.
+if ! sudo perf record -F 999 --no-bpf-event -e "$PROFILE_EVENT" \
+    --call-graph dwarf --output "$PERF_DATA" -- \
     "$DEBUG_PYTHON" "${WORKLOAD[@]}" 2> "$PERF_RECORD_LOG"; then
   cat "$PERF_RECORD_LOG" >&2
   exit 1
@@ -243,15 +250,16 @@ fi
 cat "$PERF_RECORD_LOG" >&2
 
 printf 'Creating perf report...\n'
-perf report --stdio --input "$PERF_DATA" > "$PERF_REPORT"
+sudo perf report --stdio --header --show-nr-samples --show-total-period \
+  --demangle --percent-limit 0.1 --input "$PERF_DATA" > "$PERF_REPORT"
 if ! grep -q '%' "$PERF_REPORT"; then
   printf 'perf report did not produce any sample rows: %s\n' "$PERF_REPORT" >&2
   exit 1
 fi
 printf 'Exporting and collapsing perf stacks...\n'
-perf script --input "$PERF_DATA" > "$PERF_SCRIPT"
-# Mixing cycles, faults and clock samples would make flame-graph widths
-# meaningless. Preserve the existing CPU-time flame graph explicitly.
+sudo perf script --input "$PERF_DATA" > "$PERF_SCRIPT"
+# The profile contains only CPU-clock samples, so every flame-graph width
+# represents sampled CPU time.
 "$FLAMEGRAPH_DIR/stackcollapse-perf.pl" --event-filter=cpu-clock "$PERF_SCRIPT" > "$FOLDED"
 if [[ ! -s "$FOLDED" ]]; then
   printf 'No stack samples were produced: %s\n' "$FOLDED" >&2
@@ -281,8 +289,13 @@ fi
   printf 'perf_stat_python=%s\n' "$PYTHON"
   printf 'perf_record_python=%s\n' "$DEBUG_PYTHON"
   printf 'perf_stat_events=%s\n' "$STAT_EVENT_LIST"
-  printf 'perf_record_events=%s\n' "$RECORD_EVENT_LIST"
-  printf '%s\n' 'perf_record_frequency=999' 'flamegraph_event=cpu-clock'
+  printf 'perf_record_events=%s\n' "$PROFILE_EVENT"
+  printf 'perf_record_available_events=%s\n' "$RECORD_EVENT_LIST"
+  printf '%s\n' \
+    'perf_record_frequency=999' \
+    'perf_record_call_graph=dwarf' \
+    'perf_record_kernel_inclusive=true' \
+    'flamegraph_event=cpu-clock'
   if [[ "$BENCHMARK" == "raytrace" ]]; then
     printf '%s\n' 'raytrace_image=raytrace.ppm'
     printf 'raytrace_width=%s\n' "$RAYTRACE_WIDTH"
