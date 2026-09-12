@@ -1,11 +1,15 @@
 .venv/
 .venv-dbg/
+.venv312/
+.venv312-dbg/
 venv/
 vendor/
 results/**/perf.data
+results/**/perf_script.txt
 results/**/stacks.folded
 __pycache__/
 *.pyc
 log.txt
 suites/.DS_Store
 .DS_Store
+results/raytrace/validation

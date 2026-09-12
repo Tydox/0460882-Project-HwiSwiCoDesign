@@ -1,0 +1,8 @@
+WARNING: `threadpoolctl` not found in system! Install it by `pip install threadpoolctl`. Once installed, try `np.show_runtime` again for more detailed build information
+[{'numpy_version': '2.5.3',
+  'python': '3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]',
+  'uname': uname_result(system='Windows', node='DESKTOP-RALEUED', release='10', version='10.0.19044', machine='AMD64')},
+ {'simd_extensions': {'baseline': ['X86_V2'],
+                      'found': ['X86_V3'],
+                      'not_found': []}},
+ {'ignore_floating_point_errors_in_matmul': False}]

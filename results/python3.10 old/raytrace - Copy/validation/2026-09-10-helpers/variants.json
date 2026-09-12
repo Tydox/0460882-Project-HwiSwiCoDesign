@@ -1,0 +1,32 @@
+[
+  {
+    "variant": "00-baseline",
+    "sha256": "9f5873e48cf73b1ca2710640339d1604aa2338cd05e02bf7d40cb2b0be161f51",
+    "lf_sha256": "2838a1d9a50ec7836fd705f26cf924a38e5a59153968d5188fcf262b1cf03f54"
+  },
+  {
+    "variant": "01-normalized-only",
+    "sha256": "4b0f32dc04272761cf25ecbb28e035030adeeb87f4257e22b94e013b098af987",
+    "lf_sha256": "ad29f12d2970aef296d32ad9fc61ee28e6c9903572daf1866d552c319441decc"
+  },
+  {
+    "variant": "02-reflection-only",
+    "sha256": "df252ddce3114d3fb7112c7b5907b7e5069498c9e0ac9041e87c4b3bf21be212",
+    "lf_sha256": "731e12c6a740c860f2d82b151293673a537374b1d9cfe244d247a94d782b41da"
+  },
+  {
+    "variant": "03-point-only",
+    "sha256": "17d08dba2fe39a1b4ba5cc9a73be0bc23c73ace14cdea48c2bbb19d4602cc9ca",
+    "lf_sha256": "20994f8a337b631b375a6106353e53332d894b3a172a3d913b95bbe9bee8c866"
+  },
+  {
+    "variant": "04-normal-only",
+    "sha256": "128e90e1d520da013c2eecf9c8e4cb33791c71bd2de05b23a3985572927e264b",
+    "lf_sha256": "d0c68a9edded7b562038cee97811d593b8856bbace59fa4dbde36f6de2d8f1f4"
+  },
+  {
+    "variant": "05-combined",
+    "sha256": "090e92d525953f6a0d8671e9e3205ce00729ca0fb5dda37ff3e711a32c120ceb",
+    "lf_sha256": "260f854de35e55bf68ada9d9885ef4044e1d992647fb9ace520a88181b87cb88"
+  }
+]

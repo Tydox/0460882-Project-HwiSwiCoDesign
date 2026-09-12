@@ -1,0 +1,22 @@
+[
+  {
+    "variant": "00-baseline",
+    "sha256": "7c9401deccd33851c111ecc9af470673c7cc925a6ae079d68f618a3a416308a2",
+    "lf_sha256": "260f854de35e55bf68ada9d9885ef4044e1d992647fb9ace520a88181b87cb88"
+  },
+  {
+    "variant": "01-radius-only",
+    "sha256": "9a919e5a284b9e47967022c8e060bc8ccc432e676acf2c219b015028e2333966",
+    "lf_sha256": "cf8f7b54302dc2592bc71da8917c643bb090a92357ee2ccb88d8f6ed5a181483"
+  },
+  {
+    "variant": "02-camera-only",
+    "sha256": "9b975f5efe43280c80d198ff0a47edbb84eaef42cc9ac406256de87889db7284",
+    "lf_sha256": "f505037f7a411b420febf98d60b478086a37f5b50ac9ca9ba6efd9556cf76f0a"
+  },
+  {
+    "variant": "03-combined",
+    "sha256": "91146af688a2f8b87f983af8da84d4b271d3b31a503755c1966753ccbfaa27ec",
+    "lf_sha256": "9238b33ca6e815b6837be1224582fe4eb01a5f2245f25aec911248a878700e9f"
+  }
+]

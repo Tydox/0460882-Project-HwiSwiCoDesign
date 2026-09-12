@@ -1,0 +1,29 @@
+01-normalized-only initial:
+Mean +- std dev: [00-baseline-initial] 220 ms +- 11 ms -> [01-normalized-only-initial] 215 ms +- 10 ms: 1.03x faster
+
+01-normalized-only repeat:
+Benchmark hidden because not significant (1): raytrace
+
+02-reflection-only initial:
+Benchmark hidden because not significant (1): raytrace
+
+02-reflection-only repeat:
+Benchmark hidden because not significant (1): raytrace
+
+03-point-only initial:
+Benchmark hidden because not significant (1): raytrace
+
+03-point-only repeat:
+Benchmark hidden because not significant (1): raytrace
+
+04-normal-only initial:
+Benchmark hidden because not significant (1): raytrace
+
+04-normal-only repeat:
+Benchmark hidden because not significant (1): raytrace
+
+05-combined initial:
+Benchmark hidden because not significant (1): raytrace
+
+05-combined repeat:
+Mean +- std dev: [00-baseline-repeat] 222 ms +- 8 ms -> [05-combined-repeat] 210 ms +- 12 ms: 1.06x faster

@@ -1,0 +1,8 @@
+01-radius-only:
+Mean +- std dev: [00-baseline] 213 ms +- 22 ms -> [01-radius-only] 203 ms +- 15 ms: 1.05x faster
+
+02-camera-only:
+Mean +- std dev: [00-baseline] 213 ms +- 22 ms -> [02-camera-only] 205 ms +- 10 ms: 1.04x faster
+
+03-combined:
+Mean +- std dev: [00-baseline] 213 ms +- 22 ms -> [03-combined] 202 ms +- 18 ms: 1.05x faster

@@ -1,0 +1,43 @@
+{
+  "tests": {
+    "existing": 13,
+    "batched": 9,
+    "passed": true,
+    "batch_sizes": [
+      1,
+      2,
+      10,
+      100,
+      256,
+      512,
+      1024
+    ],
+    "exact_rgb_and_binary64_dimensions": [
+      [
+        100,
+        100
+      ],
+      [
+        200,
+        200
+      ],
+      [
+        160,
+        120
+      ]
+    ],
+    "exact_server_original_ppm_dimensions": [
+      800,
+      800
+    ]
+  },
+  "cli": "worker forwarding and partial batch 12x9, batch 10 passed; default 1024 confirmed at 800x800",
+  "shell_syntax": "run_one.sh and setup_ubuntu.sh passed sh -n; Linux perf not executed locally",
+  "source_sha256": "3387067768d285b4feb28e00ac4a9c43dcc433419cb266cc270d18bfa223b5ef",
+  "source_lf_sha256": "b851d5f993a58c75c302b4c77947a8fed01f3c82bfe3418dfb9e47e7c9425ad6",
+  "baseline_sha256": "91146af688a2f8b87f983af8da84d4b271d3b31a503755c1966753ccbfaa27ec",
+  "original_sha256": "00b75771d6d7d2ac26e97aaf22db987e2b814d83c1627aa1ba4853090f2a8b5b",
+  "numpy_version": "2.5.3",
+  "default_batch_size": 1024,
+  "timing_status": "preliminary local; matched server comparison pending"
+}

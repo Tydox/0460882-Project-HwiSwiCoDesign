@@ -1,0 +1,39 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "baseline_sha256": "91146af688a2f8b87f983af8da84d4b271d3b31a503755c1966753ccbfaa27ec",
+  "optimized_sha256": "9e7cb30d906ddb3930fae095b28ac39e2a27152920515418c7f693f2b592d30a",
+  "original_sha256": "00b75771d6d7d2ac26e97aaf22db987e2b814d83c1627aa1ba4853090f2a8b5b",
+  "orders": [
+    [
+      "scalar",
+      "batch-1",
+      "batch-2",
+      "batch-10",
+      "batch-100",
+      "batch-256",
+      "batch-512",
+      "batch-1024"
+    ],
+    [
+      "batch-1024",
+      "batch-512",
+      "batch-256",
+      "batch-100",
+      "batch-10",
+      "batch-2",
+      "batch-1",
+      "scalar"
+    ],
+    [
+      "batch-10",
+      "batch-100",
+      "batch-256",
+      "batch-512",
+      "batch-1024",
+      "scalar",
+      "batch-1",
+      "batch-2"
+    ]
+  ],
+  "note": "Windows local measurements, not server results. One logical CPU."
+}

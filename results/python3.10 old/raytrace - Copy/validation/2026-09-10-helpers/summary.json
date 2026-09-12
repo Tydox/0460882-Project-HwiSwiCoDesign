@@ -1,0 +1,244 @@
+{
+  "scope": "Local Windows CPython 3.12.14, pyperf 2.10.0; not assignment VM measurements",
+  "width": 100,
+  "height": 100,
+  "cpu_affinity": 0,
+  "threads": 1,
+  "variant_design": "Each individual helper is changed relative to the same pre-round baseline; combined changes all four.",
+  "commands": {
+    "initial_and_repeat": "--processes 8 --values 5 --warmups 1 --loops 1 --affinity 0 --width 100 --height 100",
+    "paired": "--processes 1 --values 8 --warmups 2 --loops 1 --affinity 0 --width 100 --height 100"
+  },
+  "order": {
+    "initial": [
+      "00-baseline",
+      "01-normalized-only",
+      "02-reflection-only",
+      "03-point-only",
+      "04-normal-only",
+      "05-combined"
+    ],
+    "repeat": [
+      "05-combined",
+      "04-normal-only",
+      "03-point-only",
+      "02-reflection-only",
+      "01-normalized-only",
+      "00-baseline"
+    ]
+  },
+  "variants": [
+    {
+      "variant": "00-baseline",
+      "sha256": "9f5873e48cf73b1ca2710640339d1604aa2338cd05e02bf7d40cb2b0be161f51",
+      "lf_sha256": "2838a1d9a50ec7836fd705f26cf924a38e5a59153968d5188fcf262b1cf03f54",
+      "initial": {
+        "mean_ms": 220.22597750110435,
+        "stdev_ms": 11.161142246323616,
+        "values": 40
+      },
+      "repeat": {
+        "mean_ms": 222.09525750058674,
+        "stdev_ms": 8.328304338235199,
+        "values": 40
+      }
+    },
+    {
+      "variant": "01-normalized-only",
+      "sha256": "4b0f32dc04272761cf25ecbb28e035030adeeb87f4257e22b94e013b098af987",
+      "lf_sha256": "ad29f12d2970aef296d32ad9fc61ee28e6c9903572daf1866d552c319441decc",
+      "initial": {
+        "mean_ms": 214.70223749947763,
+        "stdev_ms": 10.140298064372505,
+        "values": 40,
+        "pyperf_comparison": "Mean +- std dev: [00-baseline-initial] 220 ms +- 11 ms -> [01-normalized-only-initial] 215 ms +- 10 ms: 1.03x faster"
+      },
+      "repeat": {
+        "mean_ms": 219.64125000067725,
+        "stdev_ms": 13.853170946866683,
+        "values": 40,
+        "pyperf_comparison": "Benchmark hidden because not significant (1): raytrace"
+      }
+    },
+    {
+      "variant": "02-reflection-only",
+      "sha256": "df252ddce3114d3fb7112c7b5907b7e5069498c9e0ac9041e87c4b3bf21be212",
+      "lf_sha256": "731e12c6a740c860f2d82b151293673a537374b1d9cfe244d247a94d782b41da",
+      "initial": {
+        "mean_ms": 217.49358999968535,
+        "stdev_ms": 9.829539679871093,
+        "values": 40,
+        "pyperf_comparison": "Benchmark hidden because not significant (1): raytrace"
+      },
+      "repeat": {
+        "mean_ms": 218.81191749962454,
+        "stdev_ms": 8.889491024109837,
+        "values": 40,
+        "pyperf_comparison": "Benchmark hidden because not significant (1): raytrace"
+      }
+    },
+    {
+      "variant": "03-point-only",
+      "sha256": "17d08dba2fe39a1b4ba5cc9a73be0bc23c73ace14cdea48c2bbb19d4602cc9ca",
+      "lf_sha256": "20994f8a337b631b375a6106353e53332d894b3a172a3d913b95bbe9bee8c866",
+      "initial": {
+        "mean_ms": 219.4970350001313,
+        "stdev_ms": 9.492623299838524,
+        "values": 40,
+        "pyperf_comparison": "Benchmark hidden because not significant (1): raytrace"
+      },
+      "repeat": {
+        "mean_ms": 221.11385249954765,
+        "stdev_ms": 12.78572797230012,
+        "values": 40,
+        "pyperf_comparison": "Benchmark hidden because not significant (1): raytrace"
+      }
+    },
+    {
+      "variant": "04-normal-only",
+      "sha256": "128e90e1d520da013c2eecf9c8e4cb33791c71bd2de05b23a3985572927e264b",
+      "lf_sha256": "d0c68a9edded7b562038cee97811d593b8856bbace59fa4dbde36f6de2d8f1f4",
+      "initial": {
+        "mean_ms": 221.34123500054557,
+        "stdev_ms": 12.419494820915014,
+        "values": 40,
+        "pyperf_comparison": "Benchmark hidden because not significant (1): raytrace"
+      },
+      "repeat": {
+        "mean_ms": 220.26020499997685,
+        "stdev_ms": 9.181776438538025,
+        "values": 40,
+        "pyperf_comparison": "Benchmark hidden because not significant (1): raytrace"
+      }
+    },
+    {
+      "variant": "05-combined",
+      "sha256": "090e92d525953f6a0d8671e9e3205ce00729ca0fb5dda37ff3e711a32c120ceb",
+      "lf_sha256": "260f854de35e55bf68ada9d9885ef4044e1d992647fb9ace520a88181b87cb88",
+      "initial": {
+        "mean_ms": 223.80795500012027,
+        "stdev_ms": 18.779013558865405,
+        "values": 40,
+        "pyperf_comparison": "Benchmark hidden because not significant (1): raytrace"
+      },
+      "repeat": {
+        "mean_ms": 209.8378024998965,
+        "stdev_ms": 12.455338831378533,
+        "values": 40,
+        "pyperf_comparison": "Mean +- std dev: [00-baseline-repeat] 222 ms +- 8 ms -> [05-combined-repeat] 210 ms +- 12 ms: 1.06x faster"
+      }
+    }
+  ],
+  "paired_comparison": [
+    {
+      "pair": 1,
+      "order": [
+        "00-baseline",
+        "05-combined"
+      ],
+      "00-baseline": 215.17844999925728,
+      "05-combined": 216.12971250033297,
+      "speedup": 0.9955986500418159
+    },
+    {
+      "pair": 2,
+      "order": [
+        "05-combined",
+        "00-baseline"
+      ],
+      "00-baseline": 229.19822499989095,
+      "05-combined": 208.32582499951968,
+      "speedup": 1.1001911308903705
+    },
+    {
+      "pair": 3,
+      "order": [
+        "00-baseline",
+        "05-combined"
+      ],
+      "00-baseline": 228.64122500232043,
+      "05-combined": 211.96927500022866,
+      "speedup": 1.0786526726671768
+    },
+    {
+      "pair": 4,
+      "order": [
+        "05-combined",
+        "00-baseline"
+      ],
+      "00-baseline": 212.7078125031403,
+      "05-combined": 212.21083749787795,
+      "speedup": 1.0023418926720333
+    },
+    {
+      "pair": 5,
+      "order": [
+        "00-baseline",
+        "05-combined"
+      ],
+      "00-baseline": 227.11608749796142,
+      "05-combined": 197.6752625005247,
+      "speedup": 1.1489353023996038
+    },
+    {
+      "pair": 6,
+      "order": [
+        "05-combined",
+        "00-baseline"
+      ],
+      "00-baseline": 214.6278499994878,
+      "05-combined": 205.27798749753856,
+      "speedup": 1.0455473215415334
+    }
+  ],
+  "paired_mean_baseline_ms": 221.2449416670097,
+  "paired_mean_combined_ms": 208.5981499993371,
+  "separate_instrumentation_counts": {
+    "00-baseline": {
+      "Vector.__init__": 85013,
+      "Point.__init__": 5345,
+      "Ray.__init__": 26000,
+      "Vector.magnitude": 27479,
+      "Vector.dot": 68549,
+      "Vector.scale": 43678,
+      "Sphere.intersectionTime": 179457,
+      "Halfspace.intersectionTime": 25501
+    },
+    "05-combined": {
+      "Vector.__init__": 67538,
+      "Point.__init__": 5345,
+      "Ray.__init__": 26000,
+      "Vector.magnitude": 0,
+      "Vector.dot": 41070,
+      "Vector.scale": 200,
+      "Sphere.intersectionTime": 179457,
+      "Halfspace.intersectionTime": 25501
+    }
+  },
+  "correctness": {
+    "tests": 12,
+    "status": "passed for baseline, all four independent variants, and combined",
+    "dimensions": [
+      [
+        100,
+        100
+      ],
+      [
+        200,
+        200
+      ],
+      [
+        160,
+        120
+      ]
+    ],
+    "image_comparison": "Exact RGB bytes and packed binary64 colours against the untouched original",
+    "helper_comparison": "Exact packed coordinate bits, return types, fresh results and unchanged inputs; signed zero and varied finite inputs"
+  },
+  "limitations": [
+    "Initial and reverse-order measurements warned about instability.",
+    "Additional alternating baseline/combined pairs were collected because the two complete passes disagreed.",
+    "No Linux perf counters, SIMD, native code, or assignment-VM results were collected.",
+    "Allocation/method counts were measured separately with instrumentation, never inside timing runs."
+  ]
+}

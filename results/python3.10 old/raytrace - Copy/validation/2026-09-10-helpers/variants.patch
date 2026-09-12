@@ -1,0 +1,122 @@
+--- baseline.py
++++ 01-normalized-only.py
+@@ -61,7 +61,12 @@
+                       self.x * other.y - self.y * other.x) #Check if we can use SIMD to speed up
+ 
+     def normalized(self): #this method returns a new vector that has the same direction as the original vector but with a magnitude of 1.
+-        return self.scale(1.0 / self.magnitude())
++        x = self.x
++        y = self.y
++        z = self.z
++        # Preserve the dot-product order and reciprocal-then-multiply rounding.
++        factor = 1.0 / math.sqrt((x * x) + (y * y) + (z * z))
++        return Vector(factor * x, factor * y, factor * z)
+ 
+     def negated(self):#retruns same vector but with opposite direction. 
+         return self.scale(-1)
+--- baseline.py
++++ 02-reflection-only.py
+@@ -82,8 +82,11 @@
+         raise 'Vectors are not points!'
+ 
+     def reflectThrough(self, normal): #calculates the reflection of the vector through a given normal vector. first scales the normal vector by the dot product of the original vector and the normal, then subtracts twice this scaled normal from the original vector to get the reflected vector.
+-        d = normal.scale(self.dot(normal))
+-        return self - d.scale(2)
++        projection = self.dot(normal)
++        # Keep both scaling steps in their original order without temporary vectors.
++        return Vector(self.x - 2 * (projection * normal.x),
++                      self.y - 2 * (projection * normal.y),
++                      self.z - 2 * (projection * normal.z))
+ 
+ #we do this to avoid creating new Vector objects for these common vectors, which can save memory and improve performance in a raytracer where these vectors are used frequently.
+ #we make the following: zero vector, right vector, up vector, and out vector. These are commonly used in graphics programming for various calculations, such as defining directions and orientations in 3D space.
+--- baseline.py
++++ 03-point-only.py
+@@ -209,7 +209,12 @@
+         return 'Ray(%s,%s)' % (repr(self.point), repr(self.vector))
+ 
+     def pointAtTime(self, t):
+-        return self.point + self.vector.scale(t) #Pnew=Pold+d*T #calc a point at time T along the ray d.
++        # Pnew=Pold+d*T: calculate the point without a temporary scaled vector.
++        point = self.point
++        vector = self.vector
++        return Point(point.x + t * vector.x,
++                     point.y + t * vector.y,
++                     point.z + t * vector.z)
+ 
+ 
+ Point.ZERO = Point(0, 0, 0)
+--- baseline.py
++++ 04-normal-only.py
+@@ -174,7 +174,12 @@
+             return v - math.sqrt(discriminant)
+ 
+     def normalAt(self, p):
+-        return (p - self.centre).normalized()
++        centre = self.centre
++        x = p.x - centre.x
++        y = p.y - centre.y
++        z = p.z - centre.z
++        factor = 1.0 / math.sqrt((x * x) + (y * y) + (z * z))
++        return Vector(factor * x, factor * y, factor * z)
+ 
+ 
+ class Halfspace(object): #a half space is a region of space that is divided by a plane, visually it looks like a flat surface that extends infinitely in all directions. The half space is defined by a point on the plane and a normal vector that is perpendicular to the plane. The normal vector points towards the "inside" of the half space, indicating which side of the plane is considered to be part of the half space.
+--- baseline.py
++++ 05-combined.py
+@@ -61,7 +61,12 @@
+                       self.x * other.y - self.y * other.x) #Check if we can use SIMD to speed up
+ 
+     def normalized(self): #this method returns a new vector that has the same direction as the original vector but with a magnitude of 1.
+-        return self.scale(1.0 / self.magnitude())
++        x = self.x
++        y = self.y
++        z = self.z
++        # Preserve the dot-product order and reciprocal-then-multiply rounding.
++        factor = 1.0 / math.sqrt((x * x) + (y * y) + (z * z))
++        return Vector(factor * x, factor * y, factor * z)
+ 
+     def negated(self):#retruns same vector but with opposite direction. 
+         return self.scale(-1)
+@@ -82,8 +87,11 @@
+         raise 'Vectors are not points!'
+ 
+     def reflectThrough(self, normal): #calculates the reflection of the vector through a given normal vector. first scales the normal vector by the dot product of the original vector and the normal, then subtracts twice this scaled normal from the original vector to get the reflected vector.
+-        d = normal.scale(self.dot(normal))
+-        return self - d.scale(2)
++        projection = self.dot(normal)
++        # Keep both scaling steps in their original order without temporary vectors.
++        return Vector(self.x - 2 * (projection * normal.x),
++                      self.y - 2 * (projection * normal.y),
++                      self.z - 2 * (projection * normal.z))
+ 
+ #we do this to avoid creating new Vector objects for these common vectors, which can save memory and improve performance in a raytracer where these vectors are used frequently.
+ #we make the following: zero vector, right vector, up vector, and out vector. These are commonly used in graphics programming for various calculations, such as defining directions and orientations in 3D space.
+@@ -174,7 +182,12 @@
+             return v - math.sqrt(discriminant)
+ 
+     def normalAt(self, p):
+-        return (p - self.centre).normalized()
++        centre = self.centre
++        x = p.x - centre.x
++        y = p.y - centre.y
++        z = p.z - centre.z
++        factor = 1.0 / math.sqrt((x * x) + (y * y) + (z * z))
++        return Vector(factor * x, factor * y, factor * z)
+ 
+ 
+ class Halfspace(object): #a half space is a region of space that is divided by a plane, visually it looks like a flat surface that extends infinitely in all directions. The half space is defined by a point on the plane and a normal vector that is perpendicular to the plane. The normal vector points towards the "inside" of the half space, indicating which side of the plane is considered to be part of the half space.
+@@ -209,7 +222,12 @@
+         return 'Ray(%s,%s)' % (repr(self.point), repr(self.vector))
+ 
+     def pointAtTime(self, t):
+-        return self.point + self.vector.scale(t) #Pnew=Pold+d*T #calc a point at time T along the ray d.
++        # Pnew=Pold+d*T: calculate the point without a temporary scaled vector.
++        point = self.point
++        vector = self.vector
++        return Point(point.x + t * vector.x,
++                     point.y + t * vector.y,
++                     point.z + t * vector.z)
+ 
+ 
+ Point.ZERO = Point(0, 0, 0)

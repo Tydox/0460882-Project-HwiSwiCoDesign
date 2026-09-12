@@ -1,0 +1,18 @@
+{
+  "before_numpy_import": [
+    {
+      "id": 14448,
+      "user_time": 0.046875,
+      "system_time": 0.1875
+    }
+  ],
+  "cpu_affinity": [
+    0
+  ],
+  "thread_cpu_seconds_during_10_renders": {
+    "14448": 0.609375,
+    "10444": 0.0,
+    "20676": 0.0,
+    "24716": 0.0
+  }
+}

@@ -1,0 +1,32 @@
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\baseline.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=5", "--warmups=2", "--loops=4", "-o", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\confirm-1-scalar.json"]
+.
+raytrace: Mean +- std dev: 207 ms +- 12 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=5", "--warmups=2", "--loops=4", "-o", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\confirm-1-default.json"]
+.
+raytrace: Mean +- std dev: 47.0 ms +- 2.1 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=5", "--warmups=2", "--loops=4", "-o", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\confirm-2-default.json"]
+.
+raytrace: Mean +- std dev: 45.9 ms +- 0.6 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\baseline.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=5", "--warmups=2", "--loops=4", "-o", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\confirm-2-scalar.json"]
+.
+raytrace: Mean +- std dev: 194 ms +- 5 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\baseline.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=5", "--warmups=2", "--loops=4", "-o", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\confirm-3-scalar.json"]
+.
+raytrace: Mean +- std dev: 201 ms +- 2 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=5", "--warmups=2", "--loops=4", "-o", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\confirm-3-default.json"]
+.
+raytrace: Mean +- std dev: 46.3 ms +- 1.6 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=5", "--warmups=2", "--loops=4", "-o", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\confirm-4-default.json"]
+.
+raytrace: Mean +- std dev: 45.5 ms +- 0.6 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\baseline.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=5", "--warmups=2", "--loops=4", "-o", "results\\raytrace\\validation\\2026-09-10-numpy-batches\\confirm-4-scalar.json"]
+.
+raytrace: Mean +- std dev: 193 ms +- 6 ms
+

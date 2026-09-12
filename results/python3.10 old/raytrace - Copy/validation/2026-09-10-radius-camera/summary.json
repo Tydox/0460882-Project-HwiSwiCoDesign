@@ -1,0 +1,208 @@
+{
+  "scope": "Windows CPython 3.12.14, pyperf 2.10.0; preliminary local measurements",
+  "command_arguments": "--processes 1 --values 8 --warmups 2 --loops 1 --affinity 0 --width 100 --height 100",
+  "design": "Eight rounds, each containing baseline, radius-only, camera-only and combined. Rotations in both directions place each variant in each order position twice.",
+  "run_order": [
+    [
+      "00-baseline",
+      "01-radius-only",
+      "02-camera-only",
+      "03-combined"
+    ],
+    [
+      "01-radius-only",
+      "02-camera-only",
+      "03-combined",
+      "00-baseline"
+    ],
+    [
+      "02-camera-only",
+      "03-combined",
+      "00-baseline",
+      "01-radius-only"
+    ],
+    [
+      "03-combined",
+      "00-baseline",
+      "01-radius-only",
+      "02-camera-only"
+    ],
+    [
+      "03-combined",
+      "02-camera-only",
+      "01-radius-only",
+      "00-baseline"
+    ],
+    [
+      "02-camera-only",
+      "01-radius-only",
+      "00-baseline",
+      "03-combined"
+    ],
+    [
+      "01-radius-only",
+      "00-baseline",
+      "03-combined",
+      "02-camera-only"
+    ],
+    [
+      "00-baseline",
+      "03-combined",
+      "02-camera-only",
+      "01-radius-only"
+    ]
+  ],
+  "variants": [
+    {
+      "variant": "00-baseline",
+      "sha256": "7c9401deccd33851c111ecc9af470673c7cc925a6ae079d68f618a3a416308a2",
+      "lf_sha256": "260f854de35e55bf68ada9d9885ef4044e1d992647fb9ace520a88181b87cb88",
+      "round_means_ms": [
+        210.3334375015038,
+        204.690237500472,
+        207.21201250034937,
+        206.73656249891792,
+        210.6214249988625,
+        210.50031250069878,
+        244.81093750000582,
+        209.8378499986211
+      ],
+      "mean_ms": 213.0928468749289,
+      "stdev_ms": 21.780515827065667,
+      "values": 64
+    },
+    {
+      "variant": "01-radius-only",
+      "sha256": "9a919e5a284b9e47967022c8e060bc8ccc432e676acf2c219b015028e2333966",
+      "lf_sha256": "cf8f7b54302dc2592bc71da8917c643bb090a92357ee2ccb88d8f6ed5a181483",
+      "round_means_ms": [
+        207.28185000098165,
+        199.9634874991898,
+        196.39783750062634,
+        196.2317500010613,
+        195.5835125008889,
+        212.74768749844952,
+        216.93051250076678,
+        195.02791250124574
+      ],
+      "mean_ms": 202.52056875040125,
+      "stdev_ms": 14.921384726106087,
+      "values": 64,
+      "comparison": "Mean +- std dev: [00-baseline] 213 ms +- 22 ms -> [01-radius-only] 203 ms +- 15 ms: 1.05x faster",
+      "speedup": 1.0522034783417855,
+      "faster_rounds": 7
+    },
+    {
+      "variant": "02-camera-only",
+      "sha256": "9b975f5efe43280c80d198ff0a47edbb84eaef42cc9ac406256de87889db7284",
+      "lf_sha256": "f505037f7a411b420febf98d60b478086a37f5b50ac9ca9ba6efd9556cf76f0a",
+      "round_means_ms": [
+        206.4594749999742,
+        204.05085000129475,
+        200.6221125011507,
+        197.85385000068345,
+        208.89620000161813,
+        204.32316249934956,
+        210.88194999992993,
+        206.9957500007149
+      ],
+      "mean_ms": 205.01041875058945,
+      "stdev_ms": 10.031796242610367,
+      "values": 64,
+      "comparison": "Mean +- std dev: [00-baseline] 213 ms +- 22 ms -> [02-camera-only] 205 ms +- 10 ms: 1.04x faster",
+      "speedup": 1.0394244749783783,
+      "faster_rounds": 8
+    },
+    {
+      "variant": "03-combined",
+      "sha256": "91146af688a2f8b87f983af8da84d4b271d3b31a503755c1966753ccbfaa27ec",
+      "lf_sha256": "9238b33ca6e815b6837be1224582fe4eb01a5f2245f25aec911248a878700e9f",
+      "round_means_ms": [
+        187.5772000003053,
+        191.90872499984835,
+        204.81967499927123,
+        199.58096249865775,
+        199.22628749918658,
+        220.45210000032966,
+        215.82097499867814,
+        198.32251249954425
+      ],
+      "mean_ms": 202.21355468697766,
+      "stdev_ms": 17.96765272369838,
+      "values": 64,
+      "comparison": "Mean +- std dev: [00-baseline] 213 ms +- 22 ms -> [03-combined] 202 ms +- 18 ms: 1.05x faster",
+      "speedup": 1.0538010036211083,
+      "faster_rounds": 7
+    }
+  ],
+  "separate_instrumentation_counts": {
+    "00-baseline": {
+      "radius_squared_multiplications": 179457,
+      "Vector.__init__": 67538,
+      "Vector.__add__": 20000,
+      "Ray.__init__": 26000,
+      "Sphere.intersectionTime": 179457,
+      "Halfspace.intersectionTime": 25501
+    },
+    "03-combined": {
+      "radius_squared_multiplications": 7,
+      "Vector.__init__": 57638,
+      "Vector.__add__": 10100,
+      "Ray.__init__": 26000,
+      "Sphere.intersectionTime": 179457,
+      "Halfspace.intersectionTime": 25501
+    }
+  },
+  "correctness": {
+    "tests": 13,
+    "status": "passed for baseline, both independent variants and combined",
+    "image_dimensions": [
+      [
+        100,
+        100
+      ],
+      [
+        200,
+        200
+      ],
+      [
+        160,
+        120
+      ]
+    ],
+    "primary_ray_dimensions": [
+      [
+        2,
+        2
+      ],
+      [
+        100,
+        100
+      ],
+      [
+        160,
+        120
+      ]
+    ],
+    "comparison": "Exact RGB, packed binary64 colours, and primary-ray origins/directions against untouched original; existing geometry and helper tests also pass"
+  },
+  "limitations": [
+    "Local results are not assignment-server results.",
+    "Pyperf warnings are retained in benchmark_log.txt.",
+    "Instrumented counts were measured separately from all timings.",
+    "Cached radii assume the benchmark static scene; no radius mutation support was added."
+  ],
+  "future_batching": {
+    "status": "Pending server results and explicit user instruction to continue",
+    "requested_sizes": [
+      1,
+      2,
+      10,
+      100,
+      256,
+      512,
+      1024
+    ],
+    "note": "NumPy may use SIMD for supported array kernels, but SIMD use is not guaranteed by adding NumPy."
+  }
+}

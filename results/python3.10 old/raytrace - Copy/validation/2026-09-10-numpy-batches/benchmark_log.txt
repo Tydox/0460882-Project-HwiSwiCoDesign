@@ -1,0 +1,152 @@
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\baseline.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-01-scalar.json"]
+.
+raytrace: Mean +- std dev: 207 ms +- 12 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-01-batch-1.json", "--batch-size=1"]
+.
+raytrace: Mean +- std dev: 5.99 sec +- 0.08 sec
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-01-batch-2.json", "--batch-size=2"]
+.
+raytrace: Mean +- std dev: 3.26 sec +- 0.03 sec
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-01-batch-10.json", "--batch-size=10"]
+.
+raytrace: Mean +- std dev: 802 ms +- 72 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-01-batch-100.json", "--batch-size=100"]
+.
+raytrace: Mean +- std dev: 172 ms +- 8 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-01-batch-256.json", "--batch-size=256"]
+.
+raytrace: Mean +- std dev: 99.7 ms +- 8.4 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-01-batch-512.json", "--batch-size=512"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (8.77 ms) is 13% of the mean (68.1 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 68.1 ms +- 8.8 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-01-batch-1024.json", "--batch-size=1024"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (21.1 ms) is 34% of the mean (61.5 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 61.5 ms +- 21.1 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-02-batch-1024.json", "--batch-size=1024"]
+.
+raytrace: Mean +- std dev: 50.0 ms +- 3.2 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-02-batch-512.json", "--batch-size=512"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (18.7 ms) is 22% of the mean (86.5 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 86.5 ms +- 18.7 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-02-batch-256.json", "--batch-size=256"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (18.9 ms) is 18% of the mean (107 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 107 ms +- 19 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-02-batch-100.json", "--batch-size=100"]
+.
+raytrace: Mean +- std dev: 168 ms +- 13 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-02-batch-10.json", "--batch-size=10"]
+.
+raytrace: Mean +- std dev: 801 ms +- 78 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-02-batch-2.json", "--batch-size=2"]
+.
+raytrace: Mean +- std dev: 3.25 sec +- 0.03 sec
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-02-batch-1.json", "--batch-size=1"]
+.
+raytrace: Mean +- std dev: 6.33 sec +- 0.13 sec
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\baseline.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-02-scalar.json"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (26.2 ms) is 12% of the mean (211 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 211 ms +- 26 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-03-batch-10.json", "--batch-size=10"]
+.
+raytrace: Mean +- std dev: 756 ms +- 11 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-03-batch-100.json", "--batch-size=100"]
+.
+raytrace: Mean +- std dev: 168 ms +- 10 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-03-batch-256.json", "--batch-size=256"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (10.3 ms) is 11% of the mean (97.9 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 97.9 ms +- 10.3 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-03-batch-512.json", "--batch-size=512"]
+.
+raytrace: Mean +- std dev: 60.1 ms +- 1.6 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-03-batch-1024.json", "--batch-size=1024"]
+.
+raytrace: Mean +- std dev: 44.6 ms +- 0.7 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\baseline.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-03-scalar.json"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (25.0 ms) is 13% of the mean (198 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 198 ms +- 25 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-03-batch-1.json", "--batch-size=1"]
+.
+raytrace: Mean +- std dev: 6.01 sec +- 0.10 sec
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\suites\\optimized\\bm_raytrace\\run_benchmark.py", "--width=100", "--height=100", "--affinity=0", "--processes=1", "--values=3", "--warmups=1", "--loops=1", "-o", "C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\results\\raytrace\\validation\\2026-09-10-numpy-batches\\round-03-batch-2.json", "--batch-size=2"]
+.
+raytrace: Mean +- std dev: 3.36 sec +- 0.16 sec
+

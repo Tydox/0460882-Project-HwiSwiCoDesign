@@ -1,0 +1,1 @@
+Mean +- std dev: [confirmed-scalar] 199 ms +- 9 ms -> [confirmed-default] 46.2 ms +- 1.4 ms: 4.31x faster

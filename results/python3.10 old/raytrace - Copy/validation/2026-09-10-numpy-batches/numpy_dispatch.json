@@ -1,0 +1,32 @@
+{
+  "add": {
+    "ddd": {
+      "current": "X86_V3",
+      "available": "X86_V3 baseline(X86_V2)"
+    }
+  },
+  "multiply": {
+    "ddd": {
+      "current": "X86_V3",
+      "available": "X86_V3 baseline(X86_V2)"
+    }
+  },
+  "subtract": {
+    "ddd": {
+      "current": "X86_V3",
+      "available": "X86_V3 baseline(X86_V2)"
+    }
+  },
+  "sqrt": {
+    "dd": {
+      "current": "baseline(X86_V2)",
+      "available": "baseline(X86_V2)"
+    }
+  },
+  "divide": {
+    "ddd": {
+      "current": "X86_V3",
+      "available": "X86_V3 baseline(X86_V2)"
+    }
+  }
+}

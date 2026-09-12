@@ -1,0 +1,160 @@
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\00-baseline.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-01-00-baseline.json"]
+.
+raytrace: Mean +- std dev: 210 ms +- 5 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\01-radius-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-01-01-radius-only.json"]
+.
+raytrace: Mean +- std dev: 207 ms +- 6 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\02-camera-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-01-02-camera-only.json"]
+.
+raytrace: Mean +- std dev: 206 ms +- 8 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\03-combined.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-01-03-combined.json"]
+.
+raytrace: Mean +- std dev: 188 ms +- 4 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\01-radius-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-02-01-radius-only.json"]
+.
+raytrace: Mean +- std dev: 200 ms +- 12 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\02-camera-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-02-02-camera-only.json"]
+.
+raytrace: Mean +- std dev: 204 ms +- 6 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\03-combined.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-02-03-combined.json"]
+.
+raytrace: Mean +- std dev: 192 ms +- 12 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\00-baseline.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-02-00-baseline.json"]
+.
+raytrace: Mean +- std dev: 205 ms +- 8 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\02-camera-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-03-02-camera-only.json"]
+.
+raytrace: Mean +- std dev: 201 ms +- 11 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\03-combined.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-03-03-combined.json"]
+.
+raytrace: Mean +- std dev: 205 ms +- 13 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\00-baseline.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-03-00-baseline.json"]
+.
+raytrace: Mean +- std dev: 207 ms +- 13 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\01-radius-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-03-01-radius-only.json"]
+.
+raytrace: Mean +- std dev: 196 ms +- 9 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\03-combined.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-04-03-combined.json"]
+.
+raytrace: Mean +- std dev: 200 ms +- 14 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\00-baseline.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-04-00-baseline.json"]
+.
+raytrace: Mean +- std dev: 207 ms +- 14 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\01-radius-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-04-01-radius-only.json"]
+.
+raytrace: Mean +- std dev: 196 ms +- 11 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\02-camera-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-04-02-camera-only.json"]
+.
+raytrace: Mean +- std dev: 198 ms +- 9 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\03-combined.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-05-03-combined.json"]
+.
+raytrace: Mean +- std dev: 199 ms +- 7 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\02-camera-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-05-02-camera-only.json"]
+.
+raytrace: Mean +- std dev: 209 ms +- 11 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\01-radius-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-05-01-radius-only.json"]
+.
+raytrace: Mean +- std dev: 196 ms +- 11 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\00-baseline.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-05-00-baseline.json"]
+.
+raytrace: Mean +- std dev: 211 ms +- 14 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\02-camera-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-06-02-camera-only.json"]
+.
+raytrace: Mean +- std dev: 204 ms +- 12 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\01-radius-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-06-01-radius-only.json"]
+.
+raytrace: Mean +- std dev: 213 ms +- 11 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\00-baseline.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-06-00-baseline.json"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (22.1 ms) is 10% of the mean (211 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 211 ms +- 22 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\03-combined.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-06-03-combined.json"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (28.3 ms) is 13% of the mean (220 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 220 ms +- 28 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\01-radius-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-07-01-radius-only.json"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (25.5 ms) is 12% of the mean (217 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 217 ms +- 26 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\00-baseline.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-07-00-baseline.json"]
+.
+WARNING: the benchmark result may be unstable
+* the standard deviation (40.9 ms) is 17% of the mean (245 ms)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python.exe -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.
+
+raytrace: Mean +- std dev: 245 ms +- 41 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\03-combined.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-07-03-combined.json"]
+.
+raytrace: Mean +- std dev: 216 ms +- 19 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\02-camera-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-07-02-camera-only.json"]
+.
+raytrace: Mean +- std dev: 211 ms +- 12 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\00-baseline.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-08-00-baseline.json"]
+.
+raytrace: Mean +- std dev: 210 ms +- 11 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\03-combined.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-08-03-combined.json"]
+.
+raytrace: Mean +- std dev: 198 ms +- 12 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\02-camera-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-08-02-camera-only.json"]
+.
+raytrace: Mean +- std dev: 207 ms +- 7 ms
+
+["C:\\Users\\Daniel\\Desktop\\Github\\0460882-Project-HwiSwiCoDesign\\.venv\\Scripts\\python.exe", ".venv\\raytrace-radius-camera\\01-radius-only.py", "--processes", "1", "--values", "8", "--warmups", "2", "--loops", "1", "--affinity", "0", "--width", "100", "--height", "100", "-o", "results\\raytrace\\validation\\2026-09-10-radius-camera\\round-08-01-radius-only.json"]
+.
+raytrace: Mean +- std dev: 195 ms +- 12 ms
+

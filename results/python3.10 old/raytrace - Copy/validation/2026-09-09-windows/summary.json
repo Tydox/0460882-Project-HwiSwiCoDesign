@@ -1,0 +1,201 @@
+{
+  "date": "2026-09-09",
+  "scope": "Local Windows CPython 3.12; not the assignment VM",
+  "width": 100,
+  "height": 100,
+  "cpu_affinity": "0",
+  "initial_run": "--fast --affinity 0 --width 100 --height 100",
+  "repeat_run": "--processes 6 --values 8 --warmups 2 --loops 1 --affinity 0 --width 100 --height 100",
+  "initial_order": [
+    "00-baseline",
+    "01-shadow-ray",
+    "02-camera",
+    "03-closest-hit",
+    "04-scalar-sphere",
+    "05-slots",
+    "06-light-direction",
+    "07-checker"
+  ],
+  "repeat_order": [
+    "07-checker",
+    "06-light-direction",
+    "05-slots",
+    "04-scalar-sphere",
+    "03-closest-hit",
+    "02-camera",
+    "01-shadow-ray",
+    "00-baseline"
+  ],
+  "stages": [
+    {
+      "stage": "00-baseline",
+      "source_sha256": "926508d709f932c6a7f2ff692856fb62ce351111efa89aa1e054288ee5f5f498",
+      "initial": {
+        "mean_seconds": 0.46531526498729364,
+        "stdev_seconds": 0.010316618645256776,
+        "values": 20
+      },
+      "repeat": {
+        "mean_seconds": 0.4601690916691344,
+        "stdev_seconds": 0.010179829087228469,
+        "values": 48
+      },
+      "source_lf_sha256": "85d8039bcc56c6e7073311c540a2dc55109c93992d926eecfbd9978ccfb9788c"
+    },
+    {
+      "stage": "01-shadow-ray",
+      "source_sha256": "f8f0e538f04be069ac94e98333f39efe2d8ac68012f15cd5fb8155206e065649",
+      "initial": {
+        "mean_seconds": 0.3596389249956701,
+        "stdev_seconds": 0.01386088970930721,
+        "values": 20
+      },
+      "repeat": {
+        "mean_seconds": 0.3560226687489679,
+        "stdev_seconds": 0.015019490851145323,
+        "values": 48
+      },
+      "source_lf_sha256": "1ef5b120e3925e90424c407a2fafd9ca175f7b5e76c61d77c912af3691705319"
+    },
+    {
+      "stage": "02-camera",
+      "source_sha256": "041c9c4b2d31afe81cf60a01098adc59e839c0fdb495cdeb6e69360a2032f23f",
+      "initial": {
+        "mean_seconds": 0.35289045499812344,
+        "stdev_seconds": 0.010478138618930067,
+        "values": 20
+      },
+      "repeat": {
+        "mean_seconds": 0.35291485832810093,
+        "stdev_seconds": 0.03496174409100721,
+        "values": 48
+      },
+      "source_lf_sha256": "049c1967ddfcaa960a4ef244d145f4e44e80f7f7880e559459dd2134dc6c920a"
+    },
+    {
+      "stage": "03-closest-hit",
+      "source_sha256": "aaed53cdd65bb6def9013af5f565c4f906c704b9583a8ae689bb387ef0fddd13",
+      "initial": {
+        "mean_seconds": 0.3414096200023778,
+        "stdev_seconds": 0.009026191246286385,
+        "values": 20
+      },
+      "repeat": {
+        "mean_seconds": 0.34297955417302245,
+        "stdev_seconds": 0.02771314068437121,
+        "values": 48
+      },
+      "source_lf_sha256": "52c095a723efcb77054ecd825f38601a14567e0374f72758dac0cb14fbd1f064"
+    },
+    {
+      "stage": "04-scalar-sphere",
+      "source_sha256": "a7da25ab6d336c73110dfd6e90c2be82e56e9c5d322326f7c2fe07ee7992b149",
+      "initial": {
+        "mean_seconds": 0.2327837799966801,
+        "stdev_seconds": 0.007772878048444774,
+        "values": 20
+      },
+      "repeat": {
+        "mean_seconds": 0.22779479582823114,
+        "stdev_seconds": 0.008597326794514023,
+        "values": 48
+      },
+      "source_lf_sha256": "8104586d0fc3a8eef8b596192c15d3f483b3160cb8bebce835d429edf2f3369a"
+    },
+    {
+      "stage": "05-slots",
+      "source_sha256": "bfd2f8ba1b01938e2e7c43bd82790b54daf362b9c51585fcaedf3f12323d3c78",
+      "initial": {
+        "mean_seconds": 0.2285421050124569,
+        "stdev_seconds": 0.009197702643732496,
+        "values": 20
+      },
+      "repeat": {
+        "mean_seconds": 0.2319177583376586,
+        "stdev_seconds": 0.011781519188488968,
+        "values": 48
+      },
+      "source_lf_sha256": "5bc177285589fa05e87b1faf4f0cb650567ccd95f507bdb10ea4667e1037843f"
+    },
+    {
+      "stage": "06-light-direction",
+      "source_sha256": "17e1f161811b0f9f98937c85d270ec764c50f18875954558c49c0e403297c2e6",
+      "initial": {
+        "mean_seconds": 0.21533341000322254,
+        "stdev_seconds": 0.006583771044241894,
+        "values": 20
+      },
+      "repeat": {
+        "mean_seconds": 0.22089793958245232,
+        "stdev_seconds": 0.017424839491454947,
+        "values": 48
+      },
+      "source_lf_sha256": "ec28dab5766de22cfed5732318a42139068641cd9759845dfc2fb66caba7ce8b"
+    },
+    {
+      "stage": "07-checker",
+      "source_sha256": "c691e16e77f3955f23ca5ec30059de466a1bf6d69d5821b699bce400a2796036",
+      "initial": {
+        "mean_seconds": 0.21927200000500308,
+        "stdev_seconds": 0.012581039963327186,
+        "values": 20
+      },
+      "repeat": {
+        "mean_seconds": 0.2185894666678602,
+        "stdev_seconds": 0.015966961229787857,
+        "values": 48
+      },
+      "source_lf_sha256": "35872f2da93b7017c640ccf29dc0836f220581ddbbd4b2041a4ffb5c625b5154"
+    }
+  ],
+  "separate_instrumented_call_counts": {
+    "00-baseline": {
+      "Vector.__init__": 452943,
+      "Point.__init__": 5345,
+      "Ray.__init__": 98172,
+      "Vector.normalized": 109887,
+      "Sphere.intersectionTime": 179457,
+      "Halfspace.intersectionTime": 25501
+    },
+    "07-checker": {
+      "Vector.__init__": 85013,
+      "Point.__init__": 5345,
+      "Ray.__init__": 26000,
+      "Vector.normalized": 27479,
+      "Sphere.intersectionTime": 179457,
+      "Halfspace.intersectionTime": 25501
+    }
+  },
+  "correctness": {
+    "tests": 8,
+    "status": "passed",
+    "dimensions": [
+      [
+        100,
+        100
+      ],
+      [
+        200,
+        200
+      ],
+      [
+        160,
+        120
+      ]
+    ],
+    "checks": [
+      "exact RGB bytes",
+      "packed binary64 colours before quantization",
+      "geometry, shadows, checker, depth and pixel boundaries"
+    ],
+    "each_intermediate_stage": "100x100 RGB and binary64 colours match original",
+    "pre_change_original_equivalence": "Python ASTs identical"
+  },
+  "limitations": [
+    "pyperf warned about instability; initial and reverse-order repeats are retained.",
+    "Camera caching, slots and checker cleanup have no conclusive isolated whole-render speedup.",
+    "All seven remain implemented candidates pending acceptance measurements on the assignment VM.",
+    "Call counts were collected separately, outside timing runs.",
+    "No Linux perf counters, native kernel or SIMD measurements were collected."
+  ]
+}

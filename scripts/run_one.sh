@@ -176,7 +176,6 @@ RECORD_EVENTS=()
 PROFILE_EVENT=cpu-clock
 PROFILE_FREQUENCY=199
 PROFILE_CALL_GRAPH=fp
-PERF_SCRIPT_MAX_STACK=64
 PROBE_DIR="$(mktemp -d "$RESULT_DIR/.perf-probe.XXXXXX")"
 trap 'rm -f "$PROBE_DIR/stat.txt" "$PROBE_DIR/record.data" "$PROBE_DIR/record.data.old"; rmdir "$PROBE_DIR"' EXIT
 printf 'event\tstat\trecord\n' > "$PERF_EVENTS"
@@ -250,7 +249,8 @@ printf 'Profiling %s (%s, %s mode) with debug Python...\n' "$BENCHMARK" "$IMPLEM
 if ! sudo env PYTHONPERFSUPPORT=1 \
     perf record -F "$PROFILE_FREQUENCY" --no-bpf-event -e "$PROFILE_EVENT" \
     --call-graph "$PROFILE_CALL_GRAPH" --output "$PERF_DATA" -- \
-    "$DEBUG_PYTHON" "${WORKLOAD[@]}" 2> "$PERF_RECORD_LOG"; then
+    "$DEBUG_PYTHON" "${WORKLOAD[@]}" \
+    --inherit-environ=PYTHONPERFSUPPORT 2> "$PERF_RECORD_LOG"; then
   cat "$PERF_RECORD_LOG" >&2
   exit 1
 fi
@@ -258,14 +258,17 @@ cat "$PERF_RECORD_LOG" >&2
 
 printf 'Creating perf report...\n'
 sudo perf report --stdio --header --show-nr-samples --show-total-period \
-  --demangle --percent-limit 0.1 --no-children --call-graph none \
+  --demangle --percent-limit 0.1 --children \
+  --call-graph graph,0.5,caller \
   --sort comm,dso,symbol --input "$PERF_DATA" > "$PERF_REPORT"
 if ! grep -q '%' "$PERF_REPORT"; then
   printf 'perf report did not produce any sample rows: %s\n' "$PERF_REPORT" >&2
   exit 1
 fi
 printf 'Exporting and collapsing perf stacks...\n'
-sudo perf script -F -period --max-stack "$PERF_SCRIPT_MAX_STACK" \
+# Keep perf's default stack-depth limit (127 on this server). A lower export
+# cap truncates Python 3.12 trampoline-rich callchains before their roots.
+sudo perf script -F -period \
   --input "$PERF_DATA" > "$PERF_SCRIPT"
 # Omitting perf's period field makes every folded-stack weight one actual
 # sample. The compact folded file is directly importable by speedscope.
@@ -303,10 +306,13 @@ fi
   printf 'perf_record_available_events=%s\n' "$RECORD_EVENT_LIST"
   printf 'perf_record_frequency=%s\n' "$PROFILE_FREQUENCY"
   printf 'perf_record_call_graph=%s\n' "$PROFILE_CALL_GRAPH"
-  printf 'perf_script_max_stack=%s\n' "$PERF_SCRIPT_MAX_STACK"
+  printf '%s\n' 'perf_script_max_stack=perf-default'
   printf '%s\n' \
     'python_perf_support=PYTHONPERFSUPPORT=1' \
+    'python_perf_support_inherited=PYTHONPERFSUPPORT' \
     'perf_record_kernel_inclusive=true' \
+    'perf_report_children=true' \
+    'perf_report_call_graph=graph,0.5,caller' \
     'flamegraph_event=cpu-clock' \
     'flamegraph_weight=sample_count' \
     'flamegraph_orientation=icicle' \
