@@ -1,0 +1,7 @@
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 89 times to write data ]
+[ perf record: Captured and wrote 22.223 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/original/perf.data (24085 samples) ]
