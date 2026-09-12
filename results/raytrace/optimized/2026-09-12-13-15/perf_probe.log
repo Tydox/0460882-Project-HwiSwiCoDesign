@@ -1,0 +1,1099 @@
+
+=== stat: cpu-clock ===
+# started on Sat Sep 12 13:15:03 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              0.47 msec cpu-clock                 #    0.009 CPUs utilized          
+
+       0.051010861 seconds time elapsed
+
+       0.000951000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: cpu-clock ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: task-clock ===
+# started on Sat Sep 12 13:15:03 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              0.43 msec task-clock                #    0.008 CPUs utilized          
+
+       0.050924741 seconds time elapsed
+
+       0.000894000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: task-clock ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: cycles ===
+# started on Sat Sep 12 13:15:03 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+            972961      cycles                                                      
+
+       0.051077415 seconds time elapsed
+
+       0.001043000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: cycles ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: instructions ===
+# started on Sat Sep 12 13:15:03 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+            542400      instructions                                                
+
+       0.051205255 seconds time elapsed
+
+       0.001148000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: instructions ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data (7 samples) ]
+
+=== stat: branch-instructions ===
+# started on Sat Sep 12 13:15:03 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+            112642      branch-instructions                                         
+
+       0.051119922 seconds time elapsed
+
+       0.001065000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: branch-instructions ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: branch-misses ===
+# started on Sat Sep 12 13:15:03 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              5083      branch-misses                                               
+
+       0.051065380 seconds time elapsed
+
+       0.001040000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: branch-misses ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: bus-cycles ===
+# started on Sat Sep 12 13:15:04 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+             42506      bus-cycles                                                  
+
+       0.051030276 seconds time elapsed
+
+       0.000992000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: bus-cycles ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: cache-references ===
+# started on Sat Sep 12 13:15:04 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+             20106      cache-references                                            
+
+       0.061970936 seconds time elapsed
+
+       0.000000000 seconds user
+       0.011858000 seconds sys
+
+
+
+=== record: cache-references ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: cache-misses ===
+# started on Sat Sep 12 13:15:04 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+               317      cache-misses                                                
+
+       0.050934090 seconds time elapsed
+
+       0.000902000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: cache-misses ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: ref-cycles ===
+# started on Sat Sep 12 13:15:04 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+            895776      ref-cycles                                                  
+
+       0.050934051 seconds time elapsed
+
+       0.000891000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: ref-cycles ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: stalled-cycles-frontend ===
+# started on Sat Sep 12 13:15:04 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      stalled-cycles-frontend                                     
+
+       0.050913922 seconds time elapsed
+
+       0.000871000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: stalled-cycles-frontend ===
+Error:
+The stalled-cycles-frontend event is not supported.
+
+=== stat: stalled-cycles-backend ===
+# started on Sat Sep 12 13:15:04 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      stalled-cycles-backend                                      
+
+       0.050899592 seconds time elapsed
+
+       0.000866000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: stalled-cycles-backend ===
+Error:
+The stalled-cycles-backend event is not supported.
+
+=== stat: page-faults ===
+# started on Sat Sep 12 13:15:04 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                59      page-faults                                                 
+
+       0.050821278 seconds time elapsed
+
+       0.000796000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: page-faults ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data (5 samples) ]
+
+=== stat: minor-faults ===
+# started on Sat Sep 12 13:15:05 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                61      minor-faults                                                
+
+       0.050922089 seconds time elapsed
+
+       0.000878000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: minor-faults ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data (5 samples) ]
+
+=== stat: major-faults ===
+# started on Sat Sep 12 13:15:05 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                 0      major-faults                                                
+
+       0.050890149 seconds time elapsed
+
+       0.000855000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: major-faults ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: context-switches ===
+# started on Sat Sep 12 13:15:05 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                 1      context-switches                                            
+
+       0.050976621 seconds time elapsed
+
+       0.000915000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: context-switches ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data (1 samples) ]
+
+=== stat: cpu-migrations ===
+# started on Sat Sep 12 13:15:05 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                 0      cpu-migrations                                              
+
+       0.050945646 seconds time elapsed
+
+       0.000913000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: cpu-migrations ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: alignment-faults ===
+# started on Sat Sep 12 13:15:05 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                 0      alignment-faults                                            
+
+       0.050937519 seconds time elapsed
+
+       0.000874000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: alignment-faults ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: emulation-faults ===
+# started on Sat Sep 12 13:15:05 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                 0      emulation-faults                                            
+
+       0.051006779 seconds time elapsed
+
+       0.000954000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: emulation-faults ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: cgroup-switches ===
+# started on Sat Sep 12 13:15:06 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                 1      cgroup-switches                                             
+
+       0.050990398 seconds time elapsed
+
+       0.000942000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: cgroup-switches ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data (1 samples) ]
+
+=== stat: L1-dcache-loads ===
+# started on Sat Sep 12 13:15:06 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+            157359      L1-dcache-loads                                             
+
+       0.051155239 seconds time elapsed
+
+       0.000000000 seconds user
+       0.001107000 seconds sys
+
+
+
+=== record: L1-dcache-loads ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: L1-dcache-load-misses ===
+# started on Sat Sep 12 13:15:06 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+             16344      L1-dcache-load-misses                                       
+
+       0.069343529 seconds time elapsed
+
+       0.000000000 seconds user
+       0.019259000 seconds sys
+
+
+
+=== record: L1-dcache-load-misses ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: L1-dcache-stores ===
+# started on Sat Sep 12 13:15:06 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+             94563      L1-dcache-stores                                            
+
+       0.051007169 seconds time elapsed
+
+       0.000990000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: L1-dcache-stores ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: L1-dcache-store-misses ===
+# started on Sat Sep 12 13:15:06 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      L1-dcache-store-misses                                      
+
+       0.050994352 seconds time elapsed
+
+       0.000935000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: L1-dcache-store-misses ===
+Error:
+The L1-dcache-store-misses event is not supported.
+
+=== stat: L1-dcache-prefetches ===
+# started on Sat Sep 12 13:15:06 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      L1-dcache-prefetches                                        
+
+       0.050930306 seconds time elapsed
+
+       0.000893000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: L1-dcache-prefetches ===
+Error:
+The L1-dcache-prefetches event is not supported.
+
+=== stat: L1-dcache-prefetch-misses ===
+# started on Sat Sep 12 13:15:06 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      L1-dcache-prefetch-misses                                   
+
+       0.050947786 seconds time elapsed
+
+       0.000910000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: L1-dcache-prefetch-misses ===
+Error:
+The L1-dcache-prefetch-misses event is not supported.
+
+=== stat: L1-icache-loads ===
+# started on Sat Sep 12 13:15:07 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      L1-icache-loads                                             
+
+       0.050951206 seconds time elapsed
+
+       0.000900000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: L1-icache-loads ===
+Error:
+The L1-icache-loads event is not supported.
+
+=== stat: L1-icache-load-misses ===
+# started on Sat Sep 12 13:15:07 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              8532      L1-icache-load-misses                                       
+
+       0.051086228 seconds time elapsed
+
+       0.001029000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: L1-icache-load-misses ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: LLC-loads ===
+# started on Sat Sep 12 13:15:07 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      LLC-loads                                                   
+
+       0.050965628 seconds time elapsed
+
+       0.000915000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: LLC-loads ===
+Error:
+The sys_perf_event_open() syscall returned with 6 (No such device or address) for event (LLC-loads).
+/bin/dmesg | grep -i perf may provide additional information.
+
+
+=== stat: LLC-load-misses ===
+# started on Sat Sep 12 13:15:07 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      LLC-load-misses                                             
+
+       0.050867156 seconds time elapsed
+
+       0.000820000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: LLC-load-misses ===
+Error:
+The sys_perf_event_open() syscall returned with 6 (No such device or address) for event (LLC-load-misses).
+/bin/dmesg | grep -i perf may provide additional information.
+
+
+=== stat: LLC-stores ===
+# started on Sat Sep 12 13:15:07 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      LLC-stores                                                  
+
+       0.050937666 seconds time elapsed
+
+       0.000899000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: LLC-stores ===
+Error:
+The sys_perf_event_open() syscall returned with 6 (No such device or address) for event (LLC-stores).
+/bin/dmesg | grep -i perf may provide additional information.
+
+
+=== stat: LLC-store-misses ===
+# started on Sat Sep 12 13:15:07 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      LLC-store-misses                                            
+
+       0.050925654 seconds time elapsed
+
+       0.000878000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: LLC-store-misses ===
+Error:
+The sys_perf_event_open() syscall returned with 6 (No such device or address) for event (LLC-store-misses).
+/bin/dmesg | grep -i perf may provide additional information.
+
+
+=== stat: LLC-prefetches ===
+# started on Sat Sep 12 13:15:07 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      LLC-prefetches                                              
+
+       0.050921096 seconds time elapsed
+
+       0.000896000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: LLC-prefetches ===
+Error:
+The LLC-prefetches event is not supported.
+
+=== stat: LLC-prefetch-misses ===
+# started on Sat Sep 12 13:15:07 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      LLC-prefetch-misses                                         
+
+       0.050936331 seconds time elapsed
+
+       0.000887000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: LLC-prefetch-misses ===
+Error:
+The LLC-prefetch-misses event is not supported.
+
+=== stat: dTLB-loads ===
+# started on Sat Sep 12 13:15:07 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+            826617      dTLB-loads                                                  
+
+       0.131649568 seconds time elapsed
+
+       0.000000000 seconds user
+       0.025227000 seconds sys
+
+
+
+=== record: dTLB-loads ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: dTLB-load-misses ===
+# started on Sat Sep 12 13:15:08 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              4178      dTLB-load-misses                                            
+
+       0.050926849 seconds time elapsed
+
+       0.000899000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: dTLB-load-misses ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: dTLB-stores ===
+# started on Sat Sep 12 13:15:08 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+             93050      dTLB-stores                                                 
+
+       0.051083628 seconds time elapsed
+
+       0.000000000 seconds user
+       0.001027000 seconds sys
+
+
+
+=== record: dTLB-stores ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: dTLB-store-misses ===
+# started on Sat Sep 12 13:15:08 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+               622      dTLB-store-misses                                           
+
+       0.050999403 seconds time elapsed
+
+       0.000938000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: dTLB-store-misses ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: iTLB-loads ===
+# started on Sat Sep 12 13:15:08 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+               642      iTLB-loads                                                  
+
+       0.050994115 seconds time elapsed
+
+       0.000988000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: iTLB-loads ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: iTLB-load-misses ===
+# started on Sat Sep 12 13:15:08 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              3617      iTLB-load-misses                                            
+
+       0.051007784 seconds time elapsed
+
+       0.000975000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: iTLB-load-misses ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: branch-loads ===
+# started on Sat Sep 12 13:15:09 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+            111617      branch-loads                                                
+
+       0.051114177 seconds time elapsed
+
+       0.001069000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: branch-loads ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: branch-load-misses ===
+# started on Sat Sep 12 13:15:09 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+              5255      branch-load-misses                                          
+
+       0.051066968 seconds time elapsed
+
+       0.000000000 seconds user
+       0.001003000 seconds sys
+
+
+
+=== record: branch-load-misses ===
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-13-15/.perf-probe.Ci7XPW/record.data ]
+
+=== stat: node-loads ===
+# started on Sat Sep 12 13:15:09 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      node-loads                                                  
+
+       0.050992078 seconds time elapsed
+
+       0.000947000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: node-loads ===
+Error:
+The sys_perf_event_open() syscall returned with 6 (No such device or address) for event (node-loads).
+/bin/dmesg | grep -i perf may provide additional information.
+
+
+=== stat: node-load-misses ===
+# started on Sat Sep 12 13:15:09 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      node-load-misses                                            
+
+       0.050976768 seconds time elapsed
+
+       0.000916000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: node-load-misses ===
+Error:
+The sys_perf_event_open() syscall returned with 6 (No such device or address) for event (node-load-misses).
+/bin/dmesg | grep -i perf may provide additional information.
+
+
+=== stat: node-stores ===
+# started on Sat Sep 12 13:15:09 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      node-stores                                                 
+
+       0.050967118 seconds time elapsed
+
+       0.000915000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: node-stores ===
+Error:
+The sys_perf_event_open() syscall returned with 6 (No such device or address) for event (node-stores).
+/bin/dmesg | grep -i perf may provide additional information.
+
+
+=== stat: node-store-misses ===
+# started on Sat Sep 12 13:15:09 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+   <not supported>      node-store-misses                                           
+
+       0.050937502 seconds time elapsed
+
+       0.000893000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== record: node-store-misses ===
+Error:
+The sys_perf_event_open() syscall returned with 6 (No such device or address) for event (node-store-misses).
+/bin/dmesg | grep -i perf may provide additional information.
+
+
+=== stat: duration_time ===
+# started on Sat Sep 12 13:15:09 2026
+
+
+ Performance counter stats for 'system wide':
+
+          50999023 ns   duration_time                                               
+
+       0.050999023 seconds time elapsed
+
+
+=== stat: user_time ===
+event syntax error: 'user_time'
+                     \___ parser error
+Run 'perf list' for a list of valid events
+
+ Usage: perf stat [<options>] [<command>]
+
+    -e, --event <event>   event selector. use 'perf list' to list available events
+
+=== stat: system_time ===
+event syntax error: 'system_time'
+                     \___ parser error
+Run 'perf list' for a list of valid events
+
+ Usage: perf stat [<options>] [<command>]
+
+    -e, --event <event>   event selector. use 'perf list' to list available events
+
+=== stat: dummy ===
+# started on Sat Sep 12 13:15:09 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                 0      dummy                                                       
+
+       0.050910079 seconds time elapsed
+
+       0.000880000 seconds user
+       0.000000000 seconds sys
+
+
+
+=== stat: bpf-output ===
+# started on Sat Sep 12 13:15:09 2026
+
+
+ Performance counter stats for 'sleep 0.05':
+
+                 0      bpf-output                                                  
+
+       0.050879531 seconds time elapsed
+
+       0.000839000 seconds user
+       0.000000000 seconds sys
+
+
