@@ -3,7 +3,6 @@
 venv/
 vendor/
 results/**/perf.data
-results/**/perf_script.txt
 results/**/stacks.folded
 __pycache__/
 *.pyc

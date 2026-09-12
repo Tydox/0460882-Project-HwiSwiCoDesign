@@ -121,7 +121,7 @@ PERF_STAT="$RESULT_DIR/perf_stat.txt"
 PERF_EVENTS="$RESULT_DIR/perf_events.txt"
 PERF_PROBE_LOG="$RESULT_DIR/perf_probe.log"
 PERF_RECORD_LOG="$RESULT_DIR/perf_record.log"
-FOLDED="$RESULT_DIR/stacks.folded"
+FOLDED="$RESULT_DIR/speedscope.folded"
 FLAMEGRAPH="$RESULT_DIR/flamegraph.svg"
 RUN_METADATA="$RESULT_DIR/run_metadata.txt"
 
@@ -137,7 +137,8 @@ else
   GIT_WORKTREE_STATE="not-a-git-repository"
 fi
 
-rm -f "$TIMING_JSON" "$PERF_DATA" "$PERF_REPORT" "$PERF_SCRIPT" "$FOLDED" "$FLAMEGRAPH" "$RUN_METADATA" \
+rm -f "$TIMING_JSON" "$PERF_DATA" "$PERF_REPORT" "$PERF_SCRIPT" "$FOLDED" \
+  "$RESULT_DIR/stacks.folded" "$FLAMEGRAPH" "$RUN_METADATA" \
   "$PERF_STAT" "$PERF_EVENTS" "$PERF_PROBE_LOG" "$PERF_RECORD_LOG"
 
 if [[ "$BENCHMARK" == "raytrace" ]]; then
@@ -173,6 +174,8 @@ COUNTER_CANDIDATES=(
 STAT_EVENTS=()
 RECORD_EVENTS=()
 PROFILE_EVENT=cpu-clock
+PROFILE_FREQUENCY=199
+DWARF_STACK_SIZE=4096
 PROBE_DIR="$(mktemp -d "$RESULT_DIR/.perf-probe.XXXXXX")"
 trap 'rm -f "$PROBE_DIR/stat.txt" "$PROBE_DIR/record.data" "$PROBE_DIR/record.data.old"; rmdir "$PROBE_DIR"' EXIT
 printf 'event\tstat\trecord\n' > "$PERF_EVENTS"
@@ -205,7 +208,8 @@ for event in "${COUNTER_CANDIDATES[@]}"; do
     *)
       printf '\n=== record: %s ===\n' "$event" >> "$PERF_PROBE_LOG"
       record_status=unavailable
-      if sudo perf record -F 999 --no-bpf-event -e "$event" --call-graph dwarf \
+      if sudo perf record -F "$PROFILE_FREQUENCY" --no-bpf-event -e "$event" \
+          --call-graph "dwarf,$DWARF_STACK_SIZE" \
           --output "$PROBE_DIR/record.data" -- sleep 0.05 \
           >> "$PERF_PROBE_LOG" 2>&1; then
         record_status=enabled
@@ -241,8 +245,8 @@ printf 'Profiling %s (%s, %s mode) with debug Python...\n' "$BENCHMARK" "$IMPLEM
 # consistent meaning. DWARF unwinding avoids bogus user-space call chains from
 # optimized native libraries that omit frame pointers. Run perf as root so
 # kernel mappings and symbols can be collected too.
-if ! sudo perf record -F 999 --no-bpf-event -e "$PROFILE_EVENT" \
-    --call-graph dwarf --output "$PERF_DATA" -- \
+if ! sudo perf record -F "$PROFILE_FREQUENCY" --no-bpf-event -e "$PROFILE_EVENT" \
+    --call-graph "dwarf,$DWARF_STACK_SIZE" --output "$PERF_DATA" -- \
     "$DEBUG_PYTHON" "${WORKLOAD[@]}" 2> "$PERF_RECORD_LOG"; then
   cat "$PERF_RECORD_LOG" >&2
   exit 1
@@ -251,22 +255,24 @@ cat "$PERF_RECORD_LOG" >&2
 
 printf 'Creating perf report...\n'
 sudo perf report --stdio --header --show-nr-samples --show-total-period \
-  --demangle --percent-limit 0.1 --input "$PERF_DATA" > "$PERF_REPORT"
+  --demangle --percent-limit 0.1 --no-children --call-graph none \
+  --sort comm,dso,symbol --input "$PERF_DATA" > "$PERF_REPORT"
 if ! grep -q '%' "$PERF_REPORT"; then
   printf 'perf report did not produce any sample rows: %s\n' "$PERF_REPORT" >&2
   exit 1
 fi
 printf 'Exporting and collapsing perf stacks...\n'
-sudo perf script --input "$PERF_DATA" > "$PERF_SCRIPT"
-# The profile contains only CPU-clock samples, so every flame-graph width
-# represents sampled CPU time.
+sudo perf script -F -period --input "$PERF_DATA" > "$PERF_SCRIPT"
+# Omitting perf's period field makes every folded-stack weight one actual
+# sample. The compact folded file is directly importable by speedscope.
 "$FLAMEGRAPH_DIR/stackcollapse-perf.pl" --event-filter=cpu-clock "$PERF_SCRIPT" > "$FOLDED"
 if [[ ! -s "$FOLDED" ]]; then
   printf 'No stack samples were produced: %s\n' "$FOLDED" >&2
   exit 1
 fi
 printf 'Creating flame graph...\n'
-"$FLAMEGRAPH_DIR/flamegraph.pl" --title "$BENCHMARK - $IMPLEMENTATION" "$FOLDED" > "$FLAMEGRAPH"
+"$FLAMEGRAPH_DIR/flamegraph.pl" --inverted --minwidth 0.1% --hash \
+  --title "$BENCHMARK - $IMPLEMENTATION" "$FOLDED" > "$FLAMEGRAPH"
 
 # Raytrace already supports --filename. Render one representative image in a
 # separate invocation so file output is not included in the measured timing or
@@ -291,11 +297,15 @@ fi
   printf 'perf_stat_events=%s\n' "$STAT_EVENT_LIST"
   printf 'perf_record_events=%s\n' "$PROFILE_EVENT"
   printf 'perf_record_available_events=%s\n' "$RECORD_EVENT_LIST"
+  printf 'perf_record_frequency=%s\n' "$PROFILE_FREQUENCY"
+  printf 'perf_record_call_graph=dwarf,%s\n' "$DWARF_STACK_SIZE"
   printf '%s\n' \
-    'perf_record_frequency=999' \
-    'perf_record_call_graph=dwarf' \
     'perf_record_kernel_inclusive=true' \
-    'flamegraph_event=cpu-clock'
+    'flamegraph_event=cpu-clock' \
+    'flamegraph_weight=sample_count' \
+    'flamegraph_orientation=icicle' \
+    'flamegraph_minwidth=0.1%' \
+    'speedscope_file=speedscope.folded'
   if [[ "$BENCHMARK" == "raytrace" ]]; then
     printf '%s\n' 'raytrace_image=raytrace.ppm'
     printf 'raytrace_width=%s\n' "$RAYTRACE_WIDTH"
