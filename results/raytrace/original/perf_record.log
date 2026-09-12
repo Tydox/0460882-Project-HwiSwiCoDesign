@@ -3,5 +3,5 @@ Symbol resolution may be skewed if relocation was used (e.g. kexec).
 Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
-[ perf record: Woken up 452 times to write data ]
-[ perf record: Captured and wrote 112.952 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/original/perf.data (27252 samples) ]
+[ perf record: Woken up 20 times to write data ]
+[ perf record: Captured and wrote 4.757 MB /root/0460882-Project-HwiSwiCoDesign/results/raytrace/original/perf.data (19884 samples) ]

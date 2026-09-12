@@ -1,0 +1,43 @@
+# started on Sat Sep 12 11:37:28 2026
+
+
+ Performance counter stats for '/root/0460882-Project-HwiSwiCoDesign/.venv312/bin/python /root/0460882-Project-HwiSwiCoDesign/suites/optimized/bm_raytrace/run_benchmark.py --debug-single-value --width 800 --height 800 --batch-size 1024':
+
+           4309.03 msec cpu-clock                 #    0.993 CPUs utilized          
+           4309.07 msec task-clock                #    0.993 CPUs utilized          
+        9716642677      cycles                    #    2.255 GHz                      (25.04%)
+       21032191212      instructions              #    2.16  insn per cycle           (30.01%)
+        3587795197      branch-instructions       #  832.618 M/sec                    (30.10%)
+          23385613      branch-misses             #    0.65% of all branches          (30.28%)
+         340452030      bus-cycles                #   79.009 M/sec                    (30.21%)
+          97421543      cache-references          #   22.609 M/sec                    (30.31%)
+            523707      cache-misses              #    0.538 % of all cache refs      (20.41%)
+        9853013374      ref-cycles                #    2.287 G/sec                    (25.47%)
+             16248      page-faults               #    3.771 K/sec                  
+             16248      minor-faults              #    3.771 K/sec                  
+                 0      major-faults              #    0.000 /sec                   
+               155      context-switches          #   35.971 /sec                   
+                 0      cpu-migrations            #    0.000 /sec                   
+                 0      alignment-faults          #    0.000 /sec                   
+                 0      emulation-faults          #    0.000 /sec                   
+               124      cgroup-switches           #   28.777 /sec                   
+        4341048405      L1-dcache-loads           #    1.007 G/sec                    (25.45%)
+         207055134      L1-dcache-load-misses     #    4.77% of all L1-dcache accesses  (25.56%)
+        1097268493      L1-dcache-stores          #  254.643 M/sec                    (25.58%)
+          16232379      L1-icache-load-misses                                         (25.33%)
+        4662430862      dTLB-loads                #    1.082 G/sec                    (20.17%)
+           1938060      dTLB-load-misses          #    0.04% of all dTLB cache accesses  (20.08%)
+        2570455350      dTLB-stores               #  596.525 M/sec                    (19.98%)
+            308452      dTLB-store-misses         #   71.582 K/sec                    (19.96%)
+           7408469      iTLB-loads                #    1.719 M/sec                    (19.87%)
+           2057270      iTLB-load-misses          #   27.77% of all iTLB cache accesses  (19.76%)
+        4299939759      branch-loads              #  997.885 M/sec                    (19.81%)
+          19144847      branch-load-misses        #    4.443 M/sec                    (19.94%)
+        4338731705 ns   duration_time             #    1.007 G/sec                  
+
+       4.338731705 seconds time elapsed
+
+       4.214210000 seconds user
+       0.106576000 seconds sys
+
+

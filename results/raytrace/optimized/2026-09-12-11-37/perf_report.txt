@@ -1,0 +1,263 @@
+# ========
+# captured on    : Sat Sep 12 11:37:42 2026
+# header version : 1
+# data offset    : 256
+# data size      : 479464
+# feat offset    : 479720
+# hostname : ubuntu
+# os release : 5.15.0-1106-kvm
+# perf version : 5.15.209
+# arch : x86_64
+# nrcpus online : 1
+# nrcpus avail : 1
+# cpudesc : Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+# cpuid : GenuineIntel,6,63,2
+# total memory : 4034188 kB
+# cmdline : /usr/lib/linux-kvm-tools-5.15.0-1106/perf record -F 199 --no-bpf-event -e cpu-clock --call-graph fp --output /root/0460882-Project-HwiSwiCoDesign/results/raytrace/optimized/2026-09-12-11-37/perf.data -- /root/0460882-Project-HwiSwiCoDesign/.venv312-dbg/bin/python /root/0460882-Project-HwiSwiCoDesign/suites/optimized/bm_raytrace/run_benchmark.py --debug-single-value --width 800 --height 800 --batch-size 1024 
+# event : name = cpu-clock, , id = { 1465 }, type = 1, size = 128, { sample_period, sample_freq } = 199, sample_type = IP|TID|TIME|CALLCHAIN|PERIOD, read_format = ID, disabled = 1, inherit = 1, mmap = 1, comm = 1, freq = 1, enable_on_exec = 1, task = 1, sample_id_all = 1, exclude_guest = 1, mmap2 = 1, comm_exec = 1, ksymbol = 1
+# CPU_TOPOLOGY info available, use -I to display
+# NUMA_TOPOLOGY info available, use -I to display
+# pmu mappings: software = 1, power = 7, uprobe = 6, cpu = 4, breakpoint = 5, tracepoint = 2, msr = 8
+# CACHE info available, use -I to display
+# time of first sample : 8140.471295
+# time of last sample : 8150.376069
+# sample duration :   9904.774 ms
+# MEM_TOPOLOGY info available, use -I to display
+# cpu pmu capabilities: max_precise=0, pmu_name=haswell
+# missing features: TRACING_DATA BRANCH_STACK GROUP_DESC AUXTRACE STAT CLOCKID DIR_FORMAT COMPRESSED CLOCK_DATA HYBRID_TOPOLOGY HYBRID_CPU_PMU_CAPS 
+# ========
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu-clock'
+# Event count (approx.): 9879395750
+#
+# Overhead       Samples        Period  Command  Shared Object                                      Symbol                                                     IPC   [IPC Coverage]
+# ........  ............  ............  .......  .................................................  .........................................................  ....................
+#
+     9.97%           196     984924500  python   python3.12d                                        [.] _PyEval_EvalFrameDefault                               -      -            
+     4.17%            82     412060250  python   libc.so.6                                          [.] __memset_avx2_unaligned_erms                           -      -            
+     3.36%            66     331658250  python   python3.12d                                        [.] _PyMem_DebugCheckAddress                               -      -            
+     2.24%            44     221105500  python   python3.12d                                        [.] _PyObject_Malloc                                       -      -            
+     2.14%            42     211055250  python   python3.12d                                        [.] read_size_t                                            -      -            
+     1.93%            38     190954750  python   python3.12d                                        [.] vgetargskeywords.lto_priv.0                            -      -            
+     1.83%            36     180904500  python   libc.so.6                                          [.] pthread_getspecific@@GLIBC_2.34                        -      -            
+     1.68%            33     165829125  python   python3.12d                                        [.] PyGILState_Check                                       -      -            
+     1.68%            33     165829125  python   python3.12d                                        [.] _Py_DECREF_DecRefTotal                                 -      -            
+     1.63%            32     160804000  python   python3.12d                                        [.] validate_list.lto_priv.0                               -      -            
+     1.53%            30     150753750  python   python3.12d                                        [.] _PyTuple_FromArray                                     -      -            
+     1.48%            29     145728625  python   python3.12d                                        [.] tupledealloc.lto_priv.0                                -      -            
+     1.32%            26     130653250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] ufunc_generic_fastcall                                 -      -            
+     1.27%            25     125628125  python   python3.12d                                        [.] _PyMem_DebugRawAlloc                                   -      -            
+     1.27%            25     125628125  python   python3.12d                                        [.] _PyObject_Free                                         -      -            
+     1.22%            24     120603000  python   python3.12d                                        [.] _Py_NewReference                                       -      -            
+     1.22%            24     120603000  python   python3.12d                                        [.] min_max                                                -      -            
+     1.22%            24     120603000  python   python3.12d                                        [.] write_size_t                                           -      -            
+     1.17%            23     115577875  python   python3.12d                                        [.] arena_map_is_used                                      -      -            
+     1.12%            22     110552750  python   python3.12d                                        [.] _Py_INCREF_IncRefTotal                                 -      -            
+     1.07%            21     105527625  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] DOUBLE_multiply_X86_V3                                 -      -            
+     1.07%            21     105527625  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_buffered_iternext                              -      -            
+     1.07%            21     105527625  python   python3.12d                                        [.] _Py_Dealloc                                            -      -            
+     1.02%            20     100502500  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] prepare_index_noarray                                  -      -            
+     1.02%            20     100502500  python   libc.so.6                                          [.] __memmove_avx_unaligned_erms                           -      -            
+     0.97%            19      95477375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] mapiter_get                                            -      -            
+     0.97%            19      95477375  python   python3.12d                                        [.] PyThread_tss_get                                       -      -            
+     0.86%            17      85427125  python   python3.12d                                        [.] vgetargs1_impl                                         -      -            
+     0.81%            16      80402000  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_NewFromDescr_int                               -      -            
+     0.81%            16      80402000  python   libc.so.6                                          [.] _int_malloc                                            -      -            
+     0.71%            14      70351750  python   python3.12d                                        [.] _PyObject_MakeTpCall                                   -      -            
+     0.66%            13      65326625  python   python3.12d                                        [.] _PyObject_VectorcallTstate.lto_priv.2                  -      -            
+     0.61%            12      60301500  python   python3.12d                                        [.] PyIter_Next                                            -      -            
+     0.61%            12      60301500  python   python3.12d                                        [.] PyThread_tss_is_created                                -      -            
+     0.61%            12      60301500  python   python3.12d                                        [.] list_dealloc.lto_priv.0                                -      -            
+     0.56%            11      55276375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] _contig_to_contig                                      -      -            
+     0.56%            11      55276375  python   python3.12d                                        [.] PyObject_GC_Del                                        -      -            
+     0.56%            11      55276375  python   python3.12d                                        [.] _PyLong_Add                                            -      -            
+     0.56%            11      55276375  python   python3.12d                                        [.] _Py_CheckFunctionResult                                -      -            
+     0.51%            10      50251250  python   python3.12d                                        [.] tuple_alloc                                            -      -            
+     0.51%            10      50251250  python   python3.12d                                        [.] tupleiter_next.lto_priv.0                              -      -            
+     0.51%            10      50251250  python   python3.12d                                        [.] unicodekeys_lookup_unicode                             -      -            
+     0.46%             9      45226125  python   python3.12d                                        [.] _PyFrame_ClearExceptCode                               -      -            
+     0.46%             9      45226125  python   python3.12d                                        [.] convertsimple                                          -      -            
+     0.46%             9      45226125  python   python3.12d                                        [.] holds_gil                                              -      -            
+     0.46%             9      45226125  python   python3.12d                                        [.] long_richcompare.lto_priv.0                            -      -            
+     0.41%             8      40201000  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] DOUBLE_add_X86_V3                                      -      -            
+     0.41%             8      40201000  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] DOUBLE_subtract_X86_V3                                 -      -            
+     0.41%             8      40201000  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_MapIterNew                                     -      -            
+     0.41%             8      40201000  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_prepare_operands                               -      -            
+     0.41%             8      40201000  python   python3.12d                                        [.] PyObject_GC_UnTrack                                    -      -            
+     0.41%             8      40201000  python   python3.12d                                        [.] PyObject_Malloc                                        -      -            
+     0.41%             8      40201000  python   python3.12d                                        [.] PyType_GetModuleByDef                                  -      -            
+     0.41%             8      40201000  python   python3.12d                                        [.] _PyLong_FromMedium.lto_priv.0                          -      -            
+     0.41%             8      40201000  python   python3.12d                                        [.] _PyMem_DebugRawMalloc                                  -      -            
+     0.41%             8      40201000  python   python3.12d                                        [.] listiter_next.lto_priv.0                               -      -            
+     0.36%             7      35175875  python   python3.12d                                        [.] PyLong_AsLongAndOverflow                               -      -            
+     0.36%             7      35175875  python   python3.12d                                        [.] PyObject_Free                                          -      -            
+     0.36%             7      35175875  python   python3.12d                                        [.] PyType_IsSubtype                                       -      -            
+     0.36%             7      35175875  python   python3.12d                                        [.] _PyMem_DebugFree                                       -      -            
+     0.36%             7      35175875  python   python3.12d                                        [.] _PyObject_GC_New                                       -      -            
+     0.36%             7      35175875  python   python3.12d                                        [.] cfunction_call.lto_priv.0                              -      -            
+     0.36%             7      35175875  python   python3.12d                                        [.] cleanreturn.lto_priv.0                                 -      -            
+     0.36%             7      35175875  python   python3.12d                                        [.] 0x0000000000022160                                     -      -            
+     0.31%             6      30150750  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyUFunc_DefaultLegacyInnerLoopSelector                 -      -            
+     0.31%             6      30150750  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_iternext_itflags0_dims1_iters1                 -      -            
+     0.31%             6      30150750  python   python3.12d                                        [.] PyObject_RichCompare                                   -      -            
+     0.31%             6      30150750  python   python3.12d                                        [.] PyObject_RichCompareBool                               -      -            
+     0.31%             6      30150750  python   python3.12d                                        [.] _PyArg_Parse_SizeT                                     -      -            
+     0.31%             6      30150750  python   python3.12d                                        [.] _PyMem_DebugRawFree                                    -      -            
+     0.31%             6      30150750  python   python3.12d                                        [.] _PyObject_IsFreed                                      -      -            
+     0.31%             6      30150750  python   python3.12d                                        [.] _PyTrash_begin                                         -      -            
+     0.31%             6      30150750  python   python3.12d                                        [.] _PyType_Lookup                                         -      -            
+     0.31%             6      30150750  python   python3.12d                                        [.] _Py_dict_lookup                                        -      -            
+     0.31%             6      30150750  python   python3.12d                                        [.] object_vacall                                          -      -            
+     0.25%             5      25125625  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] NpyIter_Deallocate                                     -      -            
+     0.25%             5      25125625  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_TransferNDimToStrided                          -      -            
+     0.25%             5      25125625  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] array_boolean_subscript                                -      -            
+     0.25%             5      25125625  python   libm.so.6                                          [.] fetestexcept                                           -      -            
+     0.25%             5      25125625  python   python3.12d                                        [.] PyContextVar_Get                                       -      -            
+     0.25%             5      25125625  python   python3.12d                                        [.] PyErr_Occurred                                         -      -            
+     0.25%             5      25125625  python   python3.12d                                        [.] _PyMem_DebugMalloc                                     -      -            
+     0.25%             5      25125625  python   python3.12d                                        [.] _PyTrash_get_state                                     -      -            
+     0.25%             5      25125625  python   python3.12d                                        [.] long_dealloc.lto_priv.0                                -      -            
+     0.25%             5      25125625  python   python3.12d                                        [.] tupleiter_dealloc.lto_priv.0                           -      -            
+     0.25%             5      25125625  python   python3.12d                                        [.] visit_reachable                                        -      -            
+     0.20%             4      20100500  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] IsAligned                                              -      -            
+     0.20%             4      20100500  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArrayIdentityHash_GetItem                            -      -            
+     0.20%             4      20100500  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_ToList                                         -      -            
+     0.20%             4      20100500  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] _aligned_strided_to_contig_size8_srcstride0            -      -            
+     0.20%             4      20100500  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] get_view_from_index                                    -      -            
+     0.20%             4      20100500  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] promote_and_get_ufuncimpl                              -      -            
+     0.20%             4      20100500  python   libc.so.6                                          [.] __strchr_avx2                                          -      -            
+     0.20%             4      20100500  python   libc.so.6                                          [.] malloc                                                 -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] PyArg_ParseTupleAndKeywords                            -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] PyEval_SaveThread                                      -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] PyLong_AsLong                                          -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] PyMem_Calloc                                           -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] PyNumber_AsSsize_t                                     -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] PyObject_SetItem                                       -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] _PyTrash_end                                           -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] _PyType_AllocNoTrack                                   -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] builtin_max                                            -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] get_array_state.lto_priv.0                             -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] gil_created                                            -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] long_new.lto_priv.0                                    -      -            
+     0.20%             4      20100500  python   python3.12d                                        [.] tuple_iter.lto_priv.0                                  -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_CastDescrToDType                               -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_FromAny                                        -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_SetBaseObject                                  -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] array_dealloc                                          -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] count_nonzero_int                                      -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] generic_masked_strided_loop                            -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_copy_to_buffers                                -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_find_buffering_setup                           -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_iternext_sizeone                               -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] promote_and_get_info_and_ufuncimpl                     -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] resolve_descriptors                                    -      -            
+     0.15%             3      15075375  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] simple_legacy_resolve_descriptors                      -      -            
+     0.15%             3      15075375  python   libc.so.6                                          [.] __strcmp_avx2                                          -      -            
+     0.15%             3      15075375  python   libc.so.6                                          [.] cfree@GLIBC_2.2.5                                      -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] BB_setitem.lto_priv.0                                  -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] PyLong_FromDouble                                      -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] PyLong_FromLong                                        -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] PyNumber_Long                                          -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] PyObject_Vectorcall                                    -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] PyTraceMalloc_Untrack                                  -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] _PyEval_ThreadsInitialized                             -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] _PyTrash_cond                                          -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] _PyType_GetDict                                        -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] _swap_thread_states                                    -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] address_in_range                                       -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] builtin_min                                            -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] dictkeys_generic_lookup                                -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] excess_args                                            -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] float_dealloc.lto_priv.0                               -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] get_small_int.lto_priv.0                               -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] insert_to_usedpool                                     -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] long_compare                                           -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] name_matches                                           -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] r_object                                               -      -            
+     0.15%             3      15075375  python   python3.12d                                        [.] vgetargs1                                              -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] DOUBLE_divide_X86_V3                                   -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] DOUBLE_getitem                                         -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] DOUBLE_remainder                                       -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] IsUintAligned                                          -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] NpyIter_AdvancedNew                                    -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] NpyIter_AdvancedNew.constprop.0                        -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_DiscoverDTypeAndShape_Recursive                -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_ExtractDTypeAndDescriptor                      -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_GetCastingImpl                                 -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_MultiplyList                                   -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyArray_Pack                                           -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] PyUFunc_CheckOverride                                  -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] _aligned_strided_to_contig_size8                       -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] _array_fill_strides                                    -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] array_subscript                                        -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] default_malloc                                         -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] define_cast_for_descrs                                 -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] dispatcher_vectorcall                                  -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] execute_ufunc_loop                                     -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] is_anyscalar_exact                                     -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npy_find_array_wrap                                    -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npy_free_cache_dim                                     -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_allocate_arrays                                -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_allocate_buffers                               -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_allocate_transfer_functions                    -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_fill_axisdata                                  -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] npyiter_goto_iterindex                                 -      -            
+     0.10%             2      10050250  python   _multiarray_umath.cpython-312-x86_64-linux-gnu.so  [.] simd_binary_scalar2_less_s64                           -      -            
+     0.10%             2      10050250  python   libc.so.6                                          [.] __strlen_avx2                                          -      -            
+     0.10%             2      10050250  python   libc.so.6                                          [.] _int_free                                              -      -            
+     0.10%             2      10050250  python   libc.so.6                                          [.] unlink_chunk.constprop.0                               -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyCallable_Check                                       -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyCapsule_GetPointer                                   -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyDict_GetItemWithError                                -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyFloat_FromDouble                                     -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyGILState_Ensure                                      -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyIndex_Check                                          -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyIter_Check                                           -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyList_New                                             -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyLong_AsDouble                                        -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyMem_RawFree                                          -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyNumber_Multiply                                      -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyObject_GetAttr                                       -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyObject_GetIter                                       -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PySequence_Fast                                        -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] PyTuple_New                                            -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyCode_Quicken                                        -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyEvalFrameClearAndPop.lto_priv.0                     -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyEval_Vector                                         -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyFloat_ExactDealloc                                  -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyObject_Calloc                                       -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyObject_GC_Link                                      -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyThreadState_CheckConsistency                        -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyTrash_clear_state                                   -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyUnicode_CheckConsistency                            -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _PyUnicode_FromUCS1.lto_priv.0                         -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] _Py_CheckSlotResult                                    -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] binary_op1                                             -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] convert_to_double                                      -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] convertitem.lto_priv.0                                 -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] dict_dealloc.lto_priv.0                                -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] dict_merge                                             -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] dict_traverse.lto_priv.0                               -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] find_name_in_mro.lto_priv.0                            -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] float_mul.lto_priv.0                                   -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] get_gc_state.lto_priv.0                                -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] move_unreachable.lto_priv.0                            -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] set_traverse.lto_priv.0                                -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] setarrayitem                                           -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] take_gil                                               -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] tupletraverse.lto_priv.0                               -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] type_call.lto_priv.0                                   -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] untrack_tuples.lto_priv.0                              -      -            
+     0.10%             2      10050250  python   python3.12d                                        [.] visit_decref                                           -      -            
+     0.10%             2      10050250  python   [unknown]                                          [k] 0xffffffff864c428a                                     -      -            
+     0.10%             2      10050250  python   [unknown]                                          [k] 0xffffffff8655b5b0                                     -      -            
+     0.10%             2      10050250  python   [unknown]                                          [k] 0xffffffff866dea1d                                     -      -            
+     0.10%             2      10050250  python   [unknown]                                          [k] 0xffffffff869869b7                                     -      -            
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#

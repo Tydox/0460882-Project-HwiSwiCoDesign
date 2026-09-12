@@ -1,9 +1,9 @@
 # ========
-# captured on    : Sat Sep 12 09:32:09 2026
+# captured on    : Sat Sep 12 11:36:43 2026
 # header version : 1
 # data offset    : 256
-# data size      : 118438368
-# feat offset    : 118438624
+# data size      : 4987440
+# feat offset    : 4987696
 # hostname : ubuntu
 # os release : 5.15.0-1106-kvm
 # perf version : 5.15.209
@@ -13,15 +13,15 @@
 # cpudesc : Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
 # cpuid : GenuineIntel,6,63,2
 # total memory : 4034188 kB
-# cmdline : /usr/lib/linux-kvm-tools-5.15.0-1106/perf record -F 199 --no-bpf-event -e cpu-clock --call-graph dwarf,4096 --output /root/0460882-Project-HwiSwiCoDesign/results/raytrace/original/perf.data -- /root/0460882-Project-HwiSwiCoDesign/.venv-dbg/bin/python /root/0460882-Project-HwiSwiCoDesign/suites/original/bm_raytrace/run_benchmark.py --debug-single-value --width 800 --height 800 
-# event : name = cpu-clock, , id = { 361 }, type = 1, size = 128, { sample_period, sample_freq } = 199, sample_type = IP|TID|TIME|ADDR|CALLCHAIN|PERIOD|REGS_USER|STACK_USER|DATA_SRC, read_format = ID, disabled = 1, inherit = 1, mmap = 1, comm = 1, freq = 1, enable_on_exec = 1, task = 1, mmap_data = 1, sample_id_all = 1, exclude_guest = 1, exclude_callchain_user = 1, mmap2 = 1, comm_exec = 1, ksymbol = 1, sample_regs_user = 0xff0fff, sample_stack_user = 4096
+# cmdline : /usr/lib/linux-kvm-tools-5.15.0-1106/perf record -F 199 --no-bpf-event -e cpu-clock --call-graph fp --output /root/0460882-Project-HwiSwiCoDesign/results/raytrace/original/perf.data -- /root/0460882-Project-HwiSwiCoDesign/.venv312-dbg/bin/python /root/0460882-Project-HwiSwiCoDesign/suites/original/bm_raytrace/run_benchmark.py --debug-single-value --width 800 --height 800 
+# event : name = cpu-clock, , id = { 1101 }, type = 1, size = 128, { sample_period, sample_freq } = 199, sample_type = IP|TID|TIME|CALLCHAIN|PERIOD, read_format = ID, disabled = 1, inherit = 1, mmap = 1, comm = 1, freq = 1, enable_on_exec = 1, task = 1, sample_id_all = 1, exclude_guest = 1, mmap2 = 1, comm_exec = 1, ksymbol = 1
 # CPU_TOPOLOGY info available, use -I to display
 # NUMA_TOPOLOGY info available, use -I to display
 # pmu mappings: software = 1, power = 7, uprobe = 6, cpu = 4, breakpoint = 5, tracepoint = 2, msr = 8
 # CACHE info available, use -I to display
-# time of first sample : 479.488404
-# time of last sample : 617.592046
-# sample duration : 138103.641 ms
+# time of first sample : 7991.464118
+# time of last sample : 8091.482417
+# sample duration : 100018.299 ms
 # MEM_TOPOLOGY info available, use -I to display
 # cpu pmu capabilities: max_precise=0, pmu_name=haswell
 # missing features: TRACING_DATA BRANCH_STACK GROUP_DESC AUXTRACE STAT CLOCKID DIR_FORMAT COMPRESSED CLOCK_DATA HYBRID_TOPOLOGY HYBRID_CPU_PMU_CAPS 
@@ -30,115 +30,103 @@
 #
 # Total Lost Samples: 0
 #
-# Samples: 27K of event 'cpu-clock'
-# Event count (approx.): 136944706500
+# Samples: 19K of event 'cpu-clock'
+# Event count (approx.): 99919585500
 #
-# Overhead       Samples        Period  Command  Shared Object         Symbol                                      IPC   [IPC Coverage]
-# ........  ............  ............  .......  ....................  ..........................................  ....................
+# Overhead       Samples        Period  Command  Shared Object     Symbol                                     IPC   [IPC Coverage]
+# ........  ............  ............  .......  ................  .........................................  ....................
 #
-    29.40%          8013   40266326625  python   python3.10d           [.] _PyEval_EvalFrameDefault                -      -            
-     3.39%           923    4638190375  python   python3.10d           [.] call_function.lto_priv.0                -      -            
-     3.23%           879    4417084875  python   python3.10d           [.] _PyEval_MakeFrameVector                 -      -            
-     3.17%           864    4341708000  python   python3.10d           [.] frame_dealloc.lto_priv.0                -      -            
-     2.54%           692    3477386500  python   python3.10d           [.] _PyDict_GetItemHint                     -      -            
-     2.21%           602    3025125250  python   python3.10d           [.] PyTuple_GetItem                         -      -            
-     2.12%           577    2899497125  python   python3.10d           [.] binary_op1                              -      -            
-     2.01%           548    2753768500  python   python3.10d           [.] _PyType_Lookup                          -      -            
-     1.97%           538    2703517250  python   python3.10d           [.] _PyObject_VectorcallTstate.lto_priv.10  -      -            
-     1.66%           453    2276381625  python   python3.10d           [.] _PyObject_GetMethod                     -      -            
-     1.56%           424    2130653000  python   python3.10d           [.] _PyMem_DebugCheckAddress                -      -            
-     1.39%           380    1909547500  python   python3.10d           [.] lookdict_split.lto_priv.0               -      -            
-     1.17%           319    1603014875  python   python3.10d           [.] _PyFrame_New_NoTrack                    -      -            
-     1.15%           313    1572864125  python   python3.10d           [.] read_size_t                             -      -            
-     1.14%           311    1562813875  python   python3.10d           [.] _PyEval_Vector                          -      -            
-     1.10%           301    1512562625  python   libc.so.6             [.] pthread_getspecific@@GLIBC_2.34         -      -            
-     1.10%           299    1502512375  python   python3.10d           [.] lookdict_unicode_nodummy                -      -            
-     1.06%           289    1452261125  python   python3.10d           [.] _Py_CheckFunctionResult                 -      -            
-     1.05%           287    1442210875  python   python3.10d           [.] insertdict                              -      -            
-     1.02%           278    1396984750  python   python3.10d           [.] PyFloat_FromDouble                      -      -            
-     0.99%           271    1361808875  python   python3.10d           [.] float_dealloc.lto_priv.0                -      -            
-     0.90%           246    1236180750  python   python3.10d           [.] _Py_NewReference                        -      -            
-     0.88%           240    1206030000  python   python3.10d           [.] _PyFunction_Vectorcall                  -      -            
-     0.84%           230    1155778750  python   python3.10d           [.] _PyObject_Malloc                        -      -            
-     0.84%           230    1155778750  python   python3.10d           [.] _PyUnicode_FromId                       -      -            
-     0.84%           228    1145728500  python   python3.10d           [.] float_mul.lto_priv.0                    -      -            
-     0.82%           223    1120602875  python   python3.10d           [.] subtype_dealloc.lto_priv.0              -      -            
-     0.79%           215    1080401875  python   python3.10d           [.] PyType_IsSubtype                        -      -            
-     0.76%           206    1035175750  python   python3.10d           [.] _PyObject_GenericSetAttrWithDict        -      -            
-     0.74%           202    1015075250  python   python3.10d           [.] _PyObject_MakeTpCall                    -      -            
-     0.74%           201    1010050125  python   libc.so.6             [.] __memset_avx2_unaligned_erms            -      -            
-     0.70%           192     964824000  python   python3.10d           [.] _PyDict_CheckConsistency                -      -            
-     0.69%           188     944723500  python   python3.10d           [.] PyObject_SetAttr                        -      -            
-     0.68%           185     929648125  python   python3.10d           [.] PyGILState_Check                        -      -            
-     0.68%           184     924623000  python   python3.10d           [.] _Py_Dealloc                             -      -            
-     0.65%           177     889447125  python   python3.10d           [.] dict_dealloc.lto_priv.0                 -      -            
-     0.65%           176     884422000  python   python3.10d           [.] tupledealloc.lto_priv.0                 -      -            
-     0.63%           172     864321500  python   python3.10d           [.] frame_alloc                             -      -            
-     0.57%           155     778894375  python   python3.10d           [.] binary_op                               -      -            
-     0.57%           154     773869250  python   python3.10d           [.] _Py_CheckSlotResult                     -      -            
-     0.57%           154     773869250  python   python3.10d           [.] float_add.lto_priv.0                    -      -            
-     0.56%           152     763819000  python   python3.10d           [.] PyDict_Contains                         -      -            
-     0.56%           152     763819000  python   python3.10d           [.] float_sub.lto_priv.0                    -      -            
-     0.55%           151     758793875  python   python3.10d           [.] new_dict                                -      -            
-     0.55%           149     748743625  python   python3.10d           [.] is_tstate_valid.lto_priv.0              -      -            
-     0.55%           149     748743625  python   python3.10d           [.] type_call.lto_priv.0                    -      -            
-     0.54%           147     738693375  python   python3.10d           [.] PyDict_GetItemWithError                 -      -            
-     0.53%           145     728643125  python   python3.10d           [.] _PyMem_DebugRawAlloc                    -      -            
-     0.48%           131     658291375  python   python3.10d           [.] _PyTrash_begin                          -      -            
-     0.46%           124     623115500  python   python3.10d           [.] write_size_t                            -      -            
-     0.44%           120     603015000  python   python3.10d           [.] arena_map_get                           -      -            
-     0.44%           119     597989875  python   python3.10d           [.] _PyObjectDict_SetItem                   -      -            
-     0.43%           116     582914500  python   python3.10d           [.] _PyTuple_FromArray                      -      -            
-     0.41%           111     557788875  python   python3.10d           [.] PyType_GenericAlloc                     -      -            
-     0.39%           107     537688375  python   python3.10d           [.] PyDict_SetItem                          -      -            
-     0.39%           107     537688375  python   python3.10d           [.] get_float_state                         -      -            
-     0.37%           101     507537625  python   python3.10d           [.] tuple_alloc                             -      -            
-     0.36%            99     497487375  python   python3.10d           [.] _PyObject_VectorcallTstate.lto_priv.6   -      -            
-     0.35%            96     482412000  python   python3.10d           [.] slot_nb_subtract                        -      -            
-     0.35%            95     477386875  python   python3.10d           [.] PyThread_tss_get                        -      -            
-     0.33%            90     452261250  python   python3.10d           [.] _PyTrash_cond                           -      -            
-     0.32%            88     442211000  python   python3.10d           [.] _PyObject_Free                          -      -            
-     0.32%            87     437185875  python   python3.10d           [.] PyObject_GC_UnTrack                     -      -            
-     0.29%            80     402010000  python   python3.10d           [.] listiter_next.lto_priv.0                -      -            
-     0.29%            79     396984875  python   python3.10d           [.] lookup_maybe_method.lto_priv.0          -      -            
-     0.28%            77     386934625  python   python3.10d           [.] PyNumber_Multiply                       -      -            
-     0.28%            76     381909500  python   python3.10d           [.] slot_tp_init                            -      -            
-     0.27%            73     366834125  python   python3.10d           [.] arena_map_is_used                       -      -            
-     0.26%            71     356783875  python   python3.10d           [.] PyNumber_Subtract                       -      -            
-     0.26%            70     351758750  python   python3.10d           [.] _PyGILState_GetThisThreadState          -      -            
-     0.25%            68     341708500  python   python3.10d           [.] vectorcall_maybe.lto_priv.0             -      -            
-     0.23%            63     316582875  python   python3.10d           [.] _PyObject_FastCallDictTstate            -      -            
-     0.23%            62     311557750  python   python3.10d           [.] get_type_cache.lto_priv.0               -      -            
-     0.22%            61     306532625  python   python3.10d           [.] PyUnicode_InternInPlace                 -      -            
-     0.22%            60     301507500  python   python3.10d           [.] _PyMem_DebugRawFree                     -      -            
-     0.21%            58     291457250  python   python3.10d           [.] PyCallable_Check                        -      -            
-     0.21%            57     286432125  python   python3.10d           [.] PyThreadState_Get                       -      -            
-     0.21%            57     286432125  python   python3.10d           [.] _PyUnicode_CheckConsistency             -      -            
-     0.21%            56     281407000  python   python3.10d           [.] _PyTrash_end                            -      -            
-     0.20%            55     276381875  python   python3.10d           [.] _PyMem_DebugFree                        -      -            
-     0.20%            55     276381875  python   python3.10d           [.] _PyMem_DebugMalloc                      -      -            
-     0.20%            55     276381875  python   python3.10d           [.] convert_to_double                       -      -            
-     0.20%            54     271356750  python   python3.10d           [.] PyObject_IS_GC                          -      -            
-     0.19%            51     256281375  python   python3.10d           [.] float_richcompare.lto_priv.0            -      -            
-     0.17%            46     231155750  python   python3.10d           [.] _PyDict_ContainsId                      -      -            
-     0.17%            46     231155750  python   python3.10d           [.] _PyObject_GetDictPtr                    -      -            
-     0.17%            46     231155750  python   python3.10d           [.] new_dict_with_shared_keys.lto_priv.0    -      -            
-     0.17%            45     226130625  python   python3.10d           [.] _PyObject_Call_Prepend                  -      -            
-     0.16%            44     221105500  python   python3.10d           [.] PyNumber_Add                            -      -            
-     0.16%            44     221105500  python   python3.10d           [.] min_max                                 -      -            
-     0.15%            42     211055250  python   python3.10d           [.] PyThread_tss_is_created                 -      -            
-     0.15%            42     211055250  python   python3.10d           [.] _PyObject_GC_Alloc                      -      -            
-     0.13%            36     180904500  python   python3.10d           [.] PyObject_ClearWeakRefs                  -      -            
-     0.13%            36     180904500  python   python3.10d           [.] long_sub.lto_priv.0                     -      -            
-     0.12%            33     165829125  python   python3.10d           [.] math_1_to_whatever                      -      -            
-     0.12%            32     160804000  python   python3.10d           [.] PyLong_AsDouble                         -      -            
-     0.12%            32     160804000  python   python3.10d           [.] _PyLong_Sign                            -      -            
-     0.12%            32     160804000  python   python3.10d           [.] cfunction_vectorcall_O.lto_priv.0       -      -            
-     0.11%            31     155778875  python   python3.10d           [.] PyErr_Occurred                          -      -            
-     0.11%            31     155778875  python   python3.10d           [.] get_small_int.lto_priv.0                -      -            
-     0.11%            30     150753750  python   python3.10d           [.] PyObject_RichCompare                    -      -            
-     0.11%            30     150753750  python   python3.10d           [.] object_new.lto_priv.0                   -      -            
-     0.11%            29     145728625  python   python3.10d           [.] get_tuple_state                         -      -            
+    36.68%          7294   36653261750  python   python3.12d       [.] _PyEval_EvalFrameDefault               -      -            
+     5.19%          1032    5185929000  python   python3.12d       [.] _Py_DECREF_DecRefTotal                 -      -            
+     4.04%           803    4035175375  python   python3.12d       [.] _Py_INCREF_IncRefTotal                 -      -            
+     2.26%           450    2261306250  python   python3.12d       [.] _PyMem_DebugCheckAddress               -      -            
+     2.22%           442    2221105250  python   python3.12d       [.] _PyFrame_ClearExceptCode               -      -            
+     2.00%           397    1994974625  python   python3.12d       [.] _Py_dict_lookup                        -      -            
+     1.96%           389    1954773625  python   python3.12d       [.] unicodekeys_lookup_unicode             -      -            
+     1.66%           330    1658291250  python   python3.12d       [.] _Py_Dealloc                            -      -            
+     1.56%           311    1562813875  python   python3.12d       [.] read_size_t                            -      -            
+     1.31%           261    1311557625  python   python3.12d       [.] PyFloat_FromDouble                     -      -            
+     1.26%           251    1261306375  python   python3.12d       [.] _PyObject_Malloc                       -      -            
+     1.23%           245    1231155625  python   python3.12d       [.] clear_thread_frame                     -      -            
+     1.12%           222    1115577750  python   python3.12d       [.] subtype_dealloc                        -      -            
+     1.08%           215    1080401875  python   python3.12d       [.] binary_op1                             -      -            
+     1.08%           214    1075376750  python   python3.12d       [.] _PyFloat_ExactDealloc                  -      -            
+     1.06%           211    1060301375  python   python3.12d       [.] _Py_NewReference                       -      -            
+     1.04%           207    1040200875  python   python3.12d       [.] PyDict_Contains                        -      -            
+     1.03%           204    1025125500  python   python3.12d       [.] PyType_IsSubtype                       -      -            
+     1.02%           202    1015075250  python   libc.so.6         [.] pthread_getspecific@@GLIBC_2.34        -      -            
+     0.92%           182     914572750  python   libc.so.6         [.] __memset_avx2_unaligned_erms           -      -            
+     0.90%           178     894472250  python   python3.12d       [.] initialize_locals                      -      -            
+     0.85%           170     854271250  python   python3.12d       [.] tupledealloc.lto_priv.0                -      -            
+     0.84%           168     844221000  python   python3.12d       [.] _PyTuple_FromArray                     -      -            
+     0.84%           167     839195875  python   python3.12d       [.] _PyType_Lookup                         -      -            
+     0.82%           163     819095375  python   python3.12d       [.] _PyEval_Vector                         -      -            
+     0.79%           158     793969750  python   python3.12d       [.] arena_map_is_used                      -      -            
+     0.76%           152     763819000  python   python3.12d       [.] _PyObject_MakeTpCall                   -      -            
+     0.73%           146     733668250  python   python3.12d       [.] _PyObject_FreeInstanceAttributes       -      -            
+     0.72%           144     723618000  python   python3.12d       [.] PyGILState_Check                       -      -            
+     0.71%           141     708542625  python   python3.12d       [.] _PyEvalFramePushAndInit.lto_priv.0     -      -            
+     0.67%           133     668341625  python   python3.12d       [.] _PyMem_DebugRawAlloc                   -      -            
+     0.63%           125     628140625  python   python3.12d       [.] _Py_CheckFunctionResult                -      -            
+     0.60%           119     597989875  python   python3.12d       [.] write_size_t                           -      -            
+     0.56%           112     562814000  python   python3.12d       [.] binary_op                              -      -            
+     0.56%           111     557788875  python   python3.12d       [.] _PyObject_Free                         -      -            
+     0.51%           102     512562750  python   python3.12d       [.] _PyObject_VectorcallTstate.lto_priv.6  -      -            
+     0.50%           100     502512500  python   python3.12d       [.] _Py_CheckSlotResult                    -      -            
+     0.50%           100     502512500  python   python3.12d       [.] float_dealloc.lto_priv.0               -      -            
+     0.49%            98     492462250  python   python3.12d       [.] _PyObject_VectorcallTstate.lto_priv.2  -      -            
+     0.48%            96     482412000  python   python3.12d       [.] type_call.lto_priv.0                   -      -            
+     0.48%            95     477386875  python   python3.12d       [.] init_inline_values                     -      -            
+     0.45%            89     447236125  python   python3.12d       [.] tuple_alloc                            -      -            
+     0.44%            87     437185875  python   python3.12d       [.] _PyTrash_get_state                     -      -            
+     0.42%            84     422110500  python   python3.12d       [.] get_float_state                        -      -            
+     0.42%            83     417085375  python   python3.12d       [.] lookup_maybe_method.lto_priv.0         -      -            
+     0.40%            79     396984875  python   python3.12d       [.] _PyThreadState_PopFrame                -      -            
+     0.39%            78     391959750  python   python3.12d       [.] slot_nb_subtract.lto_priv.0            -      -            
+     0.39%            77     386934625  python   python3.12d       [.] _PyObject_Call_Prepend                 -      -            
+     0.38%            75     376884375  python   python3.12d       [.] _PyTrash_end                           -      -            
+     0.36%            72     361809000  python   python3.12d       [.] PyObject_ClearWeakRefs                 -      -            
+     0.35%            69     346733625  python   python3.12d       [.] _PyType_AllocNoTrack                   -      -            
+     0.35%            69     346733625  python   python3.12d       [.] float_sub.lto_priv.0                   -      -            
+     0.35%            69     346733625  python   python3.12d       [.] vectorcall_maybe.lto_priv.0            -      -            
+     0.34%            67     336683375  python   python3.12d       [.] PyObject_GC_Del                        -      -            
+     0.34%            67     336683375  python   python3.12d       [.] _PyMem_DebugRawFree                    -      -            
+     0.33%            65     326633125  python   python3.12d       [.] slot_tp_init                           -      -            
+     0.30%            59     296482375  python   python3.12d       [.] _PyFunction_Vectorcall                 -      -            
+     0.29%            58     291457250  python   python3.12d       [.] PyLong_AsDouble                        -      -            
+     0.29%            58     291457250  python   python3.12d       [.] _PyObject_GC_Link                      -      -            
+     0.29%            58     291457250  python   python3.12d       [.] float_richcompare.lto_priv.0           -      -            
+     0.28%            56     281407000  python   python3.12d       [.] PyType_GenericAlloc                    -      -            
+     0.27%            53     266331625  python   python3.12d       [.] _PyTrash_begin                         -      -            
+     0.26%            51     256281375  python   python3.12d       [.] PyNumber_Subtract                      -      -            
+     0.26%            51     256281375  python   python3.12d       [.] _PyMem_DebugMalloc                     -      -            
+     0.25%            49     246231125  python   python3.12d       [.] PyObject_GC_UnTrack                    -      -            
+     0.25%            49     246231125  python   python3.12d       [.] PyThread_tss_get                       -      -            
+     0.24%            48     241206000  python   python3.12d       [.] _PyObject_FastCallDictTstate           -      -            
+     0.24%            47     236180875  python   python3.12d       [.] convert_to_double                      -      -            
+     0.20%            40     201005000  python   python3.12d       [.] PyThread_tss_is_created                -      -            
+     0.20%            40     201005000  python   python3.12d       [.] _PyMem_DebugFree                       -      -            
+     0.20%            39     195979875  python   python3.12d       [.] float_mul.lto_priv.0                   -      -            
+     0.19%            38     190954750  python   python3.12d       [.] _PyThreadState_PushFrame               -      -            
+     0.17%            33     165829125  python   python3.12d       [.] _PyMem_DebugRawMalloc                  -      -            
+     0.16%            32     160804000  python   python3.12d       [.] PyObject_Vectorcall                    -      -            
+     0.16%            32     160804000  python   python3.12d       [.] _PyTuple_FromArraySteal                -      -            
+     0.16%            31     155778875  python   python3.12d       [.] PyCallable_Check                       -      -            
+     0.16%            31     155778875  python   python3.12d       [.] _PyEvalFrameClearAndPop.lto_priv.0     -      -            
+     0.16%            31     155778875  python   python3.12d       [.] long_sub.lto_priv.0                    -      -            
+     0.15%            30     150753750  python   python3.12d       [.] _PyTrash_clear_state                   -      -            
+     0.15%            29     145728625  python   python3.12d       [.] _PyLong_Multiply                       -      -            
+     0.14%            28     140703500  python   python3.12d       [.] PyVectorcall_Function                  -      -            
+     0.13%            26     130653250  python   python3.12d       [.] _PyList_AppendTakeRef.lto_priv.0       -      -            
+     0.12%            24     120603000  python   python3.12d       [.] min_max                                -      -            
+     0.12%            23     115577875  python   python3.12d       [.] _PyTrash_cond                          -      -            
+     0.12%            23     115577875  python   python3.12d       [.] float_div.lto_priv.0                   -      -            
+     0.11%            22     110552750  python   python3.12d       [.] vgetargskeywords.lto_priv.0            -      -            
+     0.11%            21     105527625  python   python3.12d       [.] PyNumber_Multiply                      -      -            
+     0.10%            20     100502500  python   python3.12d       [.] address_in_range                       -      -            
+     0.10%            20     100502500  python   python3.12d       [.] do_richcompare                         -      -            
+     0.10%            20     100502500  python   python3.12d       [.] float_add.lto_priv.0                   -      -            
+     0.10%            20     100502500  python   python3.12d       [.] vgetargs1_impl                         -      -            
 
 
 #
