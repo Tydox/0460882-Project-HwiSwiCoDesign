@@ -1,0 +1,43 @@
+# started on Sat Sep 12 15:04:31 2026
+
+
+ Performance counter stats for '/root/0460882-Project-HwiSwiCoDesign/.venv312/bin/python -m pyperformance run --manifest /root/0460882-Project-HwiSwiCoDesign/suites/optimized/MANIFEST --benchmarks pyflate --debug-single-value':
+
+           3286.81 msec cpu-clock                 #    0.980 CPUs utilized          
+           3286.96 msec task-clock                #    0.980 CPUs utilized          
+        7005286233      cycles                    #    2.131 GHz                      (26.60%)
+       10374124547      instructions              #    1.48  insn per cycle           (31.64%)
+        1780872463      branch-instructions       #  541.812 M/sec                    (31.48%)
+          49888878      branch-misses             #    2.80% of all branches          (31.34%)
+         249483854      bus-cycles                #   75.903 M/sec                    (31.13%)
+          94525671      cache-references          #   28.758 M/sec                    (31.55%)
+           3194513      cache-misses              #    3.380 % of all cache refs      (21.26%)
+        6863451922      ref-cycles                #    2.088 G/sec                    (27.24%)
+             59481      page-faults               #   18.096 K/sec                  
+             59481      minor-faults              #   18.096 K/sec                  
+                 0      major-faults              #    0.000 /sec                   
+               723      context-switches          #  219.965 /sec                   
+                 0      cpu-migrations            #    0.000 /sec                   
+                 0      alignment-faults          #    0.000 /sec                   
+                 0      emulation-faults          #    0.000 /sec                   
+               576      cgroup-switches           #  175.242 /sec                   
+        1766249750      L1-dcache-loads           #  537.363 M/sec                    (26.61%)
+          98182001      L1-dcache-load-misses     #    5.56% of all L1-dcache accesses  (26.35%)
+         498644724      L1-dcache-stores          #  151.707 M/sec                    (26.15%)
+          19650759      L1-icache-load-misses                                         (25.64%)
+        1636255837      dTLB-loads                #  497.814 M/sec                    (20.75%)
+           4253303      dTLB-load-misses          #    0.26% of all dTLB cache accesses  (21.44%)
+         809941778      dTLB-stores               #  246.416 M/sec                    (21.34%)
+            686477      dTLB-store-misses         #  208.853 K/sec                    (21.73%)
+           2235648      iTLB-loads                #  680.172 K/sec                    (21.96%)
+           3529321      iTLB-load-misses          #  157.87% of all iTLB cache accesses  (21.89%)
+        2038664440      branch-loads              #  620.242 M/sec                    (21.65%)
+          40288376      branch-load-misses        #   12.257 M/sec                    (21.38%)
+        3352417969 ns   duration_time             #    1.020 G/sec                  
+
+       3.352417969 seconds time elapsed
+
+       2.915339000 seconds user
+       0.400349000 seconds sys
+
+

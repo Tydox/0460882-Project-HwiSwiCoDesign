@@ -1,43 +1,43 @@
-# started on Sat Sep 12 14:34:56 2026
+# started on Sat Sep 12 15:07:45 2026
 
 
- Performance counter stats for '/root/0460882-Project-HwiSwiCoDesign/.venv312/bin/python -m pyperformance run --manifest /root/0460882-Project-HwiSwiCoDesign/suites/original/MANIFEST --benchmarks pyflate':
+ Performance counter stats for '/root/0460882-Project-HwiSwiCoDesign/.venv312/bin/python -m pyperformance run --manifest /root/0460882-Project-HwiSwiCoDesign/suites/original/MANIFEST --benchmarks pyflate --debug-single-value':
 
-          63203.52 msec cpu-clock                 #    0.992 CPUs utilized          
-          63204.07 msec task-clock                #    0.992 CPUs utilized          
-      143192392838      cycles                    #    2.266 GHz                      (25.39%)
-      382299279606      instructions              #    2.67  insn per cycle           (30.41%)
-       63897708547      branch-instructions       #    1.011 G/sec                    (30.34%)
-         331516522      branch-misses             #    0.52% of all branches          (30.32%)
-        5043742163      bus-cycles                #   79.801 M/sec                    (30.33%)
-         451590992      cache-references          #    7.145 M/sec                    (30.32%)
-          38157669      cache-misses              #    8.450 % of all cache refs      (20.25%)
-      145136115660      ref-cycles                #    2.296 G/sec                    (25.36%)
-            695238      page-faults               #   11.000 K/sec                  
-            695238      minor-faults              #   11.000 K/sec                  
+           3586.14 msec cpu-clock                 #    0.982 CPUs utilized          
+           3586.28 msec task-clock                #    0.982 CPUs utilized          
+        7604332969      cycles                    #    2.120 GHz                      (26.35%)
+       11946126497      instructions              #    1.57  insn per cycle           (31.45%)
+        2135609212      branch-instructions       #  595.506 M/sec                    (31.44%)
+          49768344      branch-misses             #    2.33% of all branches          (31.33%)
+         270829450      bus-cycles                #   75.520 M/sec                    (31.11%)
+         100180076      cache-references          #   27.935 M/sec                    (31.35%)
+           3864137      cache-misses              #    3.857 % of all cache refs      (21.06%)
+        7661409929      ref-cycles                #    2.136 G/sec                    (26.52%)
+             68843      page-faults               #   19.197 K/sec                  
+             68843      minor-faults              #   19.197 K/sec                  
                  0      major-faults              #    0.000 /sec                   
-              2593      context-switches          #   41.026 /sec                   
+               738      context-switches          #  205.788 /sec                   
                  0      cpu-migrations            #    0.000 /sec                   
                  0      alignment-faults          #    0.000 /sec                   
                  0      emulation-faults          #    0.000 /sec                   
-              1840      cgroup-switches           #   29.112 /sec                   
-       83038298909      L1-dcache-loads           #    1.314 G/sec                    (25.30%)
-        1753570189      L1-dcache-load-misses     #    2.11% of all L1-dcache accesses  (25.30%)
-       16183583191      L1-dcache-stores          #  256.054 M/sec                    (25.30%)
-          54391698      L1-icache-load-misses                                         (25.34%)
-       85220399502      dTLB-loads                #    1.348 G/sec                    (20.30%)
-          30336772      dTLB-load-misses          #    0.04% of all dTLB cache accesses  (20.33%)
-       37724074334      dTLB-stores               #  596.864 M/sec                    (20.30%)
-          17138909      dTLB-store-misses         #  271.169 K/sec                    (20.27%)
-          14568546      iTLB-loads                #  230.501 K/sec                    (20.27%)
-          12190068      iTLB-load-misses          #   83.67% of all iTLB cache accesses  (20.29%)
-       75234572896      branch-loads              #    1.190 G/sec                    (20.35%)
-         272922403      branch-load-misses        #    4.318 M/sec                    (20.35%)
-       63714640151 ns   duration_time             #    1.008 G/sec                  
+               591      cgroup-switches           #  164.798 /sec                   
+        2231757158      L1-dcache-loads           #  622.316 M/sec                    (26.39%)
+         123273957      L1-dcache-load-misses     #    5.52% of all L1-dcache accesses  (26.42%)
+         555386740      L1-dcache-stores          #  154.867 M/sec                    (26.29%)
+          20010859      L1-icache-load-misses                                         (26.53%)
+        1911979049      dTLB-loads                #  533.147 M/sec                    (20.90%)
+           4686926      dTLB-load-misses          #    0.25% of all dTLB cache accesses  (20.86%)
+         935360790      dTLB-stores               #  260.821 M/sec                    (21.07%)
+            476653      dTLB-store-misses         #  132.913 K/sec                    (21.63%)
+           2116253      iTLB-loads                #  590.108 K/sec                    (21.53%)
+           3582125      iTLB-load-misses          #  169.27% of all iTLB cache accesses  (21.36%)
+        2489786868      branch-loads              #  694.267 M/sec                    (21.25%)
+          41162491      branch-load-misses        #   11.478 M/sec                    (21.06%)
+        3653453304 ns   duration_time             #    1.019 G/sec                  
 
-      63.714640151 seconds time elapsed
+       3.653453304 seconds time elapsed
 
-      61.550087000 seconds user
-       1.756380000 seconds sys
+       3.251216000 seconds user
+       0.365534000 seconds sys
 
 
