@@ -1,15 +1,15 @@
 
 === stat: cpu-clock ===
-# started on Sat Sep 12 14:33:47 2026
+# started on Sat Sep 12 14:09:13 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-              0.50 msec cpu-clock                 #    0.010 CPUs utilized          
+              0.89 msec cpu-clock                 #    0.016 CPUs utilized          
 
-       0.051024390 seconds time elapsed
+       0.054347866 seconds time elapsed
 
-       0.000985000 seconds user
+       0.001597000 seconds user
        0.000000000 seconds sys
 
 
@@ -21,20 +21,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: task-clock ===
-# started on Sat Sep 12 14:33:47 2026
+# started on Sat Sep 12 14:09:14 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-              0.44 msec task-clock                #    0.009 CPUs utilized          
+              0.45 msec task-clock                #    0.009 CPUs utilized          
 
-       0.050986108 seconds time elapsed
+       0.050995167 seconds time elapsed
 
        0.000000000 seconds user
-       0.000950000 seconds sys
+       0.000940000 seconds sys
 
 
 
@@ -45,20 +45,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: cycles ===
-# started on Sat Sep 12 14:33:47 2026
+# started on Sat Sep 12 14:09:14 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-            960200      cycles                                                      
+           1002748      cycles                                                      
 
-       0.051122230 seconds time elapsed
+       0.051060190 seconds time elapsed
 
-       0.001054000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.000988000 seconds sys
 
 
 
@@ -69,19 +69,19 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: instructions ===
-# started on Sat Sep 12 14:33:47 2026
+# started on Sat Sep 12 14:09:14 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-            548491      instructions                                                
+            541273      instructions                                                
 
-       0.051163968 seconds time elapsed
+       0.051151667 seconds time elapsed
 
-       0.001133000 seconds user
+       0.001099000 seconds user
        0.000000000 seconds sys
 
 
@@ -93,19 +93,19 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data (8 samples) ]
+[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data (7 samples) ]
 
 === stat: branch-instructions ===
-# started on Sat Sep 12 14:33:47 2026
+# started on Sat Sep 12 14:09:14 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-            115060      branch-instructions                                         
+            114668      branch-instructions                                         
 
-       0.051150972 seconds time elapsed
+       0.051058249 seconds time elapsed
 
-       0.001101000 seconds user
+       0.001032000 seconds user
        0.000000000 seconds sys
 
 
@@ -117,19 +117,19 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: branch-misses ===
-# started on Sat Sep 12 14:33:47 2026
+# started on Sat Sep 12 14:09:15 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-              5000      branch-misses                                               
+              5248      branch-misses                                               
 
-       0.051143320 seconds time elapsed
+       0.051094515 seconds time elapsed
 
-       0.001107000 seconds user
+       0.001035000 seconds user
        0.000000000 seconds sys
 
 
@@ -141,20 +141,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: bus-cycles ===
-# started on Sat Sep 12 14:33:48 2026
+# started on Sat Sep 12 14:09:15 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-             45029      bus-cycles                                                  
+             46857      bus-cycles                                                  
 
-       0.051115017 seconds time elapsed
+       0.056880252 seconds time elapsed
 
-       0.001081000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.006830000 seconds sys
 
 
 
@@ -165,20 +165,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: cache-references ===
-# started on Sat Sep 12 14:33:48 2026
+# started on Sat Sep 12 14:09:15 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-             19146      cache-references                                            
+             17828      cache-references                                            
 
-       0.057296364 seconds time elapsed
+       0.051188282 seconds time elapsed
 
        0.000000000 seconds user
-       0.007176000 seconds sys
+       0.001120000 seconds sys
 
 
 
@@ -189,19 +189,19 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: cache-misses ===
-# started on Sat Sep 12 14:33:48 2026
+# started on Sat Sep 12 14:09:15 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-               168      cache-misses                                                
+               132      cache-misses                                                
 
-       0.051089005 seconds time elapsed
+       0.051119930 seconds time elapsed
 
-       0.001031000 seconds user
+       0.001090000 seconds user
        0.000000000 seconds sys
 
 
@@ -213,19 +213,19 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: ref-cycles ===
-# started on Sat Sep 12 14:33:48 2026
+# started on Sat Sep 12 14:09:15 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-           1044936      ref-cycles                                                  
+           1057464      ref-cycles                                                  
 
-       0.051147575 seconds time elapsed
+       0.051166439 seconds time elapsed
 
-       0.001110000 seconds user
+       0.001134000 seconds user
        0.000000000 seconds sys
 
 
@@ -237,20 +237,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: stalled-cycles-frontend ===
-# started on Sat Sep 12 14:33:48 2026
+# started on Sat Sep 12 14:09:15 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      stalled-cycles-frontend                                     
 
-       0.050988729 seconds time elapsed
+       0.051039232 seconds time elapsed
 
-       0.000969000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.000989000 seconds sys
 
 
 
@@ -259,16 +259,16 @@ Error:
 The stalled-cycles-frontend event is not supported.
 
 === stat: stalled-cycles-backend ===
-# started on Sat Sep 12 14:33:48 2026
+# started on Sat Sep 12 14:09:15 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      stalled-cycles-backend                                      
 
-       0.051001168 seconds time elapsed
+       0.051029987 seconds time elapsed
 
-       0.000943000 seconds user
+       0.000941000 seconds user
        0.000000000 seconds sys
 
 
@@ -278,16 +278,16 @@ Error:
 The stalled-cycles-backend event is not supported.
 
 === stat: page-faults ===
-# started on Sat Sep 12 14:33:49 2026
+# started on Sat Sep 12 14:09:16 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
                 61      page-faults                                                 
 
-       0.050980537 seconds time elapsed
+       0.050995502 seconds time elapsed
 
-       0.000929000 seconds user
+       0.000940000 seconds user
        0.000000000 seconds sys
 
 
@@ -299,17 +299,17 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data (5 samples) ]
+[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data (5 samples) ]
 
 === stat: minor-faults ===
-# started on Sat Sep 12 14:33:49 2026
+# started on Sat Sep 12 14:09:16 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-                60      minor-faults                                                
+                59      minor-faults                                                
 
-       0.051020935 seconds time elapsed
+       0.051000961 seconds time elapsed
 
        0.000969000 seconds user
        0.000000000 seconds sys
@@ -323,20 +323,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data (5 samples) ]
+[ perf record: Captured and wrote 0.003 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data (5 samples) ]
 
 === stat: major-faults ===
-# started on Sat Sep 12 14:33:49 2026
+# started on Sat Sep 12 14:09:16 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
                  0      major-faults                                                
 
-       0.050981979 seconds time elapsed
+       0.051048096 seconds time elapsed
 
        0.000000000 seconds user
-       0.000989000 seconds sys
+       0.000984000 seconds sys
 
 
 
@@ -347,20 +347,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: context-switches ===
-# started on Sat Sep 12 14:33:49 2026
+# started on Sat Sep 12 14:09:16 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
                  1      context-switches                                            
 
-       0.050997058 seconds time elapsed
+       0.050957093 seconds time elapsed
 
        0.000000000 seconds user
-       0.001008000 seconds sys
+       0.000915000 seconds sys
 
 
 
@@ -371,17 +371,17 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data (1 samples) ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data (1 samples) ]
 
 === stat: cpu-migrations ===
-# started on Sat Sep 12 14:33:49 2026
+# started on Sat Sep 12 14:09:16 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
                  0      cpu-migrations                                              
 
-       0.051009551 seconds time elapsed
+       0.051020705 seconds time elapsed
 
        0.000971000 seconds user
        0.000000000 seconds sys
@@ -395,20 +395,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: alignment-faults ===
-# started on Sat Sep 12 14:33:49 2026
+# started on Sat Sep 12 14:09:16 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
                  0      alignment-faults                                            
 
-       0.051003980 seconds time elapsed
+       0.051052040 seconds time elapsed
 
        0.000000000 seconds user
-       0.000957000 seconds sys
+       0.000992000 seconds sys
 
 
 
@@ -419,19 +419,19 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: emulation-faults ===
-# started on Sat Sep 12 14:33:50 2026
+# started on Sat Sep 12 14:09:17 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
                  0      emulation-faults                                            
 
-       0.050951833 seconds time elapsed
+       0.051000470 seconds time elapsed
 
-       0.000913000 seconds user
+       0.000973000 seconds user
        0.000000000 seconds sys
 
 
@@ -443,20 +443,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: cgroup-switches ===
-# started on Sat Sep 12 14:33:50 2026
+# started on Sat Sep 12 14:09:17 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-                 2      cgroup-switches                                             
+                 1      cgroup-switches                                             
 
-       0.051014241 seconds time elapsed
+       0.051023386 seconds time elapsed
 
-       0.000000000 seconds user
-       0.000968000 seconds sys
+       0.000968000 seconds user
+       0.000000000 seconds sys
 
 
 
@@ -467,20 +467,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data (1 samples) ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data (1 samples) ]
 
 === stat: L1-dcache-loads ===
-# started on Sat Sep 12 14:33:50 2026
+# started on Sat Sep 12 14:09:17 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-            157236      L1-dcache-loads                                             
+            162644      L1-dcache-loads                                             
 
-       0.051094529 seconds time elapsed
+       0.057178196 seconds time elapsed
 
-       0.001058000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.007005000 seconds sys
 
 
 
@@ -491,20 +491,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: L1-dcache-load-misses ===
-# started on Sat Sep 12 14:33:50 2026
+# started on Sat Sep 12 14:09:17 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-             15620      L1-dcache-load-misses                                       
+             14424      L1-dcache-load-misses                                       
 
-       0.056902210 seconds time elapsed
+       0.051043843 seconds time elapsed
 
-       0.000000000 seconds user
-       0.006800000 seconds sys
+       0.000996000 seconds user
+       0.000000000 seconds sys
 
 
 
@@ -515,20 +515,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: L1-dcache-stores ===
-# started on Sat Sep 12 14:33:50 2026
+# started on Sat Sep 12 14:09:17 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-             94243      L1-dcache-stores                                            
+             92080      L1-dcache-stores                                            
 
-       0.051218843 seconds time elapsed
+       0.051048206 seconds time elapsed
 
-       0.000000000 seconds user
-       0.001135000 seconds sys
+       0.001000000 seconds user
+       0.000000000 seconds sys
 
 
 
@@ -539,20 +539,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: L1-dcache-store-misses ===
-# started on Sat Sep 12 14:33:50 2026
+# started on Sat Sep 12 14:09:17 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      L1-dcache-store-misses                                      
 
-       0.050943710 seconds time elapsed
+       0.051032243 seconds time elapsed
 
-       0.000916000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.000993000 seconds sys
 
 
 
@@ -561,16 +561,16 @@ Error:
 The L1-dcache-store-misses event is not supported.
 
 === stat: L1-dcache-prefetches ===
-# started on Sat Sep 12 14:33:50 2026
+# started on Sat Sep 12 14:09:18 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      L1-dcache-prefetches                                        
 
-       0.050890463 seconds time elapsed
+       0.050974804 seconds time elapsed
 
-       0.000860000 seconds user
+       0.000922000 seconds user
        0.000000000 seconds sys
 
 
@@ -580,17 +580,17 @@ Error:
 The L1-dcache-prefetches event is not supported.
 
 === stat: L1-dcache-prefetch-misses ===
-# started on Sat Sep 12 14:33:51 2026
+# started on Sat Sep 12 14:09:18 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      L1-dcache-prefetch-misses                                   
 
-       0.050995592 seconds time elapsed
+       0.050907270 seconds time elapsed
 
-       0.000940000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.000854000 seconds sys
 
 
 
@@ -599,17 +599,17 @@ Error:
 The L1-dcache-prefetch-misses event is not supported.
 
 === stat: L1-icache-loads ===
-# started on Sat Sep 12 14:33:51 2026
+# started on Sat Sep 12 14:09:18 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      L1-icache-loads                                             
 
-       0.050981623 seconds time elapsed
+       0.050876980 seconds time elapsed
 
-       0.000920000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.000858000 seconds sys
 
 
 
@@ -618,16 +618,16 @@ Error:
 The L1-icache-loads event is not supported.
 
 === stat: L1-icache-load-misses ===
-# started on Sat Sep 12 14:33:51 2026
+# started on Sat Sep 12 14:09:18 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-              8171      L1-icache-load-misses                                       
+              8281      L1-icache-load-misses                                       
 
-       0.051080668 seconds time elapsed
+       0.051001094 seconds time elapsed
 
-       0.001037000 seconds user
+       0.000969000 seconds user
        0.000000000 seconds sys
 
 
@@ -639,19 +639,19 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: LLC-loads ===
-# started on Sat Sep 12 14:33:51 2026
+# started on Sat Sep 12 14:09:18 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      LLC-loads                                                   
 
-       0.050935372 seconds time elapsed
+       0.050907336 seconds time elapsed
 
-       0.000902000 seconds user
+       0.000863000 seconds user
        0.000000000 seconds sys
 
 
@@ -663,17 +663,17 @@ The sys_perf_event_open() syscall returned with 6 (No such device or address) fo
 
 
 === stat: LLC-load-misses ===
-# started on Sat Sep 12 14:33:51 2026
+# started on Sat Sep 12 14:09:18 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      LLC-load-misses                                             
 
-       0.050987361 seconds time elapsed
+       0.050981107 seconds time elapsed
 
-       0.000934000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.000920000 seconds sys
 
 
 
@@ -684,16 +684,16 @@ The sys_perf_event_open() syscall returned with 6 (No such device or address) fo
 
 
 === stat: LLC-stores ===
-# started on Sat Sep 12 14:33:51 2026
+# started on Sat Sep 12 14:09:18 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      LLC-stores                                                  
 
-       0.050980259 seconds time elapsed
+       0.050886102 seconds time elapsed
 
-       0.000943000 seconds user
+       0.000847000 seconds user
        0.000000000 seconds sys
 
 
@@ -705,16 +705,16 @@ The sys_perf_event_open() syscall returned with 6 (No such device or address) fo
 
 
 === stat: LLC-store-misses ===
-# started on Sat Sep 12 14:33:51 2026
+# started on Sat Sep 12 14:09:18 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      LLC-store-misses                                            
 
-       0.050968590 seconds time elapsed
+       0.050917593 seconds time elapsed
 
-       0.000920000 seconds user
+       0.000880000 seconds user
        0.000000000 seconds sys
 
 
@@ -726,16 +726,16 @@ The sys_perf_event_open() syscall returned with 6 (No such device or address) fo
 
 
 === stat: LLC-prefetches ===
-# started on Sat Sep 12 14:33:51 2026
+# started on Sat Sep 12 14:09:18 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      LLC-prefetches                                              
 
-       0.050903866 seconds time elapsed
+       0.050947193 seconds time elapsed
 
-       0.000872000 seconds user
+       0.000899000 seconds user
        0.000000000 seconds sys
 
 
@@ -745,17 +745,17 @@ Error:
 The LLC-prefetches event is not supported.
 
 === stat: LLC-prefetch-misses ===
-# started on Sat Sep 12 14:33:52 2026
+# started on Sat Sep 12 14:09:19 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      LLC-prefetch-misses                                         
 
-       0.050882261 seconds time elapsed
+       0.050878907 seconds time elapsed
 
-       0.000832000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.000830000 seconds sys
 
 
 
@@ -764,16 +764,16 @@ Error:
 The LLC-prefetch-misses event is not supported.
 
 === stat: dTLB-loads ===
-# started on Sat Sep 12 14:33:52 2026
+# started on Sat Sep 12 14:09:19 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-            157307      dTLB-loads                                                  
+            153173      dTLB-loads                                                  
 
-       0.051004662 seconds time elapsed
+       0.051044832 seconds time elapsed
 
-       0.000970000 seconds user
+       0.000992000 seconds user
        0.000000000 seconds sys
 
 
@@ -785,20 +785,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: dTLB-load-misses ===
-# started on Sat Sep 12 14:33:52 2026
+# started on Sat Sep 12 14:09:19 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-              3543      dTLB-load-misses                                            
+              3174      dTLB-load-misses                                            
 
-       0.051092090 seconds time elapsed
+       0.051084117 seconds time elapsed
 
-       0.001064000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.001048000 seconds sys
 
 
 
@@ -809,20 +809,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: dTLB-stores ===
-# started on Sat Sep 12 14:33:52 2026
+# started on Sat Sep 12 14:09:19 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-             92359      dTLB-stores                                                 
+             94083      dTLB-stores                                                 
 
-       0.051109320 seconds time elapsed
+       0.056566970 seconds time elapsed
 
-       0.001053000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.006492000 seconds sys
 
 
 
@@ -833,20 +833,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: dTLB-store-misses ===
-# started on Sat Sep 12 14:33:52 2026
+# started on Sat Sep 12 14:09:19 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-               523      dTLB-store-misses                                           
+               478      dTLB-store-misses                                           
 
-       0.051123699 seconds time elapsed
+       0.051120830 seconds time elapsed
 
-       0.000000000 seconds user
-       0.001100000 seconds sys
+       0.001069000 seconds user
+       0.000000000 seconds sys
 
 
 
@@ -857,20 +857,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: iTLB-loads ===
-# started on Sat Sep 12 14:33:52 2026
+# started on Sat Sep 12 14:09:19 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-              1108      iTLB-loads                                                  
+              1167      iTLB-loads                                                  
 
-       0.056761841 seconds time elapsed
+       0.051207864 seconds time elapsed
 
        0.000000000 seconds user
-       0.006676000 seconds sys
+       0.001145000 seconds sys
 
 
 
@@ -881,19 +881,19 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: iTLB-load-misses ===
-# started on Sat Sep 12 14:33:52 2026
+# started on Sat Sep 12 14:09:19 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-              3722      iTLB-load-misses                                            
+              3981      iTLB-load-misses                                            
 
-       0.051109779 seconds time elapsed
+       0.051052055 seconds time elapsed
 
-       0.001075000 seconds user
+       0.001008000 seconds user
        0.000000000 seconds sys
 
 
@@ -905,19 +905,19 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: branch-loads ===
-# started on Sat Sep 12 14:33:53 2026
+# started on Sat Sep 12 14:09:20 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-            115702      branch-loads                                                
+            116347      branch-loads                                                
 
-       0.051060760 seconds time elapsed
+       0.051142882 seconds time elapsed
 
-       0.001024000 seconds user
+       0.001095000 seconds user
        0.000000000 seconds sys
 
 
@@ -929,20 +929,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: branch-load-misses ===
-# started on Sat Sep 12 14:33:53 2026
+# started on Sat Sep 12 14:09:20 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
-              5071      branch-load-misses                                          
+              4968      branch-load-misses                                          
 
-       0.051170794 seconds time elapsed
+       0.051133025 seconds time elapsed
 
-       0.001120000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.001086000 seconds sys
 
 
 
@@ -953,20 +953,20 @@ Check /proc/kallsyms permission or run as root.
 perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
 Couldn't synthesize bpf events.
 [ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/.perf-probe.jRFCQf/record.data ]
+[ perf record: Captured and wrote 0.002 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/.perf-probe.O3Iw9v/record.data ]
 
 === stat: node-loads ===
-# started on Sat Sep 12 14:33:53 2026
+# started on Sat Sep 12 14:09:20 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      node-loads                                                  
 
-       0.050948160 seconds time elapsed
+       0.051002857 seconds time elapsed
 
-       0.000903000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.000967000 seconds sys
 
 
 
@@ -977,17 +977,17 @@ The sys_perf_event_open() syscall returned with 6 (No such device or address) fo
 
 
 === stat: node-load-misses ===
-# started on Sat Sep 12 14:33:53 2026
+# started on Sat Sep 12 14:09:20 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      node-load-misses                                            
 
-       0.050979393 seconds time elapsed
+       0.050944717 seconds time elapsed
 
-       0.000000000 seconds user
-       0.000941000 seconds sys
+       0.000906000 seconds user
+       0.000000000 seconds sys
 
 
 
@@ -998,17 +998,17 @@ The sys_perf_event_open() syscall returned with 6 (No such device or address) fo
 
 
 === stat: node-stores ===
-# started on Sat Sep 12 14:33:53 2026
+# started on Sat Sep 12 14:09:20 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      node-stores                                                 
 
-       0.050965069 seconds time elapsed
+       0.051036610 seconds time elapsed
 
-       0.000933000 seconds user
-       0.000000000 seconds sys
+       0.000000000 seconds user
+       0.000971000 seconds sys
 
 
 
@@ -1019,17 +1019,17 @@ The sys_perf_event_open() syscall returned with 6 (No such device or address) fo
 
 
 === stat: node-store-misses ===
-# started on Sat Sep 12 14:33:53 2026
+# started on Sat Sep 12 14:09:20 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
    <not supported>      node-store-misses                                           
 
-       0.051000684 seconds time elapsed
+       0.050972683 seconds time elapsed
 
        0.000000000 seconds user
-       0.000945000 seconds sys
+       0.000932000 seconds sys
 
 
 
@@ -1040,14 +1040,14 @@ The sys_perf_event_open() syscall returned with 6 (No such device or address) fo
 
 
 === stat: duration_time ===
-# started on Sat Sep 12 14:33:53 2026
+# started on Sat Sep 12 14:09:20 2026
 
 
  Performance counter stats for 'system wide':
 
-          50964484 ns   duration_time                                               
+          50980281 ns   duration_time                                               
 
-       0.050964484 seconds time elapsed
+       0.050980281 seconds time elapsed
 
 
 === stat: user_time ===
@@ -1069,31 +1069,31 @@ Run 'perf list' for a list of valid events
     -e, --event <event>   event selector. use 'perf list' to list available events
 
 === stat: dummy ===
-# started on Sat Sep 12 14:33:53 2026
+# started on Sat Sep 12 14:09:21 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
                  0      dummy                                                       
 
-       0.050975503 seconds time elapsed
+       0.050879104 seconds time elapsed
 
-       0.000000000 seconds user
-       0.000940000 seconds sys
+       0.000847000 seconds user
+       0.000000000 seconds sys
 
 
 
 === stat: bpf-output ===
-# started on Sat Sep 12 14:33:54 2026
+# started on Sat Sep 12 14:09:21 2026
 
 
  Performance counter stats for 'sleep 0.05':
 
                  0      bpf-output                                                  
 
-       0.050963046 seconds time elapsed
+       0.050950380 seconds time elapsed
 
-       0.000913000 seconds user
+       0.000930000 seconds user
        0.000000000 seconds sys
 
 

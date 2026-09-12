@@ -1,43 +1,43 @@
-# started on Sat Sep 12 13:06:35 2026
+# started on Sat Sep 12 14:34:56 2026
 
 
- Performance counter stats for '/root/0460882-Project-HwiSwiCoDesign/.venv312/bin/python -m pyperformance run --manifest /root/0460882-Project-HwiSwiCoDesign/suites/original/MANIFEST --benchmarks pyflate --fast':
+ Performance counter stats for '/root/0460882-Project-HwiSwiCoDesign/.venv312/bin/python -m pyperformance run --manifest /root/0460882-Project-HwiSwiCoDesign/suites/original/MANIFEST --benchmarks pyflate':
 
-          26964.10 msec cpu-clock                 #    0.987 CPUs utilized          
-          26964.43 msec task-clock                #    0.987 CPUs utilized          
-       60666432860      cycles                    #    2.250 GHz                      (25.40%)
-      156350059663      instructions              #    2.58  insn per cycle           (30.42%)
-       26374887881      branch-instructions       #  978.142 M/sec                    (30.30%)
-         163049014      branch-misses             #    0.62% of all branches          (30.32%)
-        2142192337      bus-cycles                #   79.446 M/sec                    (30.25%)
-         242383664      cache-references          #    8.989 M/sec                    (30.31%)
-          17729471      cache-misses              #    7.315 % of all cache refs      (20.27%)
-       61078903295      ref-cycles                #    2.265 G/sec                    (25.59%)
-            359423      page-faults               #   13.330 K/sec                  
-            359423      minor-faults              #   13.330 K/sec                  
+          63203.52 msec cpu-clock                 #    0.992 CPUs utilized          
+          63204.07 msec task-clock                #    0.992 CPUs utilized          
+      143192392838      cycles                    #    2.266 GHz                      (25.39%)
+      382299279606      instructions              #    2.67  insn per cycle           (30.41%)
+       63897708547      branch-instructions       #    1.011 G/sec                    (30.34%)
+         331516522      branch-misses             #    0.52% of all branches          (30.32%)
+        5043742163      bus-cycles                #   79.801 M/sec                    (30.33%)
+         451590992      cache-references          #    7.145 M/sec                    (30.32%)
+          38157669      cache-misses              #    8.450 % of all cache refs      (20.25%)
+      145136115660      ref-cycles                #    2.296 G/sec                    (25.36%)
+            695238      page-faults               #   11.000 K/sec                  
+            695238      minor-faults              #   11.000 K/sec                  
                  0      major-faults              #    0.000 /sec                   
-              1775      context-switches          #   65.828 /sec                   
+              2593      context-switches          #   41.026 /sec                   
                  0      cpu-migrations            #    0.000 /sec                   
                  0      alignment-faults          #    0.000 /sec                   
                  0      emulation-faults          #    0.000 /sec                   
-              1316      cgroup-switches           #   48.805 /sec                   
-       32619674847      L1-dcache-loads           #    1.210 G/sec                    (25.51%)
-         736311214      L1-dcache-load-misses     #    2.26% of all L1-dcache accesses  (25.51%)
-        6906373873      L1-dcache-stores          #  256.131 M/sec                    (25.50%)
-          39439719      L1-icache-load-misses                                         (25.55%)
-       32708670158      dTLB-loads                #    1.213 G/sec                    (20.47%)
-          17531946      dTLB-load-misses          #    0.05% of all dTLB cache accesses  (20.48%)
-       14430898485      dTLB-stores               #  535.186 M/sec                    (20.56%)
-           7395690      dTLB-store-misses         #  274.277 K/sec                    (20.55%)
-           4311007      iTLB-loads                #  159.879 K/sec                    (20.51%)
-           7626141      iTLB-load-misses          #  176.90% of all iTLB cache accesses  (20.52%)
-       30629238291      branch-loads              #    1.136 G/sec                    (20.52%)
-         134047175      branch-load-misses        #    4.971 M/sec                    (20.40%)
-       27314204295 ns   duration_time             #    1.013 G/sec                  
+              1840      cgroup-switches           #   29.112 /sec                   
+       83038298909      L1-dcache-loads           #    1.314 G/sec                    (25.30%)
+        1753570189      L1-dcache-load-misses     #    2.11% of all L1-dcache accesses  (25.30%)
+       16183583191      L1-dcache-stores          #  256.054 M/sec                    (25.30%)
+          54391698      L1-icache-load-misses                                         (25.34%)
+       85220399502      dTLB-loads                #    1.348 G/sec                    (20.30%)
+          30336772      dTLB-load-misses          #    0.04% of all dTLB cache accesses  (20.33%)
+       37724074334      dTLB-stores               #  596.864 M/sec                    (20.30%)
+          17138909      dTLB-store-misses         #  271.169 K/sec                    (20.27%)
+          14568546      iTLB-loads                #  230.501 K/sec                    (20.27%)
+          12190068      iTLB-load-misses          #   83.67% of all iTLB cache accesses  (20.29%)
+       75234572896      branch-loads              #    1.190 G/sec                    (20.35%)
+         272922403      branch-load-misses        #    4.318 M/sec                    (20.35%)
+       63714640151 ns   duration_time             #    1.008 G/sec                  
 
-      27.314204295 seconds time elapsed
+      63.714640151 seconds time elapsed
 
-      26.037057000 seconds user
-       0.998480000 seconds sys
+      61.550087000 seconds user
+       1.756380000 seconds sys
 
 

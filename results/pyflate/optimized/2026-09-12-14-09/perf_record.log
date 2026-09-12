@@ -9,5 +9,5 @@ Couldn't synthesize bpf events.
 
 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
 [notice] To update, run: /root/0460882-Project-HwiSwiCoDesign/venv/cpython3.12-e191ebd6eff3-compat-31b33d68c68a/bin/python -m pip install --upgrade pip
-[ perf record: Woken up 134 times to write data ]
-[ perf record: Captured and wrote 33.417 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/original/perf.data (41056 samples) ]
+[ perf record: Woken up 90 times to write data ]
+[ perf record: Captured and wrote 22.313 MB /root/0460882-Project-HwiSwiCoDesign/results/pyflate/optimized/2026-09-12-14-09/perf.data (27200 samples) ]
