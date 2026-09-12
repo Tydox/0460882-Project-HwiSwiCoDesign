@@ -8,11 +8,11 @@ sudo apt-get update
 sudo apt-get install -y \
   git \
   perl \
-  python3 \
-  python3-dbg \
-  python3-dev \
+  python3.12 \
+  python3.12-dbg \
+  python3.12-dev \
+  python3.12-venv \
   python3-pip \
-  python3-venv \
   linux-tools-common \
   linux-tools-generic
 
@@ -28,25 +28,41 @@ if [[ ! -d "$VENDOR_DIR/FlameGraph/.git" ]]; then
     "$VENDOR_DIR/FlameGraph"
 fi
 
-python3 -m venv "$PROJECT_DIR/.venv"
-"$PROJECT_DIR/.venv/bin/python" -m pip install --upgrade pip
-"$PROJECT_DIR/.venv/bin/python" -m pip install -e "$VENDOR_DIR/pyperformance"
-"$PROJECT_DIR/.venv/bin/python" -m pip install 'numpy>=1.24,<3'
+NORMAL_ENV="$PROJECT_DIR/.venv312"
+DEBUG_ENV="$PROJECT_DIR/.venv312-dbg"
 
-if python3-dbg -m venv "$PROJECT_DIR/.venv-dbg"; then
-  "$PROJECT_DIR/.venv-dbg/bin/python" -m pip install --upgrade pip
-  "$PROJECT_DIR/.venv-dbg/bin/python" -m pip install -e "$VENDOR_DIR/pyperformance"
-  "$PROJECT_DIR/.venv-dbg/bin/python" -m pip install 'numpy>=1.24,<3'
+python3.12 -m venv "$NORMAL_ENV"
+"$NORMAL_ENV/bin/python" -m pip install --upgrade pip
+"$NORMAL_ENV/bin/python" -m pip install -e "$VENDOR_DIR/pyperformance"
+"$NORMAL_ENV/bin/python" -m pip install 'numpy>=1.24,<3'
+
+if python3.12-dbg -m venv "$DEBUG_ENV"; then
+  "$DEBUG_ENV/bin/python" -m pip install --upgrade pip
+  "$DEBUG_ENV/bin/python" -m pip install -e "$VENDOR_DIR/pyperformance"
+  "$DEBUG_ENV/bin/python" -m pip install 'numpy>=1.24,<3'
 else
   printf '%s\n' \
-    'Could not create the debug-Python virtual environment.' \
-    'Timing will work, but profiling needs python3-dbg with venv support.' >&2
+    'Could not create the Python 3.12 debug virtual environment.' \
+    'Profiling needs python3.12-dbg with venv support.' >&2
   exit 1
 fi
 
-"$PROJECT_DIR/.venv/bin/python" -m pyperformance --help >/dev/null
-"$PROJECT_DIR/.venv-dbg/bin/python" -m pyperformance --help >/dev/null
+"$NORMAL_ENV/bin/python" -c \
+  'import sys; assert sys.version_info[:2] == (3, 12), sys.version'
+"$DEBUG_ENV/bin/python" -c '
+import sys
+import sysconfig
+assert sys.version_info[:2] == (3, 12), sys.version
+assert sysconfig.get_config_var("Py_DEBUG") == 1
+sys.activate_stack_trampoline("perf")
+sys.deactivate_stack_trampoline()
+'
+"$NORMAL_ENV/bin/python" -m pyperformance --help >/dev/null
+"$DEBUG_ENV/bin/python" -m pyperformance --help >/dev/null
 perf --version
 
-printf '%s\n' 'Setup complete.'
+printf '%s\n' \
+  'Setup complete.' \
+  "Normal Python: $NORMAL_ENV/bin/python" \
+  "Debug Python:  $DEBUG_ENV/bin/python"
 

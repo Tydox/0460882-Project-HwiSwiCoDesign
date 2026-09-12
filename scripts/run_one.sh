@@ -73,8 +73,8 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MANIFEST="$PROJECT_DIR/suites/$IMPLEMENTATION/MANIFEST"
 SOURCE="$PROJECT_DIR/suites/$IMPLEMENTATION/bm_$BENCHMARK/run_benchmark.py"
 RESULT_PARENT="$PROJECT_DIR/results/$BENCHMARK/$IMPLEMENTATION"
-PYTHON="$PROJECT_DIR/.venv/bin/python"
-DEBUG_PYTHON="$PROJECT_DIR/.venv-dbg/bin/python"
+PYTHON="$PROJECT_DIR/.venv312/bin/python"
+DEBUG_PYTHON="$PROJECT_DIR/.venv312-dbg/bin/python"
 FLAMEGRAPH_DIR="$PROJECT_DIR/vendor/FlameGraph"
 
 # pyperformance stores its managed benchmark environments relative to the
@@ -175,7 +175,8 @@ STAT_EVENTS=()
 RECORD_EVENTS=()
 PROFILE_EVENT=cpu-clock
 PROFILE_FREQUENCY=199
-DWARF_STACK_SIZE=4096
+PROFILE_CALL_GRAPH=fp
+PERF_SCRIPT_MAX_STACK=64
 PROBE_DIR="$(mktemp -d "$RESULT_DIR/.perf-probe.XXXXXX")"
 trap 'rm -f "$PROBE_DIR/stat.txt" "$PROBE_DIR/record.data" "$PROBE_DIR/record.data.old"; rmdir "$PROBE_DIR"' EXIT
 printf 'event\tstat\trecord\n' > "$PERF_EVENTS"
@@ -209,7 +210,7 @@ for event in "${COUNTER_CANDIDATES[@]}"; do
       printf '\n=== record: %s ===\n' "$event" >> "$PERF_PROBE_LOG"
       record_status=unavailable
       if sudo perf record -F "$PROFILE_FREQUENCY" --no-bpf-event -e "$event" \
-          --call-graph "dwarf,$DWARF_STACK_SIZE" \
+          --call-graph "$PROFILE_CALL_GRAPH" \
           --output "$PROBE_DIR/record.data" -- sleep 0.05 \
           >> "$PERF_PROBE_LOG" 2>&1; then
         record_status=enabled
@@ -242,11 +243,13 @@ fi
 
 printf 'Profiling %s (%s, %s mode) with debug Python...\n' "$BENCHMARK" "$IMPLEMENTATION" "$RUN_MODE"
 # Use one CPU-time sampling event so the report and flame graph have a clear,
-# consistent meaning. DWARF unwinding avoids bogus user-space call chains from
-# optimized native libraries that omit frame pointers. Run perf as root so
-# kernel mappings and symbols can be collected too.
-if ! sudo perf record -F "$PROFILE_FREQUENCY" --no-bpf-event -e "$PROFILE_EVENT" \
-    --call-graph "dwarf,$DWARF_STACK_SIZE" --output "$PERF_DATA" -- \
+# consistent meaning. Python 3.12's perf trampolines expose Python function
+# names and are inherited by pyperf workers through PYTHONPERFSUPPORT. Frame
+# pointers keep recording compact and stack processing fast. Run perf as root
+# so kernel mappings and symbols can be collected when the kernel exposes them.
+if ! sudo env PYTHONPERFSUPPORT=1 \
+    perf record -F "$PROFILE_FREQUENCY" --no-bpf-event -e "$PROFILE_EVENT" \
+    --call-graph "$PROFILE_CALL_GRAPH" --output "$PERF_DATA" -- \
     "$DEBUG_PYTHON" "${WORKLOAD[@]}" 2> "$PERF_RECORD_LOG"; then
   cat "$PERF_RECORD_LOG" >&2
   exit 1
@@ -262,7 +265,8 @@ if ! grep -q '%' "$PERF_REPORT"; then
   exit 1
 fi
 printf 'Exporting and collapsing perf stacks...\n'
-sudo perf script -F -period --input "$PERF_DATA" > "$PERF_SCRIPT"
+sudo perf script -F -period --max-stack "$PERF_SCRIPT_MAX_STACK" \
+  --input "$PERF_DATA" > "$PERF_SCRIPT"
 # Omitting perf's period field makes every folded-stack weight one actual
 # sample. The compact folded file is directly importable by speedscope.
 "$FLAMEGRAPH_DIR/stackcollapse-perf.pl" --event-filter=cpu-clock "$PERF_SCRIPT" > "$FOLDED"
@@ -298,8 +302,10 @@ fi
   printf 'perf_record_events=%s\n' "$PROFILE_EVENT"
   printf 'perf_record_available_events=%s\n' "$RECORD_EVENT_LIST"
   printf 'perf_record_frequency=%s\n' "$PROFILE_FREQUENCY"
-  printf 'perf_record_call_graph=dwarf,%s\n' "$DWARF_STACK_SIZE"
+  printf 'perf_record_call_graph=%s\n' "$PROFILE_CALL_GRAPH"
+  printf 'perf_script_max_stack=%s\n' "$PERF_SCRIPT_MAX_STACK"
   printf '%s\n' \
+    'python_perf_support=PYTHONPERFSUPPORT=1' \
     'perf_record_kernel_inclusive=true' \
     'flamegraph_event=cpu-clock' \
     'flamegraph_weight=sample_count' \
