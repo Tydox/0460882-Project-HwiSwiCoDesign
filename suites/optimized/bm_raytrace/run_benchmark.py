@@ -153,6 +153,8 @@ class Sphere(object):#this class represents a sphere in 3D space. It has a cente
         centre.mustBePoint()
         self.centre = centre
         self.radius = radius
+        # Sphere radii stay constant throughout this benchmark's scene.
+        self.radiusSquared = radius * radius
 
     def __repr__(self):
         return 'Sphere(%s,%s)' % (repr(self.centre), self.radius)
@@ -175,7 +177,7 @@ class Sphere(object):#this class represents a sphere in 3D space. It has a cente
         # Keep the dot products' original left-to-right arithmetic order.
         v = (cpx * direction.x) + (cpy * direction.y) + (cpz * direction.z)
         cpSquared = (cpx * cpx) + (cpy * cpy) + (cpz * cpz)
-        discriminant = (self.radius * self.radius) - (cpSquared - v * v)
+        discriminant = self.radiusSquared - (cpSquared - v * v)
         if discriminant < 0:
             return None
         else:
@@ -300,11 +302,13 @@ class Scene(object):
         vpRight = eye.vector.cross(Vector.UP).normalized()
         vpUp = vpRight.cross(eye.vector).normalized()
 
-        xcomponents = [vpRight.scale(x * pixelWidth - halfWidth) for x in range(canvas.width)]
+        # Cache the original first addition, eye direction + horizontal offset.
+        columnDirections = [eye.vector + vpRight.scale(x * pixelWidth - halfWidth)
+                            for x in range(canvas.width)]
         for y in range(canvas.height):
             ycomp = vpUp.scale(y * pixelHeight - halfHeight)
-            for x, xcomp in enumerate(xcomponents):
-                ray = Ray(eye.point, eye.vector + xcomp + ycomp)
+            for x, columnDirection in enumerate(columnDirections):
+                ray = Ray(eye.point, columnDirection + ycomp)
                 colour = self.rayColour(ray)
                 canvas.plot(x, y, *colour)
 
