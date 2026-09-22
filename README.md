@@ -1,4 +1,15 @@
 # 0460882-Project-HwiSwiCoDesign
+Directory links incase confused:
+
+1. Original Raytrace code folder: https://github.com/Tydox/0460882-Project-HwiSwiCoDesign/tree/main/suites/original/bm_raytrace
+
+2. Optimized Raytrace code folder: https://github.com/Tydox/0460882-Project-HwiSwiCoDesign/tree/main/suites/original/bm_raytrace
+3. Original Plyflate: https://github.com/Tydox/0460882-Project-HwiSwiCoDesign/tree/main/suites/original/bm_pyflate
+4. Optimized Pyflate: https://github.com/Tydox/0460882-Project-HwiSwiCoDesign/tree/main/suites/optimized/bm_pyflate
+
+5. Results RayTrace folder: https://github.com/Tydox/0460882-Project-HwiSwiCoDesign/tree/main/results/raytrace
+
+6. Results Pyflate Folder: https://github.com/Tydox/0460882-Project-HwiSwiCoDesign/tree/main/results/pyflate
 
 ## 0. Pull this git
 Copy this entire folder to the QEMU server, the scripts are in the scripts folder.
